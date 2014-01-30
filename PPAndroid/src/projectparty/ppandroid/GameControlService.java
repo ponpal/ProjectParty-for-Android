@@ -1,10 +1,10 @@
 package projectparty.ppandroid;
 
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
+import java.util.UUID;
 
 import android.app.Service;
 import android.content.Context;
@@ -22,47 +22,20 @@ import android.os.Message;
 import android.util.Log;
 
 public class GameControlService extends Service implements SensorEventListener {
-	private static final int UTF8_DATA = 0;
-	private static final int ACCELEROMETER_DATA = 1;
+	private static final int INIT_MESSAGE = 0;
+	private static final int UTF8_DATA = 1;
+	private static final int ACCELEROMETER_DATA = 2;
 
 	private Looper looper;
 	private ServiceHandler serviceHandler;
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
+
 	private Socket socket;
 	private DataOutputStream out;
+	private DataInputStream in;
 
-	private final class ServiceHandler extends Handler {
-		public ServiceHandler(Looper looper) {
-			super(looper);
-		}
-
-		@Override
-		public void handleMessage(Message msg) {
-			synchronized (this) {
-				try {
-//					InetAddress ip = InetAddress.getByName(msg.getData().getString("ip"));
-//					Socket socket = new Socket(ip, msg.getData().getInt("port"));
-//					DataOutputStream out = new DataOutputStream(socket.getOutputStream());       
-
-					if(msg.what == ACCELEROMETER_DATA) {
-						Log.d("PPAndroid", "Trying to send sensor data!");
-
-						float[] acc = msg.getData().getFloatArray("accelerometer");
-						out.writeUTF("X: " + acc[0] + "\n" + 
-								"Y: " + acc[1] + "\n" +
-								"Z: " + acc[2] + "\n");
-					} else {
-						out.writeUTF("Hello from Android.\n");
-					}
-
-					out.flush();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+	private UUID sessionID;
 
 	@Override
 	public void onCreate() {
@@ -77,8 +50,6 @@ public class GameControlService extends Service implements SensorEventListener {
 		// Get the HandlerThread's Looper and use it for our Handler
 		looper = thread.getLooper();
 		serviceHandler = new ServiceHandler(looper);
-
-		setupAccelerometer();
 	}
 
 	public void setupAccelerometer() {
@@ -92,47 +63,22 @@ public class GameControlService extends Service implements SensorEventListener {
 		// For each start request, send a message to start a job and deliver the
 		// start ID so we know which request we're stopping when we finish the job
 		Message msg = serviceHandler.obtainMessage();
-		msg.what = UTF8_DATA;
-		
+		msg.what = INIT_MESSAGE;
+
 		msg.arg1 = startId;
 		msg.setData(intent.getExtras());
 
-		Runnable createSocket = new SocketCreator(msg.getData().getString("ip"),
-												  msg.getData().getInt("port"));
-		
-		new Thread(createSocket).start();
-		
 		serviceHandler.sendMessage(msg);
 		return START_STICKY;
-	}
-	
-	class SocketCreator implements Runnable {
-		private String ip;
-		private int port;
-		
-		public SocketCreator(String ip, int port) {
-			this.ip = ip;
-			this.port = port;
-		}
-		
-		@Override
-		public void run() {
-			try {
-				socket = new Socket(InetAddress.getByName(ip), port);
-				out = new DataOutputStream(socket.getOutputStream());
-			} catch (UnknownHostException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
 		try {
+			sensorManager.unregisterListener(this);
 			socket.close();
+			looper.quit();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -156,5 +102,51 @@ public class GameControlService extends Service implements SensorEventListener {
 		data.putFloatArray("accelerometer", e.values);
 		msg.setData(data);
 		serviceHandler.sendMessage(msg); 	
+	}
+
+	private final class ServiceHandler extends Handler {
+		public ServiceHandler(Looper looper) {
+			super(looper);
+		}
+
+		@Override
+		public void handleMessage(Message msg) {
+			synchronized (this) {
+				try {
+					switch(msg.what) {
+					case INIT_MESSAGE:
+						//Setup socket, in- and output streams
+						socket = new Socket(msg.getData().getString("ip"), msg.getData().getInt("port"));
+						out = new DataOutputStream(socket.getOutputStream());
+						in = new DataInputStream(socket.getInputStream());
+
+						setupAccelerometer();
+
+						//Read UUID sent from server
+						byte[] buffer = new byte[1024];
+						int read = in.read(buffer);
+						String id = new String(buffer, 0, read);
+						sessionID = UUID.fromString(id);
+						
+						Log.d("UUID: ", sessionID.toString());						
+						break;
+					case UTF8_DATA:
+						break;
+					case ACCELEROMETER_DATA:
+						float[] acc = msg.getData().getFloatArray("accelerometer");
+						
+						out.write(0);
+						
+						out.writeFloat(acc[0]);
+						out.writeFloat(acc[1]);
+						out.writeFloat(acc[2]);
+						break;
+					}
+					out.flush();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 }

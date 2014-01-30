@@ -8,7 +8,7 @@ import android.view.View;
 import android.widget.EditText;
 
 public class MainActivity extends Activity {
-	private Intent intent;
+	private Intent gcsIntent;
 	private EditText ipAddressField;
 	private EditText portField;
 	private SharedPreferences preferences;
@@ -18,7 +18,7 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		this.intent = new Intent(this, GameControlService.class);
+		this.gcsIntent = new Intent(this, GameControlService.class);
 		this.ipAddressField = (EditText) findViewById(R.id.ipAddressField);
 		this.portField = (EditText) findViewById(R.id.portField);
 
@@ -32,13 +32,13 @@ public class MainActivity extends Activity {
 		preferences.edit().putString("ip", ipAddressField.getText().toString()).commit();
 		preferences.edit().putString("port", portField.getText().toString()).commit();
 
-		intent.putExtra("ip", ipAddressField.getText().toString());
-		intent.putExtra("port", Integer.parseInt(portField.getText().toString()));
+		gcsIntent.putExtra("ip", ipAddressField.getText().toString());
+		gcsIntent.putExtra("port", Integer.parseInt(portField.getText().toString()));
 
-		startService(intent);
+		startService(gcsIntent);
 	}
 
 	public void stopService(View view) {
-		stopService(intent);
+		stopService(gcsIntent);
 	}
 }
