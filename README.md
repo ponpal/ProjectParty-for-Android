@@ -1,2 +1,0 @@
-Project-Party-for-Android
-=========================
