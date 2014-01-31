@@ -9,11 +9,11 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/stopBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/button1"
-        android:layout_toRightOf="@+id/button1"
+        android:layout_alignBottom="@+id/startBtn"
+        android:layout_toRightOf="@+id/startBtn"
         android:onClick="stopService"
         android:text="@string/stopService" />
 
@@ -44,12 +44,24 @@
         android:inputType="number" />
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/startBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/portField"
         android:layout_below="@+id/portField"
         android:onClick="startService"
         android:text="@string/startService" />
+
+    <TextSwitcher
+        android:id="@+id/textSwitcher1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/startBtn"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/startBtn"
+        android:layout_marginTop="10dp" >
+
+    </TextSwitcher>
 
 </RelativeLayout>
