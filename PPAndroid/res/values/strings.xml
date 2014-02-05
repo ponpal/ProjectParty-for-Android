@@ -13,5 +13,8 @@
     <string name="port">Port</string>
     <string name="title_activity_controller">ControllerActivity</string>
     <string name="itsWorking">It\'s working!</string>
+    <string name="placeholder">&lt;placeholder></string>
+    <string name="clear">Clear log</string>
+    <string name="refresh">Refresh server list</string>
 
 </resources>

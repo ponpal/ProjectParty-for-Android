@@ -1,5 +1,8 @@
 package projectparty.ppandroid;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,81 +10,83 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextSwitcher;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	private Intent gcsIntent;
 	private SharedPreferences preferences;
-	private BroadcastReceiver receiver = new BroadcastReceiver() {
-		
+	private List<ServerInfo> servers;
+	
+	private Button refreshButton;
+	private TextView messageView;
+	
+	private BroadcastReceiver logReceiver = new BroadcastReceiver() {
+
 		@Override
 		public void onReceive(Context context, Intent intent) {
-//			String message = intent.getStringExtra("message");
-//			textSwitcher.setText(message);
+			String current = messageView.getText().toString();
+			String message = intent.getStringExtra("message");
+
+			messageView.setText(current.length() > 0 ? messageView.getText() + "\n" + message : message);
 		}
 	};
 	
-	private EditText ipAddressField, portField;
-	private Button startButton, stopButton;
-	private TextSwitcher textSwitcher;
+	private BroadcastReceiver serverReceiver = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			ServerInfo info = (ServerInfo) intent.getSerializableExtra("server");
+			servers.add(info);
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		this.gcsIntent = new Intent(this, GameControlService.class);
+		this.gcsIntent = new Intent(this, ServerDiscoveryService.class);
 		this.preferences = getPreferences(MODE_PRIVATE);
-		
-		initGraphicalComponents();
+		this.servers = new ArrayList<ServerInfo>();
+
+		initGUIComponents();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		registerReceiver(receiver, new IntentFilter(GameControlService.NOTIFICATION));
+		registerReceiver(logReceiver, new IntentFilter(ServerDiscoveryService.LOG_MESSAGE));
+		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		stopService(gcsIntent);
+		unregisterReceiver(logReceiver);
+		unregisterReceiver(serverReceiver);
 	}
 	
 	@Override
-	  protected void onPause() {
-	    super.onPause();
-	    unregisterReceiver(receiver);
-	  }
+	protected void onDestroy() {
+		super.onDestroy();
+	}
 
-	public void startService(View view) {
-		toggleButtons(false);
-		
-		preferences.edit().putString("ip", ipAddressField.getText().toString()).commit();
-		preferences.edit().putString("port", portField.getText().toString()).commit();
-
-		gcsIntent.putExtra("ip", ipAddressField.getText().toString());
-		gcsIntent.putExtra("port", Integer.parseInt(portField.getText().toString()));
-
+	public void refreshServerList(View view) {
 		startService(gcsIntent);
 	}
+	
+	public void clearText(View view) {
+		messageView.setText("");
+	}
 
-	public void stopService(View view) {
-		toggleButtons(true);
-		stopService(gcsIntent);
-	}
-	
-	private void initGraphicalComponents() {
-		this.ipAddressField = (EditText) findViewById(R.id.ipAddressField);
-		this.portField = (EditText) findViewById(R.id.portField);
-		this.startButton = (Button) findViewById(R.id.startBtn);
-		this.stopButton = (Button) findViewById(R.id.stopBtn);
-		
-		ipAddressField.setText(preferences.getString("ip", ""));
-		portField.setText(preferences.getString("port", ""));
-		
-		toggleButtons(true);
-	}
-	
-	public void toggleButtons(boolean enabled) {
-		startButton.setEnabled(enabled);
-		stopButton.setEnabled(!enabled);
+	private void initGUIComponents() {
+		this.refreshButton = (Button) findViewById(R.id.startBtn);
+		this.messageView = (TextView) findViewById(R.id.textView1);
+		messageView.setText("");
+		messageView.setMovementMethod(new ScrollingMovementMethod());
 	}
 }

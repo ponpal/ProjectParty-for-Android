@@ -9,59 +9,47 @@
     tools:context=".MainActivity" >
 
     <Button
-        android:id="@+id/stopBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/startBtn"
-        android:layout_toRightOf="@+id/startBtn"
-        android:onClick="stopService"
-        android:text="@string/stopService" />
-
-    <EditText
-        android:id="@+id/ipAddressField"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:ems="10"
-        android:hint="@string/ipAddress"
-        android:inputType="phone"
-        android:digits="0123456789." >
-
-        <requestFocus />
-    </EditText>
-
-    <EditText
-        android:id="@+id/portField"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/ipAddressField"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/ipAddressField"
-        android:ems="10"
-        android:hint="@string/port"
-        android:inputType="number" />
-
-    <Button
         android:id="@+id/startBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/portField"
-        android:layout_below="@+id/portField"
-        android:onClick="startService"
-        android:text="@string/startService" />
+        android:onClick="refreshServerList"
+        android:text="@string/refresh" />
 
-    <TextSwitcher
-        android:id="@+id/textSwitcher1"
+    <Button
+        android:id="@+id/button1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/startBtn"
+        android:layout_alignBaseline="@+id/startBtn"
+        android:layout_alignBottom="@+id/startBtn"
+        android:layout_toRightOf="@+id/startBtn"
+        android:onClick="clearText"
+        android:text="@string/clear" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_below="@+id/startBtn"
-        android:layout_marginTop="10dp" >
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal" >
 
-    </TextSwitcher>
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="@string/placeholder"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        <ListView
+            android:id="@+id/listView1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" >
+        </ListView>
+
+    </LinearLayout>
 
 </RelativeLayout>
