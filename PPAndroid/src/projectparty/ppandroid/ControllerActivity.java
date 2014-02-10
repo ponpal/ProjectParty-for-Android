@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.view.WindowManager;
 
 public class ControllerActivity extends Activity {
-	private ServerInfo server;
 	private Intent csIntent;
 	
 	private BroadcastReceiver errorReceiver = new BroadcastReceiver() {
@@ -29,10 +28,13 @@ public class ControllerActivity extends Activity {
 		
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
-		this.server = (ServerInfo) getIntent().getSerializableExtra("server");
+		ServerInfo server = (ServerInfo) getIntent().getSerializableExtra("server");
+		String name = getIntent().getStringExtra("playerName");
+		
 		this.csIntent = new Intent(this, ControllerService.class);
 		csIntent.putExtra("server", server);
-
+		csIntent.putExtra("name", name);
+		
 		startService(csIntent);
 	}
 	

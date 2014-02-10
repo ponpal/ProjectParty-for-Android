@@ -116,7 +116,7 @@ public class ServerDiscoveryService extends Service {
 				byte[] ip = new byte[4];
 				dis.read(ip, 0, 4);
 
-				short port = dis.readShort();
+				int port = dis.readUnsignedShort();
 
 				int serverNameLength = dis.readInt();
 				byte[] serverName = new byte[256];

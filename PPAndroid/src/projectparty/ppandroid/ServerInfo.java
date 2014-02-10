@@ -5,10 +5,10 @@ import java.io.Serializable;
 @SuppressWarnings("serial")
 public class ServerInfo implements Serializable {
 	private byte[] ip;
-	private short port;
+	private int port;
 	private String name;
 	
-	public ServerInfo(byte[] ip, short port, String name) {
+	public ServerInfo(byte[] ip, int port, String name) {
 		this.setIP(ip);
 		this.setPort(port);
 		this.setName(name);
@@ -22,12 +22,12 @@ public class ServerInfo implements Serializable {
 		this.ip = ip;
 	}
 
-	public short getPort() {
+	public int getPort() {
 		return port;
 	}
 
-	public void setPort(short port) {
-		this.port = port;
+	public void setPort(int port2) {
+		this.port = port2;
 	}
 	
 	public String getName() {

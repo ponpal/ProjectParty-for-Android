@@ -22,6 +22,7 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 public class ControllerService extends Service implements SensorEventListener {
 	public static final String ERROR_MESSAGE = "projectparty.ppandroid.error";
@@ -39,6 +40,8 @@ public class ControllerService extends Service implements SensorEventListener {
 	private Looper looper;
 	private ServiceHandler serviceHandler;
 	private Timer timer;
+	
+	private String playerName;
 
 	@Override
 	public void onCreate() {
@@ -55,6 +58,7 @@ public class ControllerService extends Service implements SensorEventListener {
 		Message msg = serviceHandler.obtainMessage();
 
 		ServerInfo info = (ServerInfo) intent.getSerializableExtra("server");
+		this.playerName = intent.getStringExtra("name");
 		msg.obj = info;
 		serviceHandler.sendMessage(msg);
 		return START_STICKY;
@@ -88,7 +92,51 @@ public class ControllerService extends Service implements SensorEventListener {
 	public void onSensorChanged(SensorEvent e) {
 		accelerometerData = e.values;
 	}
+	
+	private final class ServiceHandler extends Handler {
+		public ServiceHandler(Looper looper) {
+			super(looper);
+		}
+		
+		@Override
+		public void handleMessage(Message msg) {
+			synchronized (this) {
+				try {
+					connect((ServerInfo) msg.obj);	
+					sendName();
+					setupAccelerometer();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		public synchronized void connect(ServerInfo server) throws UnknownHostException, IOException {
+			socket = new Socket(InetAddress.getByAddress(server.getIP()), server.getPort());
+			out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream(), 8192));
+			in = new DataInputStream(socket.getInputStream());
 
+			sessionID = in.readLong();
+
+			out.writeLong(sessionID);
+			out.flush();
+		}
+	}
+	
+	public void sendName() {
+		try {
+			byte[] byteName = playerName.getBytes("UTF-8");
+			out.writeShort(byteName.length + 1);
+			Log.d("LENGTH:", "" + byteName.length);
+			out.write(0);
+			out.write(byteName);
+			out.flush();
+		} catch (Exception e) {
+			e.printStackTrace();
+			notifyActivity();
+		}
+	}
+	
 	public void setupAccelerometer() {
 		this.sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		this.accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -112,36 +160,8 @@ public class ControllerService extends Service implements SensorEventListener {
 			out.writeFloat(accelerometerData[2]);
 			out.flush();
 		} catch (Exception e) {
+			e.printStackTrace();
 			notifyActivity();
-		}
-	}
-	
-	private final class ServiceHandler extends Handler {
-		public ServiceHandler(Looper looper) {
-			super(looper);
-		}
-		
-		@Override
-		public void handleMessage(Message msg) {
-			synchronized (this) {
-				try {
-					connect((ServerInfo) msg.obj);	
-					setupAccelerometer();
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		}
-		
-		public synchronized void connect(ServerInfo server) throws UnknownHostException, IOException {
-			socket = new Socket(InetAddress.getByAddress(server.getIP()), server.getPort());
-			out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream(), 8192));
-			in = new DataInputStream(socket.getInputStream());
-
-			sessionID = in.readLong();
-
-			out.writeLong(sessionID);
-			out.flush();
 		}
 	}
 	
