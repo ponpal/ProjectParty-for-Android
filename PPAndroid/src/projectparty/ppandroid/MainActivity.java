@@ -8,38 +8,42 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
-import android.widget.Button;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
-	private Intent gcsIntent;
-	private SharedPreferences preferences;
-	private List<ServerInfo> servers;
+	private Intent sdsIntent;
+	public static List<ServerInfo> serverList;
 	
-	private Button refreshButton;
-	private TextView messageView;
+	private ListView serverListView;
+	private TextView logView;
+	private EditText aliasField;
+	private String playerName;
+	
+	private ArrayAdapter<ServerInfo> adapter;
 	
 	private BroadcastReceiver logReceiver = new BroadcastReceiver() {
-
+		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			String current = messageView.getText().toString();
+			String current = logView.getText().toString();
 			String message = intent.getStringExtra("message");
 
-			messageView.setText(current.length() > 0 ? messageView.getText() + "\n" + message : message);
+			logView.setText(current.length() > 0 ? logView.getText() + "\n" + message : message);
 		}
 	};
-	
 	private BroadcastReceiver serverReceiver = new BroadcastReceiver() {
 		
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			ServerInfo info = (ServerInfo) intent.getSerializableExtra("server");
-			servers.add(info);
+			adapter.notifyDataSetChanged();
 		}
 	};
 
@@ -48,11 +52,11 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		this.gcsIntent = new Intent(this, ServerDiscoveryService.class);
-		this.preferences = getPreferences(MODE_PRIVATE);
-		this.servers = new ArrayList<ServerInfo>();
-
+		serverList = new ArrayList<ServerInfo>();
+		
+		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
 		initGUIComponents();
+		startService(sdsIntent);
 	}
 
 	@Override
@@ -65,7 +69,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		stopService(gcsIntent);
+		stopService(sdsIntent);
 		unregisterReceiver(logReceiver);
 		unregisterReceiver(serverReceiver);
 	}
@@ -76,17 +80,39 @@ public class MainActivity extends Activity {
 	}
 
 	public void refreshServerList(View view) {
-		startService(gcsIntent);
+		startService(sdsIntent);
 	}
 	
-	public void clearText(View view) {
-		messageView.setText("");
+	public void clearLog(View view) {
+		logView.setText("");
 	}
 
 	private void initGUIComponents() {
-		this.refreshButton = (Button) findViewById(R.id.startBtn);
-		this.messageView = (TextView) findViewById(R.id.textView1);
-		messageView.setText("");
-		messageView.setMovementMethod(new ScrollingMovementMethod());
+		this.serverListView = (ListView) findViewById(R.id.serverListView);
+		this.logView = (TextView) findViewById(R.id.logView);
+		this.aliasField = (EditText) findViewById(R.id.aliasField);
+		
+		this.adapter = new ArrayAdapter<ServerInfo>(this, android.R.layout.simple_list_item_1, serverList);
+		
+		serverListView.setAdapter(adapter);
+		serverListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+					long arg3) {
+				ServerInfo info = serverList.get(arg2);
+				playerName = (aliasField.getText().length() > 0) ? aliasField.getText().toString() : "Guest";
+				startControllerActivity(info, playerName);
+			}
+		});
+		
+		logView.setText("");
+		logView.setMovementMethod(new ScrollingMovementMethod());
+	}
+	
+	public void startControllerActivity(ServerInfo server, String playerName) {
+		Intent intent = new Intent(this, ControllerActivity.class);
+		intent.putExtra("server", server);
+		intent.putExtra("playerName", playerName);
+		startActivity(intent);
 	}
 }

@@ -16,10 +16,10 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme" android:allowTaskReparenting="false">
         <activity
             android:name="projectparty.ppandroid.MainActivity"
-            android:label="@string/app_name" android:screenOrientation="landscape" android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen">
+            android:label="@string/app_name" android:screenOrientation="portrait" android:theme="@android:style/Theme.Light.NoTitleBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -32,8 +32,9 @@
 
         <activity
             android:name="projectparty.ppandroid.ControllerActivity"
-            android:label="@string/title_activity_controller" >
+            android:label="@string/title_activity_controller" android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" android:screenOrientation="landscape">
         </activity>
+        <service android:name="ControllerService"></service>
     </application>
 
 </manifest>

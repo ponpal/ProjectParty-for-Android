@@ -43,7 +43,7 @@ public class ServerInfo implements Serializable {
 		ServerInfo info = (ServerInfo) other;
 		
 		for(int i = 0; i < 4; i++) {
-			if(!(this.ip[i] == info.getIP()[i])) {
+			if(this.ip[i] != info.getIP()[i]) {
 				return false;
 			}
 		}
@@ -52,7 +52,12 @@ public class ServerInfo implements Serializable {
 	}
 	
 	@Override
+	public int hashCode() {
+		return port;
+	}
+	
+	@Override
 	public String toString() {
-		return "IP: " + ip.toString() + "\nPort: " + port;
+		return name;
 	}
 }
