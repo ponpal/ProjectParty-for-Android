@@ -26,7 +26,11 @@ import android.util.Log;
 
 public class ControllerService extends Service implements SensorEventListener {
 	public static final String ERROR_MESSAGE = "projectparty.ppandroid.error";
-	
+
+	private Looper looper;
+	private ServiceHandler serviceHandler;
+	private Timer timer;
+
 	private Socket socket;
 	private DataOutputStream out;
 	private DataInputStream in;
@@ -36,12 +40,9 @@ public class ControllerService extends Service implements SensorEventListener {
 	private float[] accelerometerData;
 
 	private Long sessionID;
-	
-	private Looper looper;
-	private ServiceHandler serviceHandler;
-	private Timer timer;
-	
 	private String playerName;
+
+	private boolean connected = false;
 
 	@Override
 	public void onCreate() {
@@ -52,7 +53,7 @@ public class ControllerService extends Service implements SensorEventListener {
 		looper = thread.getLooper();
 		serviceHandler = new ServiceHandler(looper);
 	}
-	
+
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Message msg = serviceHandler.obtainMessage();
@@ -63,22 +64,26 @@ public class ControllerService extends Service implements SensorEventListener {
 		serviceHandler.sendMessage(msg);
 		return START_STICKY;
 	}
-	
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		
-		timer.cancel();
-		sensorManager.unregisterListener(this);
-		try {
-			out.close();
-			socket.close();
-		} catch (Exception e) {
-			e.printStackTrace();
+
+		if(connected) {
+			timer.cancel();
+			sensorManager.unregisterListener(this);
+			try {
+				out.close();
+				socket.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
+			connected = false;
 		}
 		looper.quit();
 	}
-	
+
 	@Override
 	public IBinder onBind(Intent arg0) {
 		return null;
@@ -92,12 +97,12 @@ public class ControllerService extends Service implements SensorEventListener {
 	public void onSensorChanged(SensorEvent e) {
 		accelerometerData = e.values;
 	}
-	
+
 	private final class ServiceHandler extends Handler {
 		public ServiceHandler(Looper looper) {
 			super(looper);
 		}
-		
+
 		@Override
 		public void handleMessage(Message msg) {
 			synchronized (this) {
@@ -106,11 +111,11 @@ public class ControllerService extends Service implements SensorEventListener {
 					sendName();
 					setupAccelerometer();
 				} catch (Exception e) {
-					e.printStackTrace();
+					handleNetworkError(e);
 				}
 			}
 		}
-		
+
 		public synchronized void connect(ServerInfo server) throws UnknownHostException, IOException {
 			socket = new Socket(InetAddress.getByAddress(server.getIP()), server.getPort());
 			out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream(), 8192));
@@ -120,23 +125,20 @@ public class ControllerService extends Service implements SensorEventListener {
 
 			out.writeLong(sessionID);
 			out.flush();
+			
+			connected = true;
 		}
 	}
-	
-	public void sendName() {
-		try {
+
+	public void sendName() throws IOException {
 			byte[] byteName = playerName.getBytes("UTF-8");
 			out.writeShort(byteName.length + 1);
 			Log.d("LENGTH:", "" + byteName.length);
 			out.write(0);
 			out.write(byteName);
 			out.flush();
-		} catch (Exception e) {
-			e.printStackTrace();
-			notifyActivity();
-		}
 	}
-	
+
 	public void setupAccelerometer() {
 		this.sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		this.accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -148,7 +150,7 @@ public class ControllerService extends Service implements SensorEventListener {
 			public void run() {
 				sendAccelerometer();
 			}
-		}, 100, 16);
+		}, 100, 100);
 	}
 
 	private void sendAccelerometer() {
@@ -160,13 +162,18 @@ public class ControllerService extends Service implements SensorEventListener {
 			out.writeFloat(accelerometerData[2]);
 			out.flush();
 		} catch (Exception e) {
-			e.printStackTrace();
-			notifyActivity();
+			handleNetworkError(e);
 		}
 	}
-	
+
 	public void notifyActivity() {
 		Intent intent = new Intent(ERROR_MESSAGE);
 		sendBroadcast(intent);
+	}
+	
+	private void handleNetworkError(Exception e) {
+		e.printStackTrace();
+		stopSelf();
+		notifyActivity();
 	}
 }

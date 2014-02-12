@@ -79,8 +79,10 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 	}
 
-	public void refreshServerList(View view) {
+	public synchronized void refreshServerList(View view) {
+		serverList.clear();
 		startService(sdsIntent);
+		adapter.notifyDataSetChanged();
 	}
 	
 	public void clearLog(View view) {
