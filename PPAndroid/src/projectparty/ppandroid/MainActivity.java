@@ -8,6 +8,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
 import android.view.View;
@@ -26,6 +27,8 @@ public class MainActivity extends Activity {
 	private TextView logView;
 	private EditText aliasField;
 	private String playerName;
+	
+	private SharedPreferences preferences;
 	
 	private ArrayAdapter<ServerInfo> adapter;
 	
@@ -53,6 +56,7 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		serverList = new ArrayList<ServerInfo>();
+		preferences = getPreferences(MODE_PRIVATE);
 		
 		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
 		initGUIComponents();
@@ -94,6 +98,8 @@ public class MainActivity extends Activity {
 		this.logView = (TextView) findViewById(R.id.logView);
 		this.aliasField = (EditText) findViewById(R.id.aliasField);
 		
+		aliasField.setText(preferences.getString("name", ""));
+		
 		this.adapter = new ArrayAdapter<ServerInfo>(this, android.R.layout.simple_list_item_1, serverList);
 		
 		serverListView.setAdapter(adapter);
@@ -103,6 +109,7 @@ public class MainActivity extends Activity {
 					long arg3) {
 				ServerInfo info = serverList.get(arg2);
 				playerName = (aliasField.getText().length() > 0) ? aliasField.getText().toString() : "Guest";
+				preferences.edit().putString("name", aliasField.getText().toString()).commit();
 				startControllerActivity(info, playerName);
 			}
 		});

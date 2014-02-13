@@ -1,12 +1,11 @@
 package projectparty.ppandroid;
 
-import java.io.BufferedOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
+import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -22,7 +21,6 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 
 public class ControllerService extends Service implements SensorEventListener {
 	public static final String ERROR_MESSAGE = "projectparty.ppandroid.error";
@@ -31,9 +29,7 @@ public class ControllerService extends Service implements SensorEventListener {
 	private ServiceHandler serviceHandler;
 	private Timer timer;
 
-	private Socket socket;
-	private DataOutputStream out;
-	private DataInputStream in;
+	private SocketChannel socketChan;
 
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
@@ -73,12 +69,11 @@ public class ControllerService extends Service implements SensorEventListener {
 			timer.cancel();
 			sensorManager.unregisterListener(this);
 			try {
-				out.close();
-				socket.close();
+				socketChan.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			
+
 			connected = false;
 		}
 		looper.quit();
@@ -117,26 +112,36 @@ public class ControllerService extends Service implements SensorEventListener {
 		}
 
 		public synchronized void connect(ServerInfo server) throws UnknownHostException, IOException {
-			socket = new Socket(InetAddress.getByAddress(server.getIP()), server.getPort());
-			out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream(), 8192));
-			in = new DataInputStream(socket.getInputStream());
+			socketChan = SocketChannel.open();
+			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(server.getIP()), server.getPort()));
+			socketChan.finishConnect();
 
-			sessionID = in.readLong();
-
-			out.writeLong(sessionID);
-			out.flush();
+			ByteBuffer sessionIdBuffer = ByteBuffer.allocateDirect(8);
 			
+			if(socketChan.finishConnect()) {
+				socketChan.configureBlocking(true);
+				socketChan.read(sessionIdBuffer);
+				socketChan.configureBlocking(false);
+			}
+			
+			sessionIdBuffer.flip();
+			sessionID = sessionIdBuffer.getLong(0);
+			
+			socketChan.write(sessionIdBuffer);
 			connected = true;
 		}
 	}
 
 	public void sendName() throws IOException {
-			byte[] byteName = playerName.getBytes("UTF-8");
-			out.writeShort(byteName.length + 1);
-			Log.d("LENGTH:", "" + byteName.length);
-			out.write(0);
-			out.write(byteName);
-			out.flush();
+		byte[] byteName = playerName.getBytes("UTF-8");
+		
+		ByteBuffer nameBuffer = ByteBuffer.allocate(byteName.length + 3);
+		nameBuffer.putShort((short) (byteName.length + 1));
+		nameBuffer.put((byte) 0);
+		nameBuffer.put(byteName);
+		
+		nameBuffer.position(0);
+		socketChan.write(nameBuffer);
 	}
 
 	public void setupAccelerometer() {
@@ -149,18 +154,23 @@ public class ControllerService extends Service implements SensorEventListener {
 			@Override
 			public void run() {
 				sendAccelerometer();
+				//Send messages received on SocketChannel to native here.
 			}
 		}, 100, 100);
 	}
 
 	private void sendAccelerometer() {
 		try {
-			out.writeShort(13); //Length of message
-			out.write(1);  //Message type
-			out.writeFloat(accelerometerData[0]);
-			out.writeFloat(accelerometerData[1]);
-			out.writeFloat(accelerometerData[2]);
-			out.flush();
+			ByteBuffer accBuffer = ByteBuffer.allocate(15);
+			
+			accBuffer.putShort((short) 13);
+			accBuffer.put((byte) 1);
+			accBuffer.putFloat(accelerometerData[0]);
+			accBuffer.putFloat(accelerometerData[1]);
+			accBuffer.putFloat(accelerometerData[2]);
+			
+			accBuffer.position(0);
+			socketChan.write(accBuffer);
 		} catch (Exception e) {
 			handleNetworkError(e);
 		}
@@ -171,6 +181,11 @@ public class ControllerService extends Service implements SensorEventListener {
 		sendBroadcast(intent);
 	}
 	
+	public void notifyActivity(String message) {
+		Intent intent = new Intent(ERROR_MESSAGE);
+		sendBroadcast(intent);
+	}
+
 	private void handleNetworkError(Exception e) {
 		e.printStackTrace();
 		stopSelf();
