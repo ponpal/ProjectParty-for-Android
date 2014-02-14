@@ -33,7 +33,7 @@ public class ControllerService extends Service implements SensorEventListener {
 
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
-	private float[] accelerometerData;
+	private float[] accelerometerData = {0, 0, 0};
 
 	private Long sessionID;
 	private String playerName;
