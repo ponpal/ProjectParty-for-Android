@@ -17,38 +17,20 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	private Intent sdsIntent;
 	public static List<ServerInfo> serverList;
-	
+	private SharedPreferences preferences;
+
 	private ListView serverListView;
 	private TextView logView;
 	private EditText aliasField;
 	private String playerName;
-	
-	private SharedPreferences preferences;
-	
+	private ProgressBar refreshingIndicator;
 	private ArrayAdapter<ServerInfo> adapter;
-	
-	private BroadcastReceiver logReceiver = new BroadcastReceiver() {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			String current = logView.getText().toString();
-			String message = intent.getStringExtra("message");
-
-			logView.setText(current.length() > 0 ? logView.getText() + "\n" + message : message);
-		}
-	};
-	private BroadcastReceiver serverReceiver = new BroadcastReceiver() {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			adapter.notifyDataSetChanged();
-		}
-	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +39,7 @@ public class MainActivity extends Activity {
 
 		serverList = new ArrayList<ServerInfo>();
 		preferences = getPreferences(MODE_PRIVATE);
-		
+
 		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
 		initGUIComponents();
 		startService(sdsIntent);
@@ -68,6 +50,7 @@ public class MainActivity extends Activity {
 		super.onResume();
 		registerReceiver(logReceiver, new IntentFilter(ServerDiscoveryService.LOG_MESSAGE));
 		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
+		registerReceiver(serviceStoppedReceiver, new IntentFilter(ServerDiscoveryService.SEARCH_STOPPED_MESSAGE));
 	}
 
 	@Override
@@ -76,19 +59,22 @@ public class MainActivity extends Activity {
 		stopService(sdsIntent);
 		unregisterReceiver(logReceiver);
 		unregisterReceiver(serverReceiver);
+		unregisterReceiver(serviceStoppedReceiver);
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
 	}
 
 	public synchronized void refreshServerList(View view) {
+		refreshingIndicator.setVisibility(View.VISIBLE);
 		serverList.clear();
 		startService(sdsIntent);
+
 		adapter.notifyDataSetChanged();
 	}
-	
+
 	public void clearLog(View view) {
 		logView.setText("");
 	}
@@ -96,12 +82,12 @@ public class MainActivity extends Activity {
 	private void initGUIComponents() {
 		this.serverListView = (ListView) findViewById(R.id.serverListView);
 		this.logView = (TextView) findViewById(R.id.logView);
+
 		this.aliasField = (EditText) findViewById(R.id.aliasField);
-		
 		aliasField.setText(preferences.getString("name", ""));
-		
+
 		this.adapter = new ArrayAdapter<ServerInfo>(this, android.R.layout.simple_list_item_1, serverList);
-		
+
 		serverListView.setAdapter(adapter);
 		serverListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -113,15 +99,44 @@ public class MainActivity extends Activity {
 				startControllerActivity(info, playerName);
 			}
 		});
-		
+
+		this.refreshingIndicator = (ProgressBar) findViewById(R.id.refreshIndicator);
+
 		logView.setText("");
 		logView.setMovementMethod(new ScrollingMovementMethod());
 	}
-	
+
 	public void startControllerActivity(ServerInfo server, String playerName) {
 		Intent intent = new Intent(this, ControllerActivity.class);
 		intent.putExtra("server", server);
 		intent.putExtra("playerName", playerName);
 		startActivity(intent);
 	}
+
+	private BroadcastReceiver logReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String current = logView.getText().toString();
+			String message = intent.getStringExtra("message");
+
+			logView.setText(current.length() > 0 ? logView.getText() + "\n" + message : message);
+		}
+	};
+
+	private BroadcastReceiver serverReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			adapter.notifyDataSetChanged();
+		}
+	};
+
+	private BroadcastReceiver serviceStoppedReceiver = new BroadcastReceiver() {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			refreshingIndicator.setVisibility(View.INVISIBLE);
+		}
+	};
 }

@@ -1,7 +1,7 @@
 package projectparty.ppandroid;
 
-import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NativeActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,7 +10,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.WindowManager;
 
-public class ControllerActivity extends Activity {
+public class ControllerActivity extends NativeActivity {
 	private Intent csIntent;
 	
 	private BroadcastReceiver errorReceiver = new BroadcastReceiver() {

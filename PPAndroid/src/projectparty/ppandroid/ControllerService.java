@@ -34,8 +34,6 @@ public class ControllerService extends Service implements SensorEventListener {
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private float[] accelerometerData = {0, 0, 0};
-
-	private Long sessionID;
 	private String playerName;
 
 	private boolean connected = false;
@@ -125,7 +123,6 @@ public class ControllerService extends Service implements SensorEventListener {
 			}
 			
 			sessionIdBuffer.flip();
-			sessionID = sessionIdBuffer.getLong(0);
 			
 			socketChan.write(sessionIdBuffer);
 			connected = true;
@@ -135,7 +132,7 @@ public class ControllerService extends Service implements SensorEventListener {
 	public void sendName() throws IOException {
 		byte[] byteName = playerName.getBytes("UTF-8");
 		
-		ByteBuffer nameBuffer = ByteBuffer.allocate(byteName.length + 3);
+		ByteBuffer nameBuffer = ByteBuffer.allocateDirect(byteName.length + 3);
 		nameBuffer.putShort((short) (byteName.length + 1));
 		nameBuffer.put((byte) 0);
 		nameBuffer.put(byteName);

@@ -12,5 +12,7 @@
     <string name="connectTo">Connect to:</string>
     <string name="withAlias">with alias:</string>
     <string name="alias">alias</string>
+    <string name="connectManually">Connect manually</string>
+    <string name="noServers">No servers were found. Refresh the list or try to connect manually.</string>
 
 </resources>

@@ -19,6 +19,7 @@
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -27,21 +28,30 @@
         android:layout_below="@+id/textView1"
         android:orientation="vertical" >
 
-        <ListView
-            android:id="@+id/serverListView"
+        <LinearLayout
+            android:id="@+id/topLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:layout_weight="1"
-            tools:listitem="@android:layout/simple_list_item_1" >
+            android:orientation="vertical" >
 
-        </ListView>
+            <ListView
+                android:id="@+id/serverListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:visibility="invisible"
+                tools:listitem="@android:layout/simple_list_item_1" >
+
+            </ListView>
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/bottomLayout"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
+            android:layout_weight="2"
             android:orientation="vertical" >
 
             <LinearLayout
@@ -65,7 +75,8 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:hint="@string/alias"
-                    android:maxLength="24" >
+                    android:maxLength="24"
+                    android:maxLines="1" >
                 </EditText>
             </LinearLayout>
 
@@ -80,19 +91,25 @@
                 <Button
                     android:id="@+id/button1"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:onClick="refreshServerList"
                     android:text="@string/refresh" />
 
                 <Button
+                    android:id="@+id/button3"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text="@string/connectManually" />
+
+                <Button
                     android:id="@+id/button2"
                     android:layout_width="0dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:onClick="clearLog"
                     android:text="@string/clear" />
-
             </LinearLayout>
 
             <TextView
@@ -102,8 +119,15 @@
                 android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:text="@string/placeholder"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
-
         </LinearLayout>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/refreshIndicator"
+        style="?android:attr/progressBarStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true" />
 
 </RelativeLayout>

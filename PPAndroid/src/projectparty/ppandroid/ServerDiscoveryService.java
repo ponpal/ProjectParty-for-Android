@@ -18,8 +18,9 @@ import android.os.Looper;
 import android.os.Message;
 
 public class ServerDiscoveryService extends Service {
-	public static final String LOG_MESSAGE = "projectparty.ppandroid";
+	public static final String LOG_MESSAGE = "projectparty.ppandroid.log";
 	public static final String FOUND_SERVER_MESSAGE = "projectparty.ppandroid.server";
+	public static final String SEARCH_STOPPED_MESSAGE = "projectparty.ppandroid.stopped";
 
 	private Looper looper;
 	private ServiceHandler serviceHandler;
@@ -45,9 +46,8 @@ public class ServerDiscoveryService extends Service {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		logToPhone("Stopped search.");
 	}
-	
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
@@ -83,13 +83,13 @@ public class ServerDiscoveryService extends Service {
 				try {
 					byte[] udpBuffer = new byte[32];
 					DatagramPacket inPacket = new DatagramPacket(udpBuffer, udpBuffer.length);
-					
+
 					udpSocket.receive(inPacket);
 					ServerInfo info = unpackBroadcastMessage(udpBuffer);
 
 					if(!MainActivity.serverList.contains(info)) {
 						MainActivity.serverList.add(info);
-						notifyActivity();
+						notifyActivity(FOUND_SERVER_MESSAGE);
 						sameRepeated = 0;
 					} else {
 						sameRepeated++;
@@ -101,11 +101,19 @@ public class ServerDiscoveryService extends Service {
 				}
 			}
 
-			logToPhone("Server list contains " + MainActivity.serverList.size() + " servers.");
-			udpSocket.close();
-			udpSocket.disconnect();
+			int nbrOfServers = MainActivity.serverList.size();
 			
+			logToPhone(nbrOfServers > 0 ? 
+							nbrOfServers == 1 ? "Found one server." 
+							: "Found " + nbrOfServers + " servers." 
+					   : "No servers found.");
+			
+			udpSocket.close();
+			udpSocket.disconnect();	
+
 			stopSelf();
+
+			notifyActivity(SEARCH_STOPPED_MESSAGE);
 		}
 
 		public ServerInfo unpackBroadcastMessage(byte[] udpBuffer) throws IOException {
@@ -137,8 +145,8 @@ public class ServerDiscoveryService extends Service {
 		sendBroadcast(intent);
 	}
 
-	private void notifyActivity() {
-		Intent intent = new Intent(FOUND_SERVER_MESSAGE);
+	private void notifyActivity(String message) {
+		Intent intent = new Intent(message);
 		sendBroadcast(intent);
 	}
 }
