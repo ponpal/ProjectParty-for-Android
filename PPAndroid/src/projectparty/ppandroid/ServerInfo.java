@@ -13,6 +13,10 @@ public class ServerInfo implements Serializable {
 		this.setPort(port);
 		this.setName(name);
 	}
+	
+	public ServerInfo(byte[] ip, int port) {
+		this(ip, port, "Default");
+	}
 
 	public byte[] getIP() {
 		return ip;

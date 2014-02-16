@@ -1,7 +1,7 @@
 package projectparty.ppandroid;
 
+import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NativeActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -10,7 +10,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.view.WindowManager;
 
-public class ControllerActivity extends NativeActivity {
+public class ControllerActivity extends Activity {
 	private Intent csIntent;
 	
 	private BroadcastReceiver errorReceiver = new BroadcastReceiver() {
@@ -53,10 +53,15 @@ public class ControllerActivity extends NativeActivity {
 	
 	public void showErrorDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);	
-		builder.setMessage("Something bad happened...")
-			.setTitle("Oh no...")
-			.setCancelable(false)
-			.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		builder.setTitle("Disconnected")
+			.setMessage("The connection to the server was lost.")
+			.setPositiveButton("Reconnect", new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					startService(csIntent);
+				}
+			})
+			.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
 				@Override
 				public void onClick(DialogInterface dialog, int which) {
 					goBackToMain();

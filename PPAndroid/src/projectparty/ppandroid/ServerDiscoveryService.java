@@ -77,8 +77,6 @@ public class ServerDiscoveryService extends Service {
 			udpSocket.setReuseAddress(true);
 			udpSocket.bind(new InetSocketAddress(7331));
 
-			logToPhone("Searching for broadcasting servers...");
-
 			while(true) {
 				try {
 					byte[] udpBuffer = new byte[32];
@@ -100,13 +98,6 @@ public class ServerDiscoveryService extends Service {
 					break;
 				}
 			}
-
-			int nbrOfServers = MainActivity.serverList.size();
-			
-			logToPhone(nbrOfServers > 0 ? 
-							nbrOfServers == 1 ? "Found one server." 
-							: "Found " + nbrOfServers + " servers." 
-					   : "No servers found.");
 			
 			udpSocket.close();
 			udpSocket.disconnect();	
@@ -137,12 +128,6 @@ public class ServerDiscoveryService extends Service {
 
 			return info;
 		}
-	}
-
-	private void logToPhone(String message) {
-		Intent intent = new Intent(LOG_MESSAGE);
-		intent.putExtra("message", message);
-		sendBroadcast(intent);
 	}
 
 	private void notifyActivity(String message) {

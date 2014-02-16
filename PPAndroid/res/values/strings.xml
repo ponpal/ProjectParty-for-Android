@@ -4,15 +4,20 @@
     <string name="app_name">PPAndroid</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_controller">ControllerActivity</string>
-    <string name="itsWorking">It\'s working!</string>
     <string name="placeholder">&lt;placeholder></string>
-    <string name="clear">Clear log</string>
-    <string name="refresh">Refresh server list</string>
-    <string name="name">Name</string>
-    <string name="connectTo">Connect to:</string>
-    <string name="withAlias">with alias:</string>
-    <string name="alias">alias</string>
+    <string name="refresh">Refresh</string>
+    <string name="alias">Alias:</string>
+    <string name="aliasHint">alias</string>
     <string name="connectManually">Connect manually</string>
-    <string name="noServers">No servers were found. Refresh the list or try to connect manually.</string>
+    <string name="ip">IP address</string>
+    <string name="port">Port</string>
+    <string name="availableServers">Available servers</string>
+    <string name="manualConnection">Manual connection</string>
+    <string name="title_activity_manual_connection">ManualConnectionActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="connect">Connect</string>
+    <string name="noServers">Alternatively, you can</string>
+    <string name="problems">Having problems?</string>
+    <string name="refreshing">Refreshing list...</string>
 
 </resources>

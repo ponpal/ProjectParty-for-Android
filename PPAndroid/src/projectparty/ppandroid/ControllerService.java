@@ -123,7 +123,6 @@ public class ControllerService extends Service implements SensorEventListener {
 			}
 			
 			sessionIdBuffer.flip();
-			
 			socketChan.write(sessionIdBuffer);
 			connected = true;
 		}
