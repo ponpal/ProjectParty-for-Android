@@ -41,7 +41,7 @@
             android:name="projectparty.ppandroid.ControllerActivity"
             android:label="@string/title_activity_controller"
             android:screenOrientation="landscape"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
+            android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         </activity>
 
         <service android:name="projectparty.ppandroid.ControllerService" >
