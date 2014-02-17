@@ -34,7 +34,7 @@ public class ControllerService extends Service implements SensorEventListener {
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private float[] accelerometerData = {0, 0, 0};
-	private String playerName;
+	private String playerAlias;
 
 	private boolean connected = false;
 
@@ -53,7 +53,7 @@ public class ControllerService extends Service implements SensorEventListener {
 		Message msg = serviceHandler.obtainMessage();
 
 		ServerInfo info = (ServerInfo) intent.getSerializableExtra("server");
-		this.playerName = intent.getStringExtra("name");
+		this.playerAlias = intent.getStringExtra("playerAlias");
 		msg.obj = info;
 		serviceHandler.sendMessage(msg);
 		return START_STICKY;
@@ -101,7 +101,7 @@ public class ControllerService extends Service implements SensorEventListener {
 			synchronized (this) {
 				try {
 					connect((ServerInfo) msg.obj);	
-					sendName();
+					sendAlias();
 					setupAccelerometer();
 				} catch (Exception e) {
 					handleNetworkError(e);
@@ -120,6 +120,8 @@ public class ControllerService extends Service implements SensorEventListener {
 				socketChan.configureBlocking(true);
 				socketChan.read(sessionIdBuffer);
 				socketChan.configureBlocking(false);
+			} else {
+				handleNetworkError();
 			}
 			
 			sessionIdBuffer.flip();
@@ -128,16 +130,16 @@ public class ControllerService extends Service implements SensorEventListener {
 		}
 	}
 
-	public void sendName() throws IOException {
-		byte[] byteName = playerName.getBytes("UTF-8");
+	public void sendAlias() throws IOException {
+		byte[] byteAlias = playerAlias.getBytes("UTF-8");
 		
-		ByteBuffer nameBuffer = ByteBuffer.allocateDirect(byteName.length + 3);
-		nameBuffer.putShort((short) (byteName.length + 1));
-		nameBuffer.put((byte) 0);
-		nameBuffer.put(byteName);
+		ByteBuffer aliasBuffer = ByteBuffer.allocateDirect(byteAlias.length + 3);
+		aliasBuffer.putShort((short) (byteAlias.length + 1));
+		aliasBuffer.put((byte) 0);
+		aliasBuffer.put(byteAlias);
 		
-		nameBuffer.position(0);
-		socketChan.write(nameBuffer);
+		aliasBuffer.position(0);
+		socketChan.write(aliasBuffer);
 	}
 
 	public void setupAccelerometer() {
@@ -176,14 +178,13 @@ public class ControllerService extends Service implements SensorEventListener {
 		Intent intent = new Intent(ERROR_MESSAGE);
 		sendBroadcast(intent);
 	}
-	
-	public void notifyActivity(String message) {
-		Intent intent = new Intent(ERROR_MESSAGE);
-		sendBroadcast(intent);
-	}
 
 	private void handleNetworkError(Exception e) {
 		e.printStackTrace();
+		handleNetworkError();
+	}
+	
+	private void handleNetworkError() {
 		stopSelf();
 		notifyActivity();
 	}

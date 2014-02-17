@@ -29,11 +29,11 @@ public class ControllerActivity extends Activity {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		ServerInfo server = (ServerInfo) getIntent().getSerializableExtra("server");
-		String name = getIntent().getStringExtra("playerName");
+		String alias = getIntent().getStringExtra("playerAlias");
 		
 		this.csIntent = new Intent(this, ControllerService.class);
 		csIntent.putExtra("server", server);
-		csIntent.putExtra("name", name);
+		csIntent.putExtra("playerAlias", alias);
 		
 		startService(csIntent);
 	}

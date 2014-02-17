@@ -20,18 +20,33 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+/**
+ * Activity for finding and connecting to a server.
+ * This is also where the player selects his/her name/alias.
+ * @author Pontus
+ *
+ */
 public class MainActivity extends Activity {
+	
+	/** Intent used to start the ServerDiscoveryService */
 	private Intent sdsIntent;
+	
+	/** The list of servers backing the serverListView in the GUI. Manually updated by ServerDiscoveryService. */
 	public static List<ServerInfo> serverList;
+	
+	/** Accessor for SharedPreferences. */
 	private SharedPreferences preferences;
 
 	private EditText aliasField;
-	private TextView serversLabel;
+	private TextView headerTextView;
 	private ProgressBar refreshingIndicator;
 	private Button refreshButton;
 	private ListView serverListView;
 	
-	private String playerName;
+	/** The alias (name) of the player that is used for games. */
+	private String playerAlias;
+	
+	/** Connects the datasource (serverList) to the view (serverListView). */
 	private ArrayAdapter<ServerInfo> adapter;
 
 	@Override
@@ -43,6 +58,7 @@ public class MainActivity extends Activity {
 		preferences = getPreferences(MODE_PRIVATE);
 
 		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
+		this.playerAlias = preferences.getString("playerAlias", "");
 		initGUIComponents();
 		startService(sdsIntent);
 	}
@@ -50,9 +66,6 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		initGUIComponents();
-		
 		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
 		registerReceiver(serviceStoppedReceiver, new IntentFilter(ServerDiscoveryService.SEARCH_STOPPED_MESSAGE));
 	}
@@ -60,7 +73,6 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		stopService(sdsIntent);
 		unregisterReceiver(serverReceiver);
 		unregisterReceiver(serviceStoppedReceiver);
 	}
@@ -70,25 +82,32 @@ public class MainActivity extends Activity {
 		super.onDestroy();
 	}
 
+	/**
+	 * Refreshes the list of servers available to the user.
+	 * @param view Not used.
+	 */
 	public synchronized void refreshServerList(View view) {
 		serverList.clear();
 		
 		refreshButton.setEnabled(false);
 		refreshingIndicator.setVisibility(View.VISIBLE);
-		serversLabel.setText(R.string.refreshing);
+		headerTextView.setText(R.string.refreshing);
 		startService(sdsIntent);
 
 		adapter.notifyDataSetChanged();
 	}
 
+	/**
+	 * Initializes the various GUI components used in the MainActivity view.
+	 */
 	private void initGUIComponents() {
 		this.serverListView = (ListView) findViewById(R.id.serverListView);
 		this.adapter = new ArrayAdapter<ServerInfo>(this, android.R.layout.simple_list_item_1, serverList);
 
 		this.aliasField = (EditText) findViewById(R.id.aliasField);
 		
-		if(playerName != null) {
-			aliasField.setText(playerName);
+		if(playerAlias != null) {
+			aliasField.setText(playerAlias);
 		}
 		
 		serverListView.setAdapter(adapter);
@@ -97,29 +116,41 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				ServerInfo info = serverList.get(arg2);
-				playerName = aliasField.getText().length() > 0 ? aliasField.getText().toString() : "Guest";
-				preferences.edit().putString("name", aliasField.getText().toString()).commit();
-				startControllerActivity(info, playerName);
+				playerAlias = aliasField.getText().length() > 0 ? aliasField.getText().toString() : "Guest";
+				preferences.edit().putString("playerAlias", aliasField.getText().toString()).commit();
+				startControllerActivity(info);
 			}
 		});
 
 		this.refreshingIndicator = (ProgressBar) findViewById(R.id.refreshingIndicator);
-		this.serversLabel = (TextView) findViewById(R.id.serversLabel);
+		this.headerTextView = (TextView) findViewById(R.id.serversLabel);
 		this.refreshButton = (Button) findViewById(R.id.refreshButton);
 	}
 
-	public void startControllerActivity(ServerInfo server, String playerName) {
+	/**
+	 * Starts the ControllerActivity.
+	 * @param server ServerInfo containing IP and port from the list.
+	 */
+	public void startControllerActivity(ServerInfo server) {
 		Intent intent = new Intent(this, ControllerActivity.class);
 		intent.putExtra("server", server);
-		intent.putExtra("playerName", playerName);
+		intent.putExtra("playerAlias", playerAlias);
 		startActivity(intent);
 	}
 	
+	/**
+	 * Opens the ManualConnectionActivity with the playerAlias sent via intent.
+	 * @param view
+	 */
 	public void connectManually(View view) {
 		Intent intent = new Intent(this, ManualConnectionActivity.class);
+		intent.putExtra("playerAlias", playerAlias);
 		startActivity(intent);
 	}
 
+	/**
+	 * Receives broadcasts when a new server is discovered by the ServerDiscoveryService.
+	 */
 	private BroadcastReceiver serverReceiver = new BroadcastReceiver() {
 
 		@Override
@@ -128,13 +159,16 @@ public class MainActivity extends Activity {
 		}
 	};
 
+	/**
+	 * Receives a broadcast when the ServerDiscoveryService has stopped its search.
+	 */
 	private BroadcastReceiver serviceStoppedReceiver = new BroadcastReceiver() {
 
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			refreshButton.setEnabled(true);
 			refreshingIndicator.setVisibility(View.INVISIBLE);
-			serversLabel.setText("Servers found: " + serverList.size());
+			headerTextView.setText("Servers found: " + serverList.size());
 		}
 	};
 }
