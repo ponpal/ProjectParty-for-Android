@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
 	private Intent sdsIntent;
 	
 	/** The list of servers backing the serverListView in the GUI. Updated by ServerDiscoveryService. */
-	public static List<ServerInfo> serverList;
+	public static List<ServerInfo> serverList = new ArrayList<ServerInfo>();
 	
 	/** Accessor for SharedPreferences. */
 	private SharedPreferences preferences;
@@ -57,12 +57,8 @@ public class MainActivity extends Activity {
 
         System.loadLibrary("cmain");
         Log.e("TESTLOHHINH", ""+cmain());
-		
 
-		
-		serverList = new ArrayList<ServerInfo>();
-		preferences = getPreferences(MODE_PRIVATE);
-
+        this.preferences = getPreferences(MODE_PRIVATE);
 		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
 		this.playerAlias = preferences.getString("playerAlias", "");
 		initGUIComponents();
@@ -83,11 +79,6 @@ public class MainActivity extends Activity {
 		super.onPause();
 		unregisterReceiver(serverReceiver);
 		unregisterReceiver(serviceStoppedReceiver);
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
 	}
 
 	/**
@@ -124,9 +115,8 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
 					long arg3) {
 				ServerInfo info = serverList.get(arg2);
-				playerAlias = aliasField.getText().length() > 0 ? aliasField.getText().toString() : "Guest";
-				preferences.edit().putString("playerAlias", aliasField.getText().toString()).commit();
-				startControllerActivity(info);
+				storePlayerAlias();
+				startController(info);
 			}
 		});
 
@@ -134,16 +124,26 @@ public class MainActivity extends Activity {
 		this.headerTextView = (TextView) findViewById(R.id.serversLabel);
 		this.refreshButton = (Button) findViewById(R.id.refreshButton);
 	}
+	
+	private void storePlayerAlias() {
+		playerAlias = aliasField.getText().length() > 0 ? aliasField.getText().toString() : "Guest";
+		preferences.edit().putString("playerAlias", aliasField.getText().toString()).commit();
+	}
 
 	/**
-	 * Starts the ControllerActivity.
+	 * Starts the ControllerService and the ControllerActivity.
 	 * @param server ServerInfo containing IP and port from the list.
 	 */
-	public void startControllerActivity(ServerInfo server) {
-		Intent intent = new Intent(this, ControllerActivity.class);
-		intent.putExtra("server", server);
-		intent.putExtra("playerAlias", playerAlias);
-		startActivity(intent);
+	public void startController(ServerInfo server) {
+		Intent activityIntent = new Intent(this, ControllerActivity.class);
+		activityIntent.putExtra("server", server);
+		activityIntent.putExtra("playerAlias", playerAlias);
+		startActivity(activityIntent);
+		
+		Intent serviceIntent = new Intent(this, ControllerService.class);
+		serviceIntent.putExtra("server", server);
+		serviceIntent.putExtra("playerAlias", playerAlias);
+		startService(serviceIntent);
 	}
 	
 	/**

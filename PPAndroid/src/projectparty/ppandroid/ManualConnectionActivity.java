@@ -32,7 +32,7 @@ public class ManualConnectionActivity extends Activity {
 			info = new ServerInfo(InetAddress.getByName(ipField.getText().toString()).getAddress(), 
 					Integer.parseInt(portField.getText().toString()));
 		} catch (NumberFormatException e) {
-			Toast.makeText(this, "Invalid IP address.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "Invalid port.", Toast.LENGTH_SHORT).show();
 			e.printStackTrace();
 			noExceptions = false;
 		} catch (UnknownHostException e) {

@@ -30,6 +30,9 @@ public class ControllerService extends Service implements SensorEventListener {
 	private Timer timer;
 
 	private SocketChannel socketChan;
+	
+	private ByteBuffer inBuffer;
+	private ByteBuffer outBuffer;
 
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
