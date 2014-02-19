@@ -75,15 +75,6 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private boolean isConnected() {
-		ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-		try {
-			return manager.getActiveNetworkInfo().isConnected();
-		} catch (NullPointerException e) {
-			return false;
-		}
-	}
-
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -98,6 +89,19 @@ public class MainActivity extends Activity {
 		super.onPause();
 		unregisterReceiver(serverReceiver);
 		unregisterReceiver(serviceStoppedReceiver);
+	}
+	
+	/**
+	 * Checks if the device is connected to a network.
+	 * @return true if connected, false otherwise.
+	 */
+	private boolean isConnected() {
+		ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+		try {
+			return manager.getActiveNetworkInfo().isConnected();
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 
 	/**
