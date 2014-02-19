@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
 	/** Intent used to start the ServerDiscoveryService */
 	private Intent sdsIntent;
 	
-	/** The list of servers backing the serverListView in the GUI. Manually updated by ServerDiscoveryService. */
+	/** The list of servers backing the serverListView in the GUI. Updated by ServerDiscoveryService. */
 	public static List<ServerInfo> serverList;
 	
 	/** Accessor for SharedPreferences. */
@@ -60,7 +60,7 @@ public class MainActivity extends Activity {
 		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
 		this.playerAlias = preferences.getString("playerAlias", "");
 		initGUIComponents();
-		startService(sdsIntent);
+		refreshServerList(null);
 	}
 
 	@Override
@@ -68,6 +68,8 @@ public class MainActivity extends Activity {
 		super.onResume();
 		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
 		registerReceiver(serviceStoppedReceiver, new IntentFilter(ServerDiscoveryService.SEARCH_STOPPED_MESSAGE));
+		
+		refreshServerList(null);
 	}
 
 	@Override
@@ -140,7 +142,7 @@ public class MainActivity extends Activity {
 	
 	/**
 	 * Opens the ManualConnectionActivity with the playerAlias sent via intent.
-	 * @param view
+	 * @param view Not used.
 	 */
 	public void connectManually(View view) {
 		Intent intent = new Intent(this, ManualConnectionActivity.class);
@@ -149,7 +151,7 @@ public class MainActivity extends Activity {
 	}
 
 	/**
-	 * Receives broadcasts when a new server is discovered by the ServerDiscoveryService.
+	 * Receives and handles broadcasts when a new server is discovered by the ServerDiscoveryService.
 	 */
 	private BroadcastReceiver serverReceiver = new BroadcastReceiver() {
 
@@ -160,7 +162,7 @@ public class MainActivity extends Activity {
 	};
 
 	/**
-	 * Receives a broadcast when the ServerDiscoveryService has stopped its search.
+	 * Receives and handles a broadcast when the ServerDiscoveryService has stopped its search.
 	 */
 	private BroadcastReceiver serviceStoppedReceiver = new BroadcastReceiver() {
 

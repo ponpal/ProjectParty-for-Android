@@ -17,12 +17,25 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 
+/**
+ * Service for finding active game servers on the local network.
+ * @author Pontus
+ *
+ */
 public class ServerDiscoveryService extends Service {
+	/** String constant for broadcasted log messages */
 	public static final String LOG_MESSAGE = "projectparty.ppandroid.log";
+	
+	/** String constant for broadcasted "found server" messages */
 	public static final String FOUND_SERVER_MESSAGE = "projectparty.ppandroid.server";
+	
+	/** String constant for broadcasted "search stopped" message **/
 	public static final String SEARCH_STOPPED_MESSAGE = "projectparty.ppandroid.stopped";
 
+	/** Message looper */
 	private Looper looper;
+	
+	/** Handles the messages sent to the service */
 	private ServiceHandler serviceHandler;
 
 	@Override
