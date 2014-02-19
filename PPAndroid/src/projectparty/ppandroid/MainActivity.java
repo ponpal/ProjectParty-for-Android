@@ -9,8 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -20,6 +22,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Activity for finding and connecting to a server.
@@ -28,13 +31,13 @@ import android.widget.TextView;
  *
  */
 public class MainActivity extends Activity {
-	
+
 	/** Intent used to start the ServerDiscoveryService */
 	private Intent sdsIntent;
-	
+
 	/** The list of servers backing the serverListView in the GUI. Updated by ServerDiscoveryService. */
 	public static List<ServerInfo> serverList = new ArrayList<ServerInfo>();
-	
+
 	/** Accessor for SharedPreferences. */
 	private SharedPreferences preferences;
 
@@ -43,10 +46,10 @@ public class MainActivity extends Activity {
 	private ProgressBar refreshingIndicator;
 	private Button refreshButton;
 	private ListView serverListView;
-	
+
 	/** The alias (name) of the player that is used for games. */
 	private String playerAlias;
-	
+
 	/** Connects the datasource (serverList) to the view (serverListView). */
 	private ArrayAdapter<ServerInfo> adapter;
 
@@ -55,14 +58,30 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-        System.loadLibrary("cmain");
-        Log.e("TESTLOHHINH", ""+cmain());
+		System.loadLibrary("cmain");
+		Log.e("TESTLOHHINH", ""+cmain());
 
-        this.preferences = getPreferences(MODE_PRIVATE);
+		this.preferences = getPreferences(MODE_PRIVATE);
 		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
 		this.playerAlias = preferences.getString("playerAlias", "");
 		initGUIComponents();
-		refreshServerList(null);
+
+		if(isConnected()) {
+			refreshServerList(null);
+		} else {
+			Toast t = Toast.makeText(this, "Please connect to a network.", Toast.LENGTH_LONG);
+			t.setGravity(Gravity.CENTER, 0, 0);
+			t.show();
+		}
+	}
+
+	private boolean isConnected() {
+		ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+		try {
+			return manager.getActiveNetworkInfo().isConnected();
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 
 	@Override
@@ -70,7 +89,7 @@ public class MainActivity extends Activity {
 		super.onResume();
 		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
 		registerReceiver(serviceStoppedReceiver, new IntentFilter(ServerDiscoveryService.SEARCH_STOPPED_MESSAGE));
-		
+
 		refreshServerList(null);
 	}
 
@@ -87,7 +106,7 @@ public class MainActivity extends Activity {
 	 */
 	public synchronized void refreshServerList(View view) {
 		serverList.clear();
-		
+
 		refreshButton.setEnabled(false);
 		refreshingIndicator.setVisibility(View.VISIBLE);
 		headerTextView.setText(R.string.refreshing);
@@ -104,11 +123,11 @@ public class MainActivity extends Activity {
 		this.adapter = new ArrayAdapter<ServerInfo>(this, android.R.layout.simple_list_item_1, serverList);
 
 		this.aliasField = (EditText) findViewById(R.id.aliasField);
-		
+
 		if(playerAlias != null) {
 			aliasField.setText(playerAlias);
 		}
-		
+
 		serverListView.setAdapter(adapter);
 		serverListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -124,7 +143,7 @@ public class MainActivity extends Activity {
 		this.headerTextView = (TextView) findViewById(R.id.serversLabel);
 		this.refreshButton = (Button) findViewById(R.id.refreshButton);
 	}
-	
+
 	private void storePlayerAlias() {
 		playerAlias = aliasField.getText().length() > 0 ? aliasField.getText().toString() : "Guest";
 		preferences.edit().putString("playerAlias", aliasField.getText().toString()).commit();
@@ -139,13 +158,13 @@ public class MainActivity extends Activity {
 		activityIntent.putExtra("server", server);
 		activityIntent.putExtra("playerAlias", playerAlias);
 		startActivity(activityIntent);
-		
+
 		Intent serviceIntent = new Intent(this, ControllerService.class);
 		serviceIntent.putExtra("server", server);
 		serviceIntent.putExtra("playerAlias", playerAlias);
 		startService(serviceIntent);
 	}
-	
+
 	/**
 	 * Opens the ManualConnectionActivity with the playerAlias sent via intent.
 	 * @param view Not used.
@@ -179,6 +198,6 @@ public class MainActivity extends Activity {
 			headerTextView.setText("Servers found: " + serverList.size());
 		}
 	};
-	
+
 	public native int cmain();
 }
