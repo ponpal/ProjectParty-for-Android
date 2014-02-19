@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -54,6 +55,11 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+        System.loadLibrary("cmain");
+        Log.e("TESTLOHHINH", ""+cmain());
+		
+
+		
 		serverList = new ArrayList<ServerInfo>();
 		preferences = getPreferences(MODE_PRIVATE);
 
@@ -171,4 +177,6 @@ public class MainActivity extends Activity {
 			headerTextView.setText("Servers found: " + serverList.size());
 		}
 	};
+	
+	public native int cmain();
 }
