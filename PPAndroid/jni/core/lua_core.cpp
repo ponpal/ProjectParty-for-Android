@@ -96,7 +96,6 @@ void addFrame2(uint32_t frameHandle, vec2 pos, vec2 dim, uint32_t color,
 						glm::vec2(origin.x, origin.y), rotation, mirror == 0 ? false : true);
 }
 
-
 void addText(uint32_t fontHandle, const char* str, vec2 pos, uint32_t color)
 {
 	auto font = fonts[fontHandle];

@@ -27,4 +27,6 @@ Renderer.addFrame = cfuns.C.addFrame
 Renderer.addFrame2 = cfuns.C.addFrame2 
 Renderer.addText   = cfuns.C.addText 
 
+Network = {}
+
 Create = cfuns.new 

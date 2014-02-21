@@ -80,7 +80,7 @@ public class MainActivity extends Activity {
 		super.onResume();
 		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
 		registerReceiver(serviceStoppedReceiver, new IntentFilter(ServerDiscoveryService.SEARCH_STOPPED_MESSAGE));
-
+		registerReceiver(connectedReceiver, new IntentFilter(ControllerService.CONNECTED_MESSAGE));
 		refreshServerList(null);
 	}
 
@@ -89,6 +89,7 @@ public class MainActivity extends Activity {
 		super.onPause();
 		unregisterReceiver(serverReceiver);
 		unregisterReceiver(serviceStoppedReceiver);
+		unregisterReceiver(connectedReceiver);
 	}
 	
 	/**
@@ -163,10 +164,7 @@ public class MainActivity extends Activity {
 		serviceIntent.putExtra("playerAlias", playerAlias);
 		startService(serviceIntent);
 		
-		Intent activityIntent = new Intent(this, ControllerActivity.class);
-		activityIntent.putExtra("server", server);
-		activityIntent.putExtra("playerAlias", playerAlias);
-		startActivity(activityIntent);
+		
 	}
 
 	/**
@@ -190,6 +188,19 @@ public class MainActivity extends Activity {
 		}
 	};
 
+	private BroadcastReceiver connectedReceiver = new BroadcastReceiver() {
+		
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			launchNativeActivity();
+		}
+	};
+	
+	private void launchNativeActivity() {
+		Intent activityIntent = new Intent(this, MyNativeActivity.class);
+		startActivity(activityIntent);
+	}
+	
 	/**
 	 * Receives and handles a broadcast when the ServerDiscoveryService has stopped its search.
 	 */

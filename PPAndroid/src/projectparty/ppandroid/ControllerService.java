@@ -18,6 +18,7 @@ import android.os.Message;
 
 public class ControllerService extends Service {
 	public static final String ERROR_MESSAGE = "projectparty.ppandroid.error";
+	public static final String CONNECTED_MESSAGE = "projectparty.ppandroid.connected";
 
 	private Looper looper;
 	private ServiceHandler serviceHandler;
@@ -31,6 +32,7 @@ public class ControllerService extends Service {
 	public ByteBuffer inBuffer;
 	public ByteBuffer outBuffer;
 	public static ControllerService instance;
+	public static int toAccess;
 
 	@Override
 	public void onCreate() {
@@ -39,7 +41,7 @@ public class ControllerService extends Service {
 		thread.start();
 		
 		instance = this;
-		this.inBuffer = ByteBuffer.allocateDirect(1024);
+		this.inBuffer  = ByteBuffer.allocateDirect(1024);
 		this.outBuffer = ByteBuffer.allocateDirect(1024);
 
 		looper = thread.getLooper();
@@ -90,15 +92,26 @@ public class ControllerService extends Service {
 		}
 	}
 
-	public void send(int size) {
+	public int send(int size) {
 		if(size > 0) {
+			outBuffer.position(0);
 			outBuffer.limit(size);
+			int i;
 			try {
-				socketChan.write(outBuffer);
+				int written = socketChan.write(outBuffer);
+				if(written != size)
+				{
+					i = 1;
+				}
+				
+				return written;
 			} catch (IOException e) {
-				e.printStackTrace();
+				//e.printStackTrace();
+				return -1;
 			}
 		}
+		
+		return 0;
 	}
 
 	private final class ServiceHandler extends Handler {
@@ -121,7 +134,7 @@ public class ControllerService extends Service {
 		public synchronized void connect(ServerInfo server) throws UnknownHostException, IOException {
 			socketChan = SocketChannel.open();
 			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(server.getIP()), server.getPort()));
-
+			
 			ByteBuffer sessionIdBuffer = ByteBuffer.allocateDirect(8);
 
 			if(socketChan.finishConnect()) {
@@ -135,6 +148,8 @@ public class ControllerService extends Service {
 			sessionIdBuffer.flip();
 			socketChan.write(sessionIdBuffer);
 			connected = true;
+			
+			notifyConnected();
 		}
 	}
 
@@ -184,6 +199,11 @@ public class ControllerService extends Service {
 
 	public void notifyActivity() {
 		Intent intent = new Intent(ERROR_MESSAGE);
+		sendBroadcast(intent);
+	}
+	
+	private void notifyConnected() {
+		Intent intent = new Intent(CONNECTED_MESSAGE);
 		sendBroadcast(intent);
 	}
 

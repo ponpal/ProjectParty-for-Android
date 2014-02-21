@@ -21,6 +21,7 @@
 #include "core/types.h"
 #include "core/image_loader.h"
 #include "core/font_loading.h"
+#include <netinet/in.h>
 
 
 #define HELPER_CLASS_NAME "projectparty/ppandroid/NDKHelper"
@@ -52,35 +53,96 @@ ndk_helper::GLContext* context;
 bool isInitialized;
 bool noRender;
 
+jclass serviceClass;
+
+
+extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved)
+{
+    JNIEnv* env;
+    if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
+        return -1;
+    }
+    LOGI("JNI_OnLoad was called!");
+
+    auto clazz = env->FindClass("projectparty/ppandroid/ControllerService");
+    LOGI("Loaded class! %d ", (size_t)clazz);
+    serviceClass = (jclass)env->NewGlobalRef(clazz);
+
+    return JNI_VERSION_1_6;
+}
+
+
 void connectToService(android_app* app)
 {
+
 	auto env = app->activity->env;
-	auto clazz = env->FindClass("projectparty/ppandroid/ControllerService");
+	app->activity->vm->AttachCurrentThread( &env, NULL );
+
+	LOGI("Attached thread to environment!");
+
+	auto clazz = serviceClass;
+
+	LOGI("Got a class %d ", (size_t)serviceClass);
+
+	auto dummy = env->GetStaticFieldID(clazz, "toAccess", "I");
+
+	LOGI("Got a dummy static int! %d", (size_t)dummy);
 
 	auto fi = env->GetStaticFieldID(clazz, "instance", "Lprojectparty/ppandroid/ControllerService;");
+	LOGI("Fetched field ID! %d", (size_t)fi);
+	LOGI(":(");
+
 	auto obj = env->GetStaticObjectField(clazz, fi);
+	LOGI("Fetched the object!");
 
 	fi = env->GetFieldID(clazz, "inBuffer", "Ljava/nio/ByteBuffer;");
+	LOGI("Got the field id for inBuffer");
 
 	auto inBufferObj = env->GetObjectField(obj, fi);
+	LOGI("Got in Buffer! %d", (size_t)inBufferObj);
 
 	fi = env->GetFieldID(clazz, "outBuffer", "Ljava/nio/ByteBuffer;");
 
-	auto outBufferObj = env->GetObjectField(clazz, fi);
+	auto outBufferObj = env->GetObjectField(obj, fi);
 
+	LOGI("Got out Buffer! %d", (size_t)outBufferObj);
 
 	auto inBuffer  = env->GetDirectBufferAddress(inBufferObj);
 	auto outBuffer = env->GetDirectBufferAddress(outBufferObj);
 
-	auto recID  = env->GetMethodID(clazz, "send", "(I)V");
-	auto sendID = env->GetMethodID(clazz, "receive", "()I");
+	LOGI("Got access to buffers!");
+
+	auto recID  = env->GetMethodID(clazz, "receive", "()I");
+	auto sendID = env->GetMethodID(clazz, "send", "(I)I");
+
+	auto outPtr = (uint8_t*)outBuffer;
+
+	union Value
+	{
+		uint32_t x;
+		float y;
+	};
 
 	while(1)
 	{
-		outBuffer[0] = 1;
-		outBuffer[1] = 1;
+		uint16_t* sPtr = (uint16_t*)(outPtr);
+		*sPtr = htons(13);
 
-		env->CallVoidMethod(obj, sendID, 2);
+		outPtr[2] = 1;
+
+		Value v;
+		v.y = 1.0f;
+
+		uint32_t* ptr = (uint32_t*)(&outPtr[3]);
+		*(ptr++) = htonl(v.x);
+		v.y = 1.0f;
+		*(ptr++) = htonl(v.x);
+		v.y = 1.0f;
+		*(ptr++) = htonl(v.x);
+
+		auto written = env->CallIntMethod(obj, sendID, 15);
+
+		LOGI("SENDING %d bytes of data.", written);
 	}
 }
 
@@ -126,7 +188,7 @@ void handle_cmd(android_app* app, int32_t cmd)
 			break;
 		case APP_CMD_START:
 			LOGI("App started!");
-			connectToService();
+			connectToService(app);
 
 			break;
 		case APP_CMD_RESUME:
@@ -141,6 +203,8 @@ void handle_cmd(android_app* app, int32_t cmd)
 			break;
 	}
 }
+
+
 
 void render()
 {

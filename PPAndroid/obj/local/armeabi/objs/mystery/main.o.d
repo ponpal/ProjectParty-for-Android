@@ -154,7 +154,24 @@ obj/local/armeabi/objs/mystery/main.o: jni/main.cpp \
  jni/glm/glm/gtc/matrix_access.inl jni/core/Renderer.h jni/core/types.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
  jni/core/font.h jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp \
- jni/core/types.h jni/core/image_loader.h jni/core/font_loading.h
+ jni/core/types.h jni/core/image_loader.h jni/core/font_loading.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/socket.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/socket.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/sockios.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/sockios.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/uio.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/byteorder.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/little_endian.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/swab.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/generic.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in6.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/ipv6.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in6.h
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
 
@@ -579,3 +596,37 @@ jni/core/types.h:
 jni/core/image_loader.h:
 
 jni/core/font_loading.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/socket.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/socket.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/sockios.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/sockios.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/uio.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/byteorder.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/little_endian.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/swab.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/generic.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in6.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/ipv6.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in6.h:
