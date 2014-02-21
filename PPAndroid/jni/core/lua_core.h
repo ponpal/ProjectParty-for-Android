@@ -17,7 +17,6 @@ extern "C"
 	void unloadFrame(unsigned int frame);
 	void unloadFont(unsigned int font);
 
-
 	void addFrame(unsigned int frame, vec2 pos, vec2 dim, unsigned int color);
 	void addFrame2(unsigned int frame, vec2 pos, vec2 dim, unsigned int color,
 				  vec2 origin, float rotation, int mirrored);

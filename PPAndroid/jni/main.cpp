@@ -52,6 +52,39 @@ ndk_helper::GLContext* context;
 bool isInitialized;
 bool noRender;
 
+void connectToService(android_app* app)
+{
+	auto env = app->activity->env;
+	auto clazz = env->FindClass("projectparty/ppandroid/ControllerService");
+
+	auto fi = env->GetStaticFieldID(clazz, "instance", "Lprojectparty/ppandroid/ControllerService;");
+	auto obj = env->GetStaticObjectField(clazz, fi);
+
+	fi = env->GetFieldID(clazz, "inBuffer", "Ljava/nio/ByteBuffer;");
+
+	auto inBufferObj = env->GetObjectField(obj, fi);
+
+	fi = env->GetFieldID(clazz, "outBuffer", "Ljava/nio/ByteBuffer;");
+
+	auto outBufferObj = env->GetObjectField(clazz, fi);
+
+
+	auto inBuffer  = env->GetDirectBufferAddress(inBufferObj);
+	auto outBuffer = env->GetDirectBufferAddress(outBufferObj);
+
+	auto recID  = env->GetMethodID(clazz, "send", "(I)V");
+	auto sendID = env->GetMethodID(clazz, "receive", "()I");
+
+	while(1)
+	{
+		outBuffer[0] = 1;
+		outBuffer[1] = 1;
+
+		env->CallVoidMethod(obj, sendID, 2);
+	}
+}
+
+
 void handle_cmd(android_app* app, int32_t cmd)
 {
 	switch(cmd)
@@ -93,6 +126,8 @@ void handle_cmd(android_app* app, int32_t cmd)
 			break;
 		case APP_CMD_START:
 			LOGI("App started!");
+			connectToService();
+
 			break;
 		case APP_CMD_RESUME:
 			LOGI("App Resumed!");
