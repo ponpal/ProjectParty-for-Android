@@ -7,7 +7,7 @@
     <string name="placeholder">&lt;placeholder></string>
     <string name="refresh">Refresh</string>
     <string name="alias">Alias:</string>
-    <string name="aliasHint">alias</string>
+    <string name="aliasHint">enter your name</string>
     <string name="connectManually">Connect manually</string>
     <string name="ip">IP address</string>
     <string name="port">Port</string>
