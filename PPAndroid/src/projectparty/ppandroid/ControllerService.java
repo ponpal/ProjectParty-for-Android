@@ -7,22 +7,16 @@ import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 
-public class ControllerService extends Service implements SensorEventListener {
+public class ControllerService extends Service {
 	public static final String ERROR_MESSAGE = "projectparty.ppandroid.error";
 
 	private Looper looper;
@@ -30,22 +24,23 @@ public class ControllerService extends Service implements SensorEventListener {
 	private Timer timer;
 
 	private SocketChannel socketChan;
-	
-	private ByteBuffer inBuffer;
-	private ByteBuffer outBuffer;
-
-	private SensorManager sensorManager;
-	private Sensor accelerometer;
-	private float[] accelerometerData = {0, 0, 0};
-	private String playerAlias;
-
 	private boolean connected = false;
+	
+	private String playerAlias;
+	
+	public ByteBuffer inBuffer;
+	public ByteBuffer outBuffer;
+	public static ControllerService instance;
 
 	@Override
 	public void onCreate() {
 		HandlerThread thread = new HandlerThread("ServiceStartArguments",
 				Thread.MAX_PRIORITY);
 		thread.start();
+		
+		instance = this;
+		this.inBuffer = ByteBuffer.allocateDirect(1024);
+		this.outBuffer = ByteBuffer.allocateDirect(1024);
 
 		looper = thread.getLooper();
 		serviceHandler = new ServiceHandler(looper);
@@ -65,10 +60,9 @@ public class ControllerService extends Service implements SensorEventListener {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-
+		
 		if(connected) {
 			timer.cancel();
-			sensorManager.unregisterListener(this);
 			try {
 				socketChan.close();
 			} catch (Exception e) {
@@ -78,6 +72,8 @@ public class ControllerService extends Service implements SensorEventListener {
 			connected = false;
 		}
 		looper.quit();
+		
+		instance = null;
 	}
 
 	@Override
@@ -85,13 +81,24 @@ public class ControllerService extends Service implements SensorEventListener {
 		return null;
 	}
 
-	@Override
-	public void onAccuracyChanged(Sensor arg0, int arg1) {
+	public int receive() {
+		try {
+			return socketChan.read(inBuffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
 
-	@Override
-	public void onSensorChanged(SensorEvent e) {
-		accelerometerData = e.values;
+	public void send(int size) {
+		if(size > 0) {
+			outBuffer.limit(size);
+			try {
+				socketChan.write(outBuffer);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	private final class ServiceHandler extends Handler {
@@ -105,7 +112,6 @@ public class ControllerService extends Service implements SensorEventListener {
 				try {
 					connect((ServerInfo) msg.obj);	
 					sendAlias();
-					setupAccelerometer();
 				} catch (Exception e) {
 					handleNetworkError(e);
 				}
@@ -115,10 +121,9 @@ public class ControllerService extends Service implements SensorEventListener {
 		public synchronized void connect(ServerInfo server) throws UnknownHostException, IOException {
 			socketChan = SocketChannel.open();
 			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(server.getIP()), server.getPort()));
-			socketChan.finishConnect();
 
 			ByteBuffer sessionIdBuffer = ByteBuffer.allocateDirect(8);
-			
+
 			if(socketChan.finishConnect()) {
 				socketChan.configureBlocking(true);
 				socketChan.read(sessionIdBuffer);
@@ -126,7 +131,7 @@ public class ControllerService extends Service implements SensorEventListener {
 			} else {
 				handleNetworkError();
 			}
-			
+
 			sessionIdBuffer.flip();
 			socketChan.write(sessionIdBuffer);
 			connected = true;
@@ -135,47 +140,47 @@ public class ControllerService extends Service implements SensorEventListener {
 
 	public void sendAlias() throws IOException {
 		byte[] byteAlias = playerAlias.getBytes("UTF-8");
-		
+
 		ByteBuffer aliasBuffer = ByteBuffer.allocateDirect(byteAlias.length + 3);
 		aliasBuffer.putShort((short) (byteAlias.length + 1));
 		aliasBuffer.put((byte) 0);
 		aliasBuffer.put(byteAlias);
-		
+
 		aliasBuffer.position(0);
 		socketChan.write(aliasBuffer);
 	}
 
-	public void setupAccelerometer() {
-		this.sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		this.accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-
-		this.timer = new Timer();
-		timer.schedule(new TimerTask() {
-			@Override
-			public void run() {
-				sendAccelerometer();
-				//Send messages received on SocketChannel to native here.
-			}
-		}, 100, 100);
-	}
-
-	private void sendAccelerometer() {
-		try {
-			ByteBuffer accBuffer = ByteBuffer.allocate(15);
-			
-			accBuffer.putShort((short) 13);
-			accBuffer.put((byte) 1);
-			accBuffer.putFloat(accelerometerData[0]);
-			accBuffer.putFloat(accelerometerData[1]);
-			accBuffer.putFloat(accelerometerData[2]);
-			
-			accBuffer.position(0);
-			socketChan.write(accBuffer);
-		} catch (Exception e) {
-			handleNetworkError(e);
-		}
-	}
+	//	public void setupAccelerometer() {
+	//		this.sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+	//		this.accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+	//		sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+	//
+	//		this.timer = new Timer();
+	//		timer.schedule(new TimerTask() {
+	//			@Override
+	//			public void run() {
+	//				sendAccelerometer();
+	//				//Send messages received on SocketChannel to native here.
+	//			}
+	//		}, 100, 100);
+	//	}
+	//
+	//	private void sendAccelerometer() {
+	//		try {
+	//			ByteBuffer accBuffer = ByteBuffer.allocate(15);
+	//			
+	//			accBuffer.putShort((short) 13);
+	//			accBuffer.put((byte) 1);
+	//			accBuffer.putFloat(accelerometerData[0]);
+	//			accBuffer.putFloat(accelerometerData[1]);
+	//			accBuffer.putFloat(accelerometerData[2]);
+	//			
+	//			accBuffer.position(0);
+	//			socketChan.write(accBuffer);
+	//		} catch (Exception e) {
+	//			handleNetworkError(e);
+	//		}
+	//	}
 
 	public void notifyActivity() {
 		Intent intent = new Intent(ERROR_MESSAGE);
@@ -186,7 +191,7 @@ public class ControllerService extends Service implements SensorEventListener {
 		e.printStackTrace();
 		handleNetworkError();
 	}
-	
+
 	private void handleNetworkError() {
 		stopSelf();
 		notifyActivity();

@@ -57,11 +57,6 @@ public class ServerDiscoveryService extends Service {
 	}
 
 	@Override
-	public void onDestroy() {
-		super.onDestroy();
-	}
-
-	@Override
 	public IBinder onBind(Intent intent) {
 		return null;
 	}
