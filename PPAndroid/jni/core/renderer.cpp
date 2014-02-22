@@ -250,7 +250,9 @@ void Renderer::drawChar(Texture texture, const CharInfo& info, glm::vec2 pos, gl
 
 void Renderer::addText(const Font& font, const std::string& text, glm::vec2 pos, Color color)
 {
-	glm::vec2 cursor;
+	glm::vec2 size = font::measure(font, text);
+
+	glm::vec2 cursor = glm::vec2(0, size.y - font.base);
 	auto spaceInfo = font[' '];
 	for(auto c : text)
 	{
@@ -313,4 +315,6 @@ void Renderer::draw()
 	glDrawElements(GL_TRIANGLES, (elements / 4) * 6, GL_UNSIGNED_SHORT, (void*)0);
 
 	elements = 0;
+
+	checkGlError("draw");
 }

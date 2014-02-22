@@ -10,6 +10,8 @@
 
 #include <glm/glm.hpp>
 #include "types.h"
+#include <string>
+
 
 struct CharInfo
 {
@@ -77,6 +79,11 @@ struct Font
 		}
 	}
 };
+
+namespace font
+{
+	glm::vec2 measure(const Font& f, const std::string& text);
+}
 
 
 #endif /* FONT_H_ */

@@ -8,7 +8,9 @@ include $(PREBUILT_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 LOCAL_MODULE    := mystery
-LOCAL_SRC_FILES := main.cpp core/font_loading.cpp core/image_loader.cpp core/renderer.cpp core/shader.cpp core/lua_core.cpp
+LOCAL_SRC_FILES := main.cpp
+FILE_LIST := $(wildcard $(LOCAL_PATH)/core/*.cpp)
+LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
 
 LOCAL_STATIC_LIBRARIES := libluajit android_native_app_glue ndk_helper
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/glm

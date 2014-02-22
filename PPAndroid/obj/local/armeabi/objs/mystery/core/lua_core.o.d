@@ -157,7 +157,8 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  jni/glm/glm/gtx/../gtc/../matrix.hpp jni/glm/glm/gtx/transform.inl \
  jni/glm/glm/gtc/matrix_access.hpp jni/glm/glm/gtc/../detail/setup.hpp \
  jni/glm/glm/gtc/matrix_access.inl jni/lua/lua.hpp jni/lua/lua.h \
- jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h jni/lua/luajit.h
+ jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h jni/lua/luajit.h \
+ jni/core/android_helper.h
 
 jni/core/lua_core.h:
 
@@ -596,3 +597,5 @@ jni/lua/lauxlib.h:
 jni/lua/lualib.h:
 
 jni/lua/luajit.h:
+
+jni/core/android_helper.h:

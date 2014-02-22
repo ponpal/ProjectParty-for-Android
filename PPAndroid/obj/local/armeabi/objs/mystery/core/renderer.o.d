@@ -74,9 +74,10 @@ obj/local/armeabi/objs/mystery/core/renderer.o: jni/core/renderer.cpp \
  jni/glm/glm/detail/../geometric.hpp jni/glm/glm/vector_relational.hpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
- jni/core/font.h jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
+ jni/core/font.h \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
+ jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
  jni/core/shader.h jni/core/log.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib
@@ -325,13 +326,13 @@ jni/glm/glm/detail/func_integer.inl:
 
 jni/core/font.h:
 
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
+
 jni/glm/glm/vec2.hpp:
 
 jni/glm/glm/mat4x4.hpp:
 
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector:
-
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
 
 jni/core/shader.h:
 

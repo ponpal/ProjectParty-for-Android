@@ -11,6 +11,7 @@
 #include "font_loading.h"
 #include "image_loader.h"
 #include "types.h"
+#include "font.h"
 
 #include <NDKHelper.h>
 #include <android_native_app_glue.h>
@@ -18,9 +19,9 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_access.hpp>
 #include <lua.hpp>
+#include "android_helper.h"
 
 Renderer* gRenderer;
-android_app* gApp;
 
 std::vector<Font> fonts;
 std::vector<Frame> frames;
@@ -63,6 +64,17 @@ void unloadFont(uint32_t fontHandle)
 {
 }
 
+vec2 measureString(uint32_t fontHandle, const char* str)
+{
+	auto f = fonts[fontHandle];
+	auto vec = font::measure(f, str);
+
+	vec2 v;
+	v.x = vec.x;
+	v.y = vec.y;
+	return v;
+}
+
 uint32_t loadFrame(const char* name)
 {
 	auto texture = loadTexture(name);
@@ -80,8 +92,6 @@ void unloadFrame(uint32_t frameHandle)
 
 void addFrame(uint32_t frameHandle, vec2 pos, vec2 dim, uint32_t color)
 {
-	LOGI("pos: %f,%f dim: %f,%f", pos.x, pos.y, dim.x, dim.y);
-
 	auto frame = frames[frameHandle];
 	gRenderer->addFrame(frame, glm::vec2(pos.x, pos.y), glm::vec2(dim.x, dim.y), Color(color));
 }
@@ -89,8 +99,6 @@ void addFrame(uint32_t frameHandle, vec2 pos, vec2 dim, uint32_t color)
 void addFrame2(uint32_t frameHandle, vec2 pos, vec2 dim, uint32_t color,
 			   vec2 origin, float rotation, int mirror)
 {
-	LOGI("pos: %f,%f dim: %f,%f", pos.x, pos.y, dim.x, dim.y);
-
 	auto frame = frames[frameHandle];
 	gRenderer->addFrame(frame, glm::vec2(pos.x, pos.y), glm::vec2(dim.x, dim.y), Color(color),
 						glm::vec2(origin.x, origin.y), rotation, mirror == 0 ? false : true);
@@ -104,9 +112,8 @@ void addText(uint32_t fontHandle, const char* str, vec2 pos, uint32_t color)
 
 lua_State* luaState;
 
-void initializeLuaCore(android_app* app)
+void initializeLuaCore()
 {
-	gApp = app;
 	gRenderer = new Renderer(1024);
 
 	luaState = luaL_newstate();
@@ -119,6 +126,7 @@ void initializeLuaCore(android_app* app)
 
 	if(error)
 	{
+		LOGI("LUA ERROR %s", lua_tostring(luaState, -1));
 		LOGI("ERROR LUA 1");
 	}
 
@@ -130,6 +138,7 @@ void initializeLuaCore(android_app* app)
 
 	if(error)
 	{
+		LOGI("LUA ERROR %s", lua_tostring(luaState, -1));
 		LOGI("ERROR LUA 2");
 	}
 }
@@ -140,13 +149,13 @@ void callEmptyLuaFunction(const char* buffer)
 	error = error | lua_pcall(luaState, 0, 0, 0);
 
 	if(error) {
-		LOGI("LUA STATE ERROR!");
+		LOGI("LUA ERROR 3 %s", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
 	}
 }
 
 void initLuaCall()
 {
-	LOGI("Calling init like a baws :)");
 	callEmptyLuaFunction("init()");
 }
 
@@ -157,7 +166,7 @@ void termLuaCall()
 
 void updateLuaCall()
 {
-	callEmptyLuaFunction("update()");
+	callEmptyLuaFunction("coreUpdate() update()");
 }
 
 void renderLuaCall(ndk_helper::GLContext* context)
@@ -175,4 +184,9 @@ void renderLuaCall(ndk_helper::GLContext* context)
 
 	gRenderer->draw();
 	context->Swap();
+}
+
+void luaLog(const char* toLog)
+{
+	LOGI("%s" , toLog);
 }

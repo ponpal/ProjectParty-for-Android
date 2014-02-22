@@ -42,7 +42,7 @@
         <activity 
             android:name="projectparty.ppandroid.MyNativeActivity"
             android:label="@string/title_activity_controller"
-            android:configChanges="orientation|keyboardHidden">
+            android:configChanges="orientation|screenSize">
         
         	<meta-data android:name="android.app.lib_name" android:value="mystery" />   
        	</activity>

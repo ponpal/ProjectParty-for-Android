@@ -113,6 +113,9 @@ public class ControllerService extends Service {
 		
 		return 0;
 	}
+	
+	public boolean isAlive() { return true; }
+	public boolean reconnect() { return false; }
 
 	private final class ServiceHandler extends Handler {
 		public ServiceHandler(Looper looper) {

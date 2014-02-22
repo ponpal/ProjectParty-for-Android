@@ -1,6 +1,5 @@
-obj/local/armeabi/objs/mystery/core/font_loading.o: \
- jni/core/font_loading.cpp jni/core/font.h jni/glm/glm/glm.hpp \
- jni/glm/glm/detail/_fixes.hpp \
+obj/local/armeabi/objs/mystery/core/font.o: jni/core/font.cpp \
+ jni/glm/glm/glm.hpp jni/glm/glm/detail/_fixes.hpp \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cmath \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/climits \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cfloat \
@@ -64,17 +63,12 @@ obj/local/armeabi/objs/mystery/core/font_loading.o: \
  jni/glm/glm/detail/../geometric.hpp jni/glm/glm/vector_relational.hpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
- jni/core/types.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
+ jni/core/font.h jni/core/types.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
- jni/core/log.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h
-
-jni/core/font.h:
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h
 
 jni/glm/glm/glm.hpp:
 
@@ -294,6 +288,10 @@ jni/glm/glm/detail/func_integer.hpp:
 
 jni/glm/glm/detail/func_integer.inl:
 
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
+
+jni/core/font.h:
+
 jni/core/types.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
@@ -303,11 +301,3 @@ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2pl
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
-
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
-
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
-
-jni/core/log.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
