@@ -61,6 +61,11 @@ public class ServerDiscoveryService extends Service {
 		return null;
 	}
 
+	/**
+	 * Inner class for handling the initial message sent from onStartCommand.
+	 * @author Pontus
+	 *
+	 */
 	private final class ServiceHandler extends Handler {
 		public ServiceHandler(Looper looper) {
 			super(looper);
@@ -77,6 +82,13 @@ public class ServerDiscoveryService extends Service {
 			}
 		}
 
+		/**
+		 * For each local server, this method receives an UDP broadcast message and
+		 * adds the server to the list of available servers in MainActivity if the 
+		 * list doesn't already contain it. 
+		 * @throws UnknownHostException
+		 * @throws IOException
+		 */
 		public void refreshServerList() throws UnknownHostException, IOException {
 			int sameRepeated = 0;
 
@@ -114,8 +126,8 @@ public class ServerDiscoveryService extends Service {
 
 			notifyActivity(SEARCH_STOPPED_MESSAGE);
 		}
-
-		public ServerInfo unpackBroadcastMessage(byte[] udpBuffer) throws IOException {
+		
+		private ServerInfo unpackBroadcastMessage(byte[] udpBuffer) throws IOException {
 			ServerInfo info = null;
 			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(udpBuffer));
 

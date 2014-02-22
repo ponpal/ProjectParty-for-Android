@@ -49,13 +49,6 @@
 
         <service android:name="projectparty.ppandroid.ControllerService" >
         </service>
-
-        <activity
-            android:name="projectparty.ppandroid.ManualConnectionActivity"
-            android:label="@string/title_activity_manual_connection" 
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Holo.Light.NoActionBar">
-        </activity>
     </application>
 
 </manifest>

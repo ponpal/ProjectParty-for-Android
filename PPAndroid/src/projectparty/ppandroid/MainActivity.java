@@ -11,7 +11,6 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
@@ -25,16 +24,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Activity for finding and connecting to a server.
- * This is also where the player selects his/her name/alias.
+ * Activity for finding and connecting to a local server.
+ * This is also where players input their names/aliases.
  * @author Pontus
  *
  */
 public class MainActivity extends Activity {
-
-	/** Intent used to start the ServerDiscoveryService */
-	private Intent sdsIntent;
-
 	/** The list of servers backing the serverListView in the GUI. Updated by ServerDiscoveryService. */
 	public static List<ServerInfo> serverList = new ArrayList<ServerInfo>();
 
@@ -59,20 +54,12 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		System.loadLibrary("cmain");
-		Log.e("TESTLOHHINH", ""+cmain());
 
 		this.preferences = getPreferences(MODE_PRIVATE);
-		this.sdsIntent = new Intent(this, ServerDiscoveryService.class);
 		this.playerAlias = preferences.getString("playerAlias", "");
-		initGUIComponents();
-
-		if(isConnected()) {
-			refreshServerList(null);
-		} else {
-			Toast t = Toast.makeText(this, "Please connect to a network.", Toast.LENGTH_LONG);
-			t.setGravity(Gravity.CENTER, 0, 0);
-			t.show();
-		}
+		
+		initGUI();
+		refresh();
 	}
 
 	@Override
@@ -81,7 +68,7 @@ public class MainActivity extends Activity {
 		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
 		registerReceiver(serviceStoppedReceiver, new IntentFilter(ServerDiscoveryService.SEARCH_STOPPED_MESSAGE));
 		registerReceiver(connectedReceiver, new IntentFilter(ControllerService.CONNECTED_MESSAGE));
-		refreshServerList(null);
+		refresh();
 	}
 
 	@Override
@@ -90,6 +77,19 @@ public class MainActivity extends Activity {
 		unregisterReceiver(serverReceiver);
 		unregisterReceiver(serviceStoppedReceiver);
 		unregisterReceiver(connectedReceiver);
+	}
+	
+	/**
+	 * Refreshes the list of server if the device is connected to a network, else shows a notification.
+	 */
+	private void refresh() {
+		if(isConnected()) {
+			refreshServerList(null);
+		} else {
+			Toast t = Toast.makeText(this, "To be able to play, connect to a network.", Toast.LENGTH_LONG);
+			t.setGravity(Gravity.CENTER, 0, 0);
+			t.show();
+		}
 	}
 	
 	/**
@@ -115,7 +115,7 @@ public class MainActivity extends Activity {
 		refreshButton.setEnabled(false);
 		refreshingIndicator.setVisibility(View.VISIBLE);
 		headerTextView.setText(R.string.refreshing);
-		startService(sdsIntent);
+		startService(new Intent(this, ServerDiscoveryService.class));
 
 		adapter.notifyDataSetChanged();
 	}
@@ -123,7 +123,7 @@ public class MainActivity extends Activity {
 	/**
 	 * Initializes the various GUI components used in the MainActivity view.
 	 */
-	private void initGUIComponents() {
+	private void initGUI() {
 		this.serverListView = (ListView) findViewById(R.id.serverListView);
 		this.adapter = new ArrayAdapter<ServerInfo>(this, android.R.layout.simple_list_item_1, serverList);
 
@@ -149,13 +149,16 @@ public class MainActivity extends Activity {
 		this.refreshButton = (Button) findViewById(R.id.refreshButton);
 	}
 
+	/**
+	 * Stores the player's alias in SharedPreferences.
+	 */
 	private void storePlayerAlias() {
 		playerAlias = aliasField.getText().length() > 0 ? aliasField.getText().toString() : "Guest";
 		preferences.edit().putString("playerAlias", aliasField.getText().toString()).commit();
 	}
 
 	/**
-	 * Starts the ControllerService and the ControllerActivity.
+	 * Starts the ControllerService.
 	 * @param server ServerInfo containing IP and port from the list.
 	 */
 	public void startController(ServerInfo server) {
@@ -163,18 +166,6 @@ public class MainActivity extends Activity {
 		serviceIntent.putExtra("server", server);
 		serviceIntent.putExtra("playerAlias", playerAlias);
 		startService(serviceIntent);
-		
-		
-	}
-
-	/**
-	 * Opens the ManualConnectionActivity with the playerAlias sent via intent.
-	 * @param view Not used.
-	 */
-	public void connectManually(View view) {
-		Intent intent = new Intent(this, ManualConnectionActivity.class);
-		intent.putExtra("playerAlias", playerAlias);
-		startActivity(intent);
 	}
 
 	/**
