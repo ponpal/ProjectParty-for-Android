@@ -3,15 +3,21 @@ package projectparty.ppandroid;
 import java.io.Serializable;
 
 @SuppressWarnings("serial")
+
+/**
+ * Contains IP address, port and hostname for a server.
+ * @author Pontus
+ *
+ */
 public class ServerInfo implements Serializable {
 	private byte[] ip;
 	private int port;
-	private String name;
+	private String hostName;
 	
-	public ServerInfo(byte[] ip, int port, String name) {
+	public ServerInfo(byte[] ip, int port, String hostName) {
 		this.setIP(ip);
 		this.setPort(port);
-		this.setName(name);
+		this.setHostName(hostName);
 	}
 	
 	public ServerInfo(byte[] ip, int port) {
@@ -34,12 +40,12 @@ public class ServerInfo implements Serializable {
 		this.port = port2;
 	}
 	
-	public String getName() {
-		return name;
+	public String getHostName() {
+		return hostName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setHostName(String name) {
+		this.hostName = name;
 	}
 	
 	@Override
@@ -62,6 +68,6 @@ public class ServerInfo implements Serializable {
 	
 	@Override
 	public String toString() {
-		return name;
+		return hostName;
 	}
 }
