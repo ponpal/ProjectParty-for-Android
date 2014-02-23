@@ -96,14 +96,10 @@ public class ControllerService extends Service {
 		if(size > 0) {
 			outBuffer.position(0);
 			outBuffer.limit(size);
-			int i;
 			try {
 				int written = socketChan.write(outBuffer);
 				if(written != size)
-				{
-					i = 1;
-				}
-				
+					
 				return written;
 			} catch (IOException e) {
 				//e.printStackTrace();
@@ -113,6 +109,9 @@ public class ControllerService extends Service {
 		
 		return 0;
 	}
+	
+	public boolean isAlive() { return true; }
+	public boolean reconnect() { return false; }
 
 	private final class ServiceHandler extends Handler {
 		public ServiceHandler(Looper looper) {

@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <cmath>
 #include "font.h"
+#include "external_libs/utf8.h"
 
 static const char gVertexShader[] =
     "attribute vec2 vPosition;\n"
@@ -250,28 +251,35 @@ void Renderer::drawChar(Texture texture, const CharInfo& info, glm::vec2 pos, gl
 
 void Renderer::addText(const Font& font, const std::string& text, glm::vec2 pos, Color color)
 {
-	glm::vec2 cursor;
+	glm::vec2 size = font::measure(font, text);
+
+	glm::vec2 cursor = glm::vec2(0, size.y - font.base);
 	auto spaceInfo = font[' '];
-	for(auto c : text)
+
+	auto itr = text.begin();
+	auto end   = text.end();
+
+	while(itr != end)
 	{
+		auto c = utf8::next(itr, end);
 		if(c == '\r') continue;
 
-		if(c == ' ') {
-			drawChar(font.page.texture, spaceInfo, pos, cursor, color);
-			cursor.x += spaceInfo.advance;
-			continue;
-		} else if(c == '\n') {
-			cursor.y -= font.lineHeight;
-			cursor.x = 0;
-			continue;
-		} else if(c == '\t') {
-			cursor += spaceInfo.advance * 4;
-		}
+			if(c == ' ') {
+				drawChar(font.page.texture, spaceInfo, pos, cursor, color);
+				cursor.x += spaceInfo.advance;
+				continue;
+			} else if(c == '\n') {
+				cursor.y -= font.lineHeight;
+				cursor.x = 0;
+				continue;
+			} else if(c == '\t') {
+				cursor += spaceInfo.advance * 4;
+			}
 
-		CharInfo info = font.chars[c];
-		drawChar(font.page.texture, info, pos, cursor + info.offset, color);
+			CharInfo info = font[c];
+			drawChar(font.page.texture, info, pos, cursor + info.offset, color);
 
-		cursor.x += info.advance;
+			cursor.x += info.advance;
 	}
 }
 
@@ -313,4 +321,6 @@ void Renderer::draw()
 	glDrawElements(GL_TRIANGLES, (elements / 4) * 6, GL_UNSIGNED_SHORT, (void*)0);
 
 	elements = 0;
+
+	checkGlError("draw");
 }

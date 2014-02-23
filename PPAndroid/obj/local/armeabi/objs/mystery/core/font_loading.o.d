@@ -69,6 +69,7 @@ obj/local/armeabi/objs/mystery/core/font_loading.o: \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
  jni/core/log.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h
@@ -302,6 +303,8 @@ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2pl
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
 
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
 

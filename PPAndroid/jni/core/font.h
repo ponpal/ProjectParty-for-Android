@@ -10,6 +10,8 @@
 
 #include <glm/glm.hpp>
 #include "types.h"
+#include <string>
+
 
 struct CharInfo
 {
@@ -59,7 +61,7 @@ struct Font
 	  chars(_chars),
 	  charsLength(_charsLength)
 	{
-		defaultChar = chars[' '];
+		defaultChar = chars['/'];
 	}
 
 	inline const CharInfo& operator[](size_t index) const
@@ -77,6 +79,11 @@ struct Font
 		}
 	}
 };
+
+namespace font
+{
+	glm::vec2 measure(const Font& f, const std::string& text);
+}
 
 
 #endif /* FONT_H_ */

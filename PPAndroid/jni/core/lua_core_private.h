@@ -10,7 +10,7 @@
 #include <android_native_app_glue.h>
 #include "NDKHelper.h"
 
-void initializeLuaCore(android_app* app);
+void initializeLuaCore();
 void initLuaCall();
 void termLuaCall();
 void updateLuaCall();

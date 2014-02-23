@@ -12,7 +12,7 @@
 
 namespace font
 {
-	glm::vec2 messure(const Font& font, const std::string& text)
+	glm::vec2 measure(const Font& font, const std::string& text)
 	{
 		float width = 0, height = 0, cursor = 0;
 
