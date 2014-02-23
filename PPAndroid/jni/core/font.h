@@ -61,7 +61,7 @@ struct Font
 	  chars(_chars),
 	  charsLength(_charsLength)
 	{
-		defaultChar = chars[' '];
+		defaultChar = chars['/'];
 	}
 
 	inline const CharInfo& operator[](size_t index) const

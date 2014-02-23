@@ -80,7 +80,12 @@ obj/local/armeabi/objs/mystery/core/renderer.o: jni/core/renderer.cpp \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
  jni/core/shader.h jni/core/log.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib \
+ jni/external_libs/utf8.h jni/external_libs/utf8/checked.h \
+ jni/external_libs/utf8/core.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
+ jni/external_libs/utf8/unchecked.h
 
 jni/core/renderer.h:
 
@@ -341,3 +346,15 @@ jni/core/log.h:
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
 
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib:
+
+jni/external_libs/utf8.h:
+
+jni/external_libs/utf8/checked.h:
+
+jni/external_libs/utf8/core.h:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
+
+jni/external_libs/utf8/unchecked.h:

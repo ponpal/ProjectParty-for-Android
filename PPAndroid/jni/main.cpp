@@ -77,7 +77,6 @@ namespace lifecycle
 {
 	void create()
 	{
-		ndk_helper::JNIHelper::Init(gApp->activity, HELPER_CLASS_NAME);
 		context = ndk_helper::GLContext::GetInstance();
 
 		gAppState.isStarted 	= false;

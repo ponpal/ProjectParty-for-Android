@@ -16,10 +16,16 @@
 #include <cstdlib>
 #include "NDKHelper.h"
 
-#define assert(b, msg, ...) \
+#define assert(b, msg) \
 if(!(b)) \
 { \
 	LOGI("Assertion Failure: File: %s Line: %d Msg: %s", __FILE__, __LINE__, msg); \
+	exit(-1); \
+}
+#define assertf(b, fmt, ...) \
+if(!(b)) \
+{ \
+	LOGI("Assertion Failure: File: %s Line: %d \n" fmt, __FILE__, __LINE__, __VA_ARGS__); \
 	exit(-1); \
 }
 

@@ -9,7 +9,7 @@ obj/local/armeabi/objs/mystery/core/image_loader.o: \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h \
- jni/core/lodepng.h \
+ jni/external_libs/lodepng.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/string.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/malloc.h \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
@@ -143,7 +143,7 @@ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h:
 
-jni/core/lodepng.h:
+jni/external_libs/lodepng.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/string.h:
 

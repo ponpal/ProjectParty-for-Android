@@ -96,14 +96,10 @@ public class ControllerService extends Service {
 		if(size > 0) {
 			outBuffer.position(0);
 			outBuffer.limit(size);
-			int i;
 			try {
 				int written = socketChan.write(outBuffer);
 				if(written != size)
-				{
-					i = 1;
-				}
-				
+					
 				return written;
 			} catch (IOException e) {
 				//e.printStackTrace();

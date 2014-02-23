@@ -32,7 +32,7 @@ function render()
 
 	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF);
 
-	local text = string.format("FPS: %f Total %.2f \nElapsed %.3f" , fps, Time.total, Time.elapsed)
+	local text = string.format("FPS: %f Tötäatal %.2f \nElapsed %.3f" , fps, Time.total, Time.elapsed)
 	pos.x = 0;
 	pos.y = 0;
 	Renderer.addText(font, text, pos, 0xFF03cc42);	

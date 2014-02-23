@@ -6,26 +6,20 @@
  */
 
 #include <GLES2/gl2.h>
-#include "lodepng.h"
+#include "external_libs/lodepng.h"
 #include "asset_helper.h"
 #include "types.h"
 #include "assert.h"
 
 Texture loadTexture(const char* path)
 {
-/*	auto helper = ndk_helper::JNIHelper::GetInstance();
-	int32_t ok = helper->LoadTexture(path);
-	if(ok != -1)
-		return Texture(ok);
-
-	throw std::domain_error("Could not load texture!"); */
 
 	Asset asset(path);
 	AutoPtr<uint8_t> pngData;
 
 	uint32_t width, height;
 	auto err = lodepng_decode32(&pngData.ptr, &width, &height, asset.buffer, asset.length);
-	assert(err == 0, "Failed to load png!");
+	assertf(err == 0, "Failed to load png! %s", path);
 
 	GLuint name;
 	glGenTextures(1, &name);

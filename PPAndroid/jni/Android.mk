@@ -10,6 +10,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := mystery
 LOCAL_SRC_FILES := main.cpp
 FILE_LIST := $(wildcard $(LOCAL_PATH)/core/*.cpp)
+FILE_LIST += $(wildcard $(LOCAL_PATH)/external_libs/*.cpp)
 LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
 
 LOCAL_STATIC_LIBRARIES := libluajit android_native_app_glue ndk_helper
