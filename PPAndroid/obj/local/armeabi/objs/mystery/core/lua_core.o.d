@@ -158,7 +158,11 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  jni/glm/glm/gtc/matrix_access.hpp jni/glm/glm/gtc/../detail/setup.hpp \
  jni/glm/glm/gtc/matrix_access.inl jni/lua/lua.hpp jni/lua/lua.h \
  jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h jni/lua/luajit.h \
- jni/core/android_helper.h
+ jni/core/android_helper.h jni/core/asset_helper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h
 
 jni/core/lua_core.h:
 
@@ -599,3 +603,13 @@ jni/lua/lualib.h:
 jni/lua/luajit.h:
 
 jni/core/android_helper.h:
+
+jni/core/asset_helper.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h:

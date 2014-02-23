@@ -20,33 +20,12 @@
 #include <glm/gtc/matrix_access.hpp>
 #include <lua.hpp>
 #include "android_helper.h"
+#include "asset_helper.h"
 
 Renderer* gRenderer;
 
 std::vector<Font> fonts;
 std::vector<Frame> frames;
-
-struct Asset
-{
-	size_t length;
-	uint8_t* buffer;
-	AAsset* asset;
-
-	Asset(const char* fileName)
-	{
-		auto mgr   = gApp->activity->assetManager;
-		asset = AAssetManager_open(mgr, fileName, AASSET_MODE_RANDOM);
-		length = AAsset_getLength(asset);
-		buffer = (uint8_t*)AAsset_getBuffer(asset);
-
-	}
-
-	~Asset()
-	{
-		AAsset_close(asset);
-	}
-};
-
 
 uint32_t loadFont(const char* frameName, const char* fontName)
 {

@@ -27,13 +27,15 @@ struct Color
 struct Texture
 {
 	GLuint glName;
+	uint16_t width, height;
 
 	Texture()
-	: glName(0xFFFFFFFF)
+	: glName(0xFFFFFFFF),
+	  width(0), height(0)
 	{ }
 
-	Texture(GLuint name)
-	: glName(name)
+	Texture(GLuint name, uint16_t w, uint16_t h)
+	: glName(name), width(w), height(h)
 	{ }
 };
 

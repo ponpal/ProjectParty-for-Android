@@ -5,24 +5,7 @@
  *      Author: Lukas_2
  */
 
-#define GLM_FORCE_RADIANS
-
-#include <android/log.h>
-#include <android_native_app_glue.h>
-#include <NDKHelper.h>
-#include <vector>
-#include "core/lua_core_private.h"
-
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/matrix_access.hpp>
-
-#include "core/Renderer.h"
-#include "core/types.h"
-#include "core/image_loader.h"
-#include "core/font_loading.h"
-#include "core/game.h"
-#include "core/android_helper.h"
+#include "main.h"
 
 #define HELPER_CLASS_NAME "projectparty/ppandroid/NDKHelper"
 
@@ -71,84 +54,147 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved)
     return JNI_VERSION_1_6;
 }
 
-void onCreate()
-{
-	LOGI("App was created!");
-}
 
-void onStart()
+struct AppState
 {
-	LOGI("App was started!");
-}
+	bool isStarted,
+		 isResumed,
+		 isFocused,
+		 hasSurface,
+		 wasStopped;
 
-void onResume()
-{
-	LOGI("App was resumed!");
-}
+	bool fullyActive()
+	{
+		return isFocused && isResumed && isStarted && hasSurface;
+	}
 
-void onPause()
-{
-	LOGI("App was paused!");
-}
 
-void onStop()
+};
+
+AppState gAppState;
+
+namespace lifecycle
 {
-	LOGI("App was stopped!");
+	void create()
+	{
+		ndk_helper::JNIHelper::Init(gApp->activity, HELPER_CLASS_NAME);
+		context = ndk_helper::GLContext::GetInstance();
+
+		gAppState.isStarted 	= false;
+		gAppState.isResumed 	= false;
+		gAppState.isFocused 	= false;
+		gAppState.hasSurface 	= false;
+		gAppState.wasStopped 	= false;
+	}
+
+	void start()
+	{
+		if(gAppState.wasStopped)
+			restart();
+		else
+			freshStart();
+	}
+
+	void restart()
+	{
+		LOGI("App was restarted!");
+		gAppState.isStarted = true;
+	}
+
+	void freshStart()
+	{
+		LOGI("App was started!");
+		gAppState.isStarted = true;
+	}
+
+	void resume()
+	{
+		LOGI("App was resumed!");
+		gAppState.isResumed = true;
+	}
+
+	void pause()
+	{
+		LOGI("App was paused!");
+		gAppState.isResumed = false;
+		gAppState.isFocused = false;
+
+	}
+
+	void stop()
+	{
+		LOGI("App was stopped!");
+
+		gAppState.wasStopped = true;
+		gAppState.isStarted  = false;
+	}
+
+	void destroy()
+	{
+		LOGI("App was destroyed!");
+	}
+
+	//Focus Events
+	void gainedFocus()
+	{
+		LOGI("App gained focus");
+		gAppState.isFocused = true;
+	}
+
+	void lostFocus()
+	{
+		LOGI("App lost focus");
+		gAppState.isFocused = false;
+	}
+
+	//EGL calls
+	void surfaceCreated()
+	{
+		LOGI("Surface created graphics resources can be safely loaded.");
+		gAppState.hasSurface = true;
+
+		context ->Init(gApp->window);
+
+		gameInitialize(gApp);
+		gameStart();
+		isInitialized = true;
+
+	}
+
+	void surfaceDestroyed()
+	{
+		LOGI("Surface Destroyed");
+		gAppState.hasSurface = false;
+
+		context->Invalidate();
+	}
+
+	void surfaceChanged()
+	{
+		LOGI("Surface Changed");
+	}
 }
 
 void handle_cmd(android_app* app, int32_t cmd)
 {
 	switch(cmd)
 	{
-		case APP_CMD_SAVE_STATE:
-			LOGI("Command save state.");
-			break;
-		case APP_CMD_INIT_WINDOW:
-			LOGI("Window initialized.");
-			context ->Init(app->window);
-			gameInitialize(app);
-			gameStart();
-			isInitialized = true;
-	        break;
-		case APP_CMD_TERM_WINDOW:
-			LOGI("Window terminated");
-			context->Invalidate();
-			break;
-		case APP_CMD_LOST_FOCUS:
-			LOGI("Gained lost focus");
-			break;
-		case APP_CMD_GAINED_FOCUS:
-			LOGI("Gained focus");
-			break;
-		case APP_CMD_INPUT_CHANGED:
-			LOGI("Input changed");
-			break;
-		case APP_CMD_WINDOW_RESIZED:
-			LOGI("Window resized");
-			break;
-		case APP_CMD_WINDOW_REDRAW_NEEDED:
-			LOGI("App redraw needed!");
-			break;
-		case APP_CMD_CONTENT_RECT_CHANGED:
-			LOGI("App Rect Changed!");
-			break;
-		case APP_CMD_CONFIG_CHANGED:
-			LOGI("App Config Changed!");
-			break;
-		case APP_CMD_START:
-			LOGI("App started!");
-			networkInitialize(app);
-			break;
-		case APP_CMD_RESUME:
-			LOGI("App Resumed!");
-			break;
-		case APP_CMD_STOP:
-			LOGI("App was stopped state.");
-			break;
-		case APP_CMD_DESTROY:
-			LOGI("App is being destroyed.");
-			context->Invalidate();
-			break;
+		//Basic Lifecycle events
+		case APP_CMD_START: 	lifecycle::start();		break;
+		case APP_CMD_RESUME: 	lifecycle::resume(); 	break;
+		case APP_CMD_PAUSE:		lifecycle::pause(); 	break;
+		case APP_CMD_STOP:		lifecycle::stop();		break;
+		case APP_CMD_DESTROY:	lifecycle::destroy(); 	break;
+
+		//Focus events
+		case APP_CMD_GAINED_FOCUS: 	lifecycle::gainedFocus(); 	break;
+		case APP_CMD_LOST_FOCUS: 	lifecycle::lostFocus(); 	break;
+
+		//Window events
+		case APP_CMD_INIT_WINDOW: 	 lifecycle::surfaceCreated();   break;
+		case APP_CMD_TERM_WINDOW: 	 lifecycle::surfaceDestroyed();	break;
+		case APP_CMD_WINDOW_RESIZED: lifecycle::surfaceChanged();	break;
+		case APP_CMD_CONFIG_CHANGED: lifecycle::surfaceChanged();	break;
 	}
 }
 
@@ -162,19 +208,12 @@ void render()
 void android_main(android_app* state)
 {
 	app_dummy();
-
-	isInitialized = false;
-
 	state->onAppCmd 		= &handle_cmd;
 	state->onInputEvent 	= &handle_input;
-
-	ndk_helper::JNIHelper::Init(state->activity, HELPER_CLASS_NAME);
-	context = ndk_helper::GLContext::GetInstance();
-
 	gApp = state;
 
+	lifecycle::create();
 
-	int frame = 0;
 	while(1)
 	{
 		int ident, fdesc, events;
@@ -182,16 +221,17 @@ void android_main(android_app* state)
 
 		while((ident = ALooper_pollOnce(0, &fdesc, &events, (void**)&source)) >= 0)
 		{
-		   //Do something wonderful with the event.
 		   if(source)
 			   source->process(state, source);
 
 		   if(state->destroyRequested)
 			   return;
 		}
-		if(isInitialized) {
+
+		if(gAppState.fullyActive()) {
 			gameStep(context);
-			frame++;
 		}
 	}
+
+	LOGI("Native Activity Was Fully Destroyed!");
 }
