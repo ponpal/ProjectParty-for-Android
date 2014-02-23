@@ -29,10 +29,12 @@ public class ControllerService extends Service {
 	
 	private String playerAlias;
 	
+	//Fields accessed by the native code
 	public ByteBuffer inBuffer;
 	public ByteBuffer outBuffer;
 	public static ControllerService instance;
 	public static int toAccess;
+	public static Long sessionID;
 
 	@Override
 	public void onCreate() {
@@ -70,11 +72,9 @@ public class ControllerService extends Service {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
 			connected = false;
 		}
 		looper.quit();
-		
 		instance = null;
 	}
 
@@ -145,6 +145,8 @@ public class ControllerService extends Service {
 				handleNetworkError();
 			}
 
+			sessionID = sessionIdBuffer.getLong();
+			
 			sessionIdBuffer.flip();
 			socketChan.write(sessionIdBuffer);
 			connected = true;
