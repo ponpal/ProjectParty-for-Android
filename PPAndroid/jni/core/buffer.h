@@ -31,8 +31,8 @@ extern "C"
 	void bufferWriteFloat(Buffer* buffer, float data);
 	void bufferWriteDouble(Buffer* buffer,double data);
 
-	void bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes);
-	void bufferReadUTF8(Buffer* buffer, const char* dest);
+	size_t bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes);
+	size_t bufferReadUTF8(Buffer* buffer, char** dest);
 	uint8_t  bufferReadByte(Buffer* buffer);
 	uint16_t bufferReadShort(Buffer* buffer);
 	uint32_t bufferReadInt(Buffer* buffer);

@@ -44,33 +44,43 @@ void bufferWriteShort(Buffer* buffer,uint16_t data)
 {
 	BOUNDS_CHECK(buffer, sizeof(uint16_t));
 
-	auto ptr = (uint16_t*)buffer->ptr;
-	*(ptr++) = data;
-	buffer->ptr = (uint8_t*)ptr;
+	auto ptr = buffer->ptr;
+	*(ptr++) = (data & 0xFF);
+	*(ptr++) = (data & 0xFF00) >> 8;
+	buffer->ptr = ptr;
 }
 
 void bufferWriteInt(Buffer* buffer, uint32_t data)
 {
 	BOUNDS_CHECK(buffer, sizeof(uint32_t));
 
-	auto ptr = (uint32_t*)buffer->ptr;
-	*(ptr++) = data;
-	buffer->ptr = (uint8_t*)ptr;
+	auto ptr = buffer->ptr;
+	*(ptr++) = (data & 0xFF);
+	*(ptr++) = (data & 0xFF00) >> 8;
+	*(ptr++) = (data & 0xFF0000) >> 16;
+	*(ptr++) = (data & 0xFF000000) >> 24;
+	buffer->ptr = ptr;
 }
 
 void bufferWriteLong(Buffer* buffer, uint64_t data)
 {
 	BOUNDS_CHECK(buffer, sizeof(uint64_t));
 
-	auto ptr = (uint64_t*)buffer->ptr;
-	*(ptr++) = data;
-	buffer->ptr = (uint8_t*)ptr;
+	auto ptr = buffer->ptr;
+	*(ptr++) = (data & 0xFF);
+	*(ptr++) = (data & 0xFF00) >> 8;
+	*(ptr++) = (data & 0xFF0000) >> 16;
+	*(ptr++) = (data & 0xFF000000) >> 24;
+	*(ptr++) = (data & 0xFF00000000) >> 32;
+	*(ptr++) = (data & 0xFF0000000000) >> 40;
+	*(ptr++) = (data & 0xFF000000000000) >> 48;
+	*(ptr++) = (data & 0xFF00000000000000) >> 56;
+
+	buffer->ptr = ptr;
 }
 
 void bufferWriteFloat(Buffer* buffer, float data)
 {
-	BOUNDS_CHECK(buffer, sizeof(float));
-
 	union U
 	{
 		float a;
@@ -84,8 +94,6 @@ void bufferWriteFloat(Buffer* buffer, float data)
 
 void bufferWriteDouble(Buffer* buffer, double data)
 {
-	BOUNDS_CHECK(buffer, sizeof(double));
-
 	union U
 	{
 		double a;
@@ -96,18 +104,21 @@ void bufferWriteDouble(Buffer* buffer, double data)
 	bufferWriteLong(buffer, u.b);
 }
 
-void bufferReadUTF8(Buffer* buffer, const char* dest)
+size_t bufferReadUTF8(Buffer* buffer, char** dest)
 {
 	size_t length = bufferReadShort(buffer);
 	BOUNDS_CHECK(buffer, length);
-
-	bufferReadBytes(buffer, (uint8_t*)dest, length);
+	*dest = new char[length + 1];
+	(*dest)[length] = '\0';
+	return bufferReadBytes(buffer, (uint8_t*)(*dest), length);
 }
 
-void bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes)
+size_t bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes)
 {
 	BOUNDS_CHECK(buffer, numBytes);
 	memcpy(dest, buffer->ptr, numBytes);
+	buffer->ptr += numBytes;
+	return numBytes;
 }
 
 uint8_t bufferReadByte(Buffer* buffer)
@@ -120,8 +131,10 @@ uint16_t bufferReadShort(Buffer* buffer)
 {
 	BOUNDS_CHECK(buffer, sizeof(uint16_t));
 
-	auto ptr = (uint16_t*)buffer->ptr;
-	auto result = *(ptr++);
+	auto ptr = buffer->ptr;
+	uint16_t result = *(ptr++);
+	result = result | (*(ptr++) << 8);
+
 	buffer->ptr = (uint8_t*)ptr;
 	return result;
 }
@@ -130,9 +143,12 @@ uint32_t bufferReadInt(Buffer* buffer)
 {
 	BOUNDS_CHECK(buffer, sizeof(uint32_t));
 
-	auto ptr = (uint32_t*)buffer->ptr;
-	auto result = *(ptr++);
-	buffer->ptr = (uint8_t*)ptr;
+	auto ptr = buffer->ptr;
+	uint32_t result = *(ptr++);
+	result = result | (*(ptr++) << 8);
+	result = result | (*(ptr++) << 16);
+	result = result | (*(ptr++) << 24);
+	buffer->ptr = ptr;
 	return result;
 }
 
@@ -140,34 +156,33 @@ uint64_t bufferReadLong(Buffer* buffer)
 {
 	BOUNDS_CHECK(buffer, sizeof(uint64_t));
 
-	auto ptr = (uint64_t*)buffer->ptr;
-	auto result = *(ptr++);
-	buffer->ptr = (uint8_t*)ptr;
+	auto ptr = buffer->ptr;
+	uint32_t result = *(ptr++);
+	result = result | (*(ptr++) << 8);
+	result = result | (*(ptr++) << 16);
+	result = result | (*(ptr++) << 24);
+	result = result | (*(ptr++) << 32);
+	result = result | (*(ptr++) << 40);
+	result = result | (*(ptr++) << 48);
+	result = result | (*(ptr++) << 56);
+	buffer->ptr = ptr;
 	return result;
 }
 
 float bufferReadFloat(Buffer* buffer)
 {
 	BOUNDS_CHECK(buffer, sizeof(float));
+	union U { float a; uint32_t b; }; U u;
 
-	union U { float a; uint32_t b; };
-	U u;
-
-	auto ptr = (uint32_t*)buffer->ptr;
-	u.b = *(ptr++);
-	buffer->ptr = (uint8_t*)ptr;
+	u.b = bufferReadInt(buffer);
 	return u.a;
 }
 
 double bufferReadDouble(Buffer* buffer)
 {
 	BOUNDS_CHECK(buffer, sizeof(double));
+	union U { double  a; uint64_t b; }; U u;
 
-	union U { double  a; uint64_t b; };
-	U u;
-
-	auto ptr = (uint32_t*)buffer->ptr;
-	u.b = *(ptr++);
-	buffer->ptr = (uint8_t*)ptr;
+	u.b = bufferReadLong(buffer);
 	return u.a;
 }

@@ -43,7 +43,7 @@ Network* networkInitialize(android_app* app)
 	LOGI(":(");
 
 	auto obj = env->GetStaticObjectField(clazz, fi);
-	gNetworkServiceObject = obj;
+	gNetworkServiceObject = env->NewGlobalRef(obj);
 	LOGI("Fetched the object!");
 
 	receiveID   = env->GetMethodID(clazz, "receive", "()I");
@@ -64,11 +64,14 @@ Network* networkInitialize(android_app* app)
 	LOGI("Got out Buffer! %d", (size_t)outBufferObj);
 
 	auto network = new Network();
-	network->in.base  = network->in.ptr  = (uint8_t*)env->GetDirectBufferAddress(inBufferObj);
-	network->out.base = network->out.ptr = (uint8_t*)env->GetDirectBufferAddress(outBufferObj);
+	network->in_  = new Buffer();
+	network->out = new Buffer();
 
-	network->in.length  = env->GetDirectBufferCapacity(inBufferObj);
-	network->out.length = env->GetDirectBufferCapacity(outBufferObj);
+	network->in_->base  = network->in_->ptr  = (uint8_t*)env->GetDirectBufferAddress(inBufferObj);
+	network->out->base = network->out->ptr = (uint8_t*)env->GetDirectBufferAddress(outBufferObj);
+
+	network->in_->length  = env->GetDirectBufferCapacity(inBufferObj);
+	network->out->length = env->GetDirectBufferCapacity(outBufferObj);
 
 	LOGI("Got access to buffers!");
 	app->activity->vm->DetachCurrentThread();
@@ -78,7 +81,7 @@ Network* networkInitialize(android_app* app)
 
 int networkSend(Network* network)
 {
-	Buffer* out = &(network->out);
+	Buffer* out = network->out;
 
 	ptrdiff_t length = out->ptr - out->base;
 	if(length == 0) return 1; //Nothing to send.
@@ -100,7 +103,7 @@ int networkSend(Network* network)
 }
 int networkReceive(Network* network)
 {
-	auto in = &network->in;
+	auto in = network->in_;
 	in->ptr = in->base;
 
 	auto env = gApp->activity->env;
@@ -111,7 +114,7 @@ int networkReceive(Network* network)
 
 	gApp->activity->vm->DetachCurrentThread();
 
-	return 1;
+	return result;
 }
 
 int networkIsAlive(Network* network)

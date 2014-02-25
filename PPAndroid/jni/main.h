@@ -12,6 +12,7 @@
 #include "core/game.h"
 #include "android_native_app_glue.h"
 #include "core/android_helper.h"
+#include "core/sensor.h"
 
 namespace lifecycle
 {

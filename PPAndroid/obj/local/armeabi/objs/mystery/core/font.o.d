@@ -68,7 +68,12 @@ obj/local/armeabi/objs/mystery/core/font.o: jni/core/font.cpp \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
+ jni/external_libs/utf8.h jni/external_libs/utf8/checked.h \
+ jni/external_libs/utf8/core.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
+ jni/external_libs/utf8/unchecked.h
 
 jni/glm/glm/glm.hpp:
 
@@ -301,3 +306,15 @@ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2pl
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
+
+jni/external_libs/utf8.h:
+
+jni/external_libs/utf8/checked.h:
+
+jni/external_libs/utf8/core.h:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
+
+jni/external_libs/utf8/unchecked.h:

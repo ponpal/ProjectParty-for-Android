@@ -5,6 +5,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 import java.util.Timer;
 
@@ -43,8 +44,8 @@ public class ControllerService extends Service {
 		thread.start();
 		
 		instance = this;
-		this.inBuffer  = ByteBuffer.allocateDirect(1024);
-		this.outBuffer = ByteBuffer.allocateDirect(1024);
+		this.inBuffer  = ByteBuffer.allocateDirect(0xFFFF);
+		this.outBuffer = ByteBuffer.allocateDirect(0xFFFF);
 
 		looper = thread.getLooper();
 		serviceHandler = new ServiceHandler(looper);
@@ -85,6 +86,7 @@ public class ControllerService extends Service {
 
 	public int receive() {
 		try {
+			inBuffer.position(0);
 			return socketChan.read(inBuffer);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -98,8 +100,7 @@ public class ControllerService extends Service {
 			outBuffer.limit(size);
 			try {
 				int written = socketChan.write(outBuffer);
-				if(written != size)
-					
+				
 				return written;
 			} catch (IOException e) {
 				//e.printStackTrace();
@@ -135,6 +136,7 @@ public class ControllerService extends Service {
 			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(server.getIP()), server.getPort()));
 			
 			ByteBuffer sessionIdBuffer = ByteBuffer.allocateDirect(8);
+			sessionIdBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
 			if(socketChan.finishConnect()) {
 				socketChan.configureBlocking(true);
@@ -159,6 +161,7 @@ public class ControllerService extends Service {
 		byte[] byteAlias = playerAlias.getBytes("UTF-8");
 
 		ByteBuffer aliasBuffer = ByteBuffer.allocateDirect(byteAlias.length + 3);
+		aliasBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		aliasBuffer.putShort((short) (byteAlias.length + 1));
 		aliasBuffer.put((byte) 0);
 		aliasBuffer.put(byteAlias);

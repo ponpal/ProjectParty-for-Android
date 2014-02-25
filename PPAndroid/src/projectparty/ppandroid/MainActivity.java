@@ -53,8 +53,6 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		System.loadLibrary("cmain");
-
 		this.preferences = getPreferences(MODE_PRIVATE);
 		this.playerAlias = preferences.getString("playerAlias", "");
 		
