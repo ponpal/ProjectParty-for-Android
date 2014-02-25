@@ -50,12 +50,7 @@ public class ControllerService extends Service {
 		super.onDestroy();
 
 		if(connected) {
-			try {
-				socketChan.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-			connected = false;
+			disconnect();
 		}
 		instance = null;
 	}
@@ -133,6 +128,17 @@ public class ControllerService extends Service {
 			e.printStackTrace();
 			return 0;
 		}
+	}
+	
+	public int disconnect() {
+		try {
+			socketChan.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return 0;
+		}
+		connected = false;
+		return 1;
 	}
 	
 	public int shutdown() {
