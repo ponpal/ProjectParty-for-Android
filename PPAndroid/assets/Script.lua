@@ -35,7 +35,7 @@ function term()
 	Loader.unloadFrame(frame)
 	Loader.unloadFont(font)
 
-	cfuns.C.networkShutdown(Network);
+	cfuns.C.networkDisconnect(Network);
 end
 
 function handleMessage(id, length)
