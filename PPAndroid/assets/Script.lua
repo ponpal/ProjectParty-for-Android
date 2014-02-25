@@ -34,7 +34,6 @@ function term()
 end
 
 function handleMessage(id, length)
-
 	if id == deathNetworkID then
 		score = In.readShort(Network.in_)
 	end

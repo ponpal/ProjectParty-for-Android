@@ -101,13 +101,13 @@ void gameHandleReceive()
 	if(count == 0) return;
 
 	auto buffer = gGame->network->in_;
+	LOGI("Got count=%d", count);
 
 	size_t remaining;
 	while(true)
 	{
 		if((remaining = bufferBytesRemaining(buffer)) == 0) {
 			count = networkReceive(gGame->network);
-			LOGI("Count is %d", count);
 			if(count == 0) return;
 		}
 
@@ -117,13 +117,15 @@ void gameHandleReceive()
 		if(id == NETWORK_FILE) {
 			handleFileTransfer(buffer);
 		} else {
-			auto end = buffer->ptr + size - 1;
+		auto end = buffer->ptr + size - 1;
 			if(gMessageHandler != NULL) {
 				gMessageHandler(id, size - 1);
 			}
 			buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
 		}
 	}
+
+	LOGI("I was wrong!");
 }
 
 void gameStep(ndk_helper::GLContext* context)

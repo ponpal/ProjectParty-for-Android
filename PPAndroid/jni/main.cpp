@@ -181,6 +181,7 @@ namespace lifecycle
 	void destroy()
 	{
 		LOGI("App was destroyed!");
+		networkShutdown(gGame->network);
 	}
 
 	//Focus Events
@@ -278,7 +279,7 @@ void android_main(android_app* state)
 
 		while((ident = ALooper_pollOnce(0, &fdesc, &events, (void**)&source)) >= 0)
 		{
-		   if(source)
+			if(source)
 			   source->process(state, source);
 
 		   processSensors(ident);
