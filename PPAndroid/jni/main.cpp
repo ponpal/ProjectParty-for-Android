@@ -107,7 +107,6 @@ void processSensors(int32_t id)
 					v.y = event.acceleration.y;
 					v.z = event.acceleration.z;
 
-					LOGI("Updating sensor! x=%f y=%f z=%f", v.x, v.y, v.z);
 					gGame->sensor->acceleration = v;
 				break;
 			}
@@ -208,6 +207,7 @@ namespace lifecycle
 	{
 		LOGI("Surface Destroyed");
 		gAppState.hasSurface = false;
+		gameStop();
 
 		context->Invalidate();
 	}

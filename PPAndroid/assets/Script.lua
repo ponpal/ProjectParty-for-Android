@@ -23,8 +23,6 @@ local function renderTime()
 	Renderer.addText(font, text, pos, 0xFF03cc42);	
 end
 
-
-
 function init()
 	frame = Loader.loadFrame("orb.png")
 	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
@@ -36,6 +34,8 @@ end
 function term()
 	Loader.unloadFrame(frame)
 	Loader.unloadFont(font)
+
+	cfuns.C.networkShutdown(Network);
 end
 
 function handleMessage(id, length)
