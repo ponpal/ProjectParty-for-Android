@@ -45,7 +45,7 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved)
     }
     LOGI("JNI_OnLoad was called!");
 
-    auto tmp = env->FindClass("projectparty/ppandroid/ControllerService");
+    auto tmp = env->FindClass("projectparty/ppandroid/services/ControllerService");
     LOGI("Loaded class! %d ", (size_t)tmp);
     auto clazz = (jclass)env->NewGlobalRef(tmp);
 
