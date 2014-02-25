@@ -161,8 +161,6 @@ public class ServerDiscoveryService extends Service {
 			return info;
 		}
 	}
-	
-	
 
 	private void notifyActivity(String message) {
 		Intent intent = new Intent(message);
