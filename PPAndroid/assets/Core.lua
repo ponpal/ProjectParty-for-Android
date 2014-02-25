@@ -2,7 +2,52 @@
 cfuns = require("ffi") 
 
 cfuns.cdef[[ 
-  	typedef struct { float x; float y; } vec2;
+
+	typedef struct { float x; float y; } vec2;
+    typedef struct { float x; float y; float z; } vec3;
+
+	typedef struct
+	{
+		vec3 acceleration;
+		vec3 gyroscope;
+	} SensorState;
+
+	typedef struct
+	{
+		uint64_t _totalTime, _lastTime, _elapsedTime;
+		bool _isPaused, _isStopped;
+	} Clock;
+
+	typedef struct
+	{
+		uint8_t* base;
+		uint8_t* ptr;
+		uint32_t length;
+	} Buffer;
+
+
+	typedef struct
+	{
+		Buffer* in_;
+		Buffer* out;
+	} Network;
+
+
+	//game.h
+	typedef struct
+	{
+		Clock* clock;
+		Network* network;
+		SensorState* sensors;
+		bool paused;
+
+	} Game;
+
+	extern Game* gGame;
+
+	typedef void (*messageHandler)(uint8_t id, uint32_t length);
+	extern messageHandler gMessageHandler;
+
 
 	uint32_t loadFrame(const char* name);
 	uint32_t loadFont(const char* frameName, const char* fontName);
@@ -10,13 +55,6 @@ cfuns.cdef[[
 	void unloadFont(uint32_t font);
 	
 	//clock.h
-	typedef struct
-	{
-		uint64_t _totalTime, _lastTime, _elapsedTime;
-		bool _isPaused, _isStopped;
-	} Clock;
-
-
 	float clockElapsed(Clock* clock);
 	float clockTotal(Clock* clock);
 
@@ -31,13 +69,6 @@ cfuns.cdef[[
 	void luaLog(const char* toLog);
 
 	//buffer.h
-	typedef struct
-	{
-		uint8_t* base;
-		uint8_t* ptr;
-		uint32_t length;
-	} Buffer;
-
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 
 	void bufferWriteBytes(Buffer* buffer, uint8_t* data, size_t length);
@@ -60,61 +91,79 @@ cfuns.cdef[[
 	float  bufferReadFloat(Buffer* buffer);
 	double bufferReadDouble(Buffer* buffer);
 
-	//network.h	
-	typedef struct
-	{
-		Buffer in;
-		Buffer out;
-	} Network;
-
+	//network.h
 	int networkSend(Network* network);
 	int networkReceive(Network* network);
 
 	int networkIsAlive(Network* network);
 	int networkReconnect(Network* network);
-
-	//game.h
-	typedef struct
-	{
-		Clock* clock;
-		Network* network;
-		bool paused;
-
-	} Game;
-
-	extern Game* gGame;
 ]]
 
+local C = cfuns.C
+
+log = C.luaLog;
+
 Loader = {} 
-Loader.loadFrame   = cfuns.C.loadFrame 
-Loader.loadFont    = cfuns.C.loadFont 
-Loader.unloadFont  = cfuns.C.unloadFont 
-Loader.unloadFrame = cfuns.C.unloadFrame
+Loader.loadFrame   = C.loadFrame 
+Loader.loadFont    = C.loadFont 
+Loader.unloadFont  = C.unloadFont 
+Loader.unloadFrame = C.unloadFrame
 
 Renderer = {} 
-Renderer.addFrame = cfuns.C.addFrame 
-Renderer.addFrame2 = cfuns.C.addFrame2 
-Renderer.addText   = cfuns.C.addText 
+Renderer.addFrame  = C.addFrame 
+Renderer.addFrame2 = C.addFrame2 
+Renderer.addText   = C.addText 
 
 Font = {}
-Font.measure =  cfuns.C.measureString;
+Font.measure =  C.measureString;
 
-Network = {}
+Network = C.gGame.network;
 
 Time = {}
 Time.total   = 0
 Time.elapsed = 0
 
+C.gMessageHandler = function (id, length)
+	handleMessage(id, length)
+end
+
+Out = { }
+Out.writeByte   = C.bufferWriteByte;
+Out.writeShort  = C.bufferWriteShort;
+Out.writeInt    = C.bufferWriteInt;
+Out.writeLong   = C.bufferWriteLong;
+Out.writeFloat  = C.bufferWriteFloat;
+Out.writeDouble = C.bufferWriteDouble;
+
+Out.writeVec2 = function (b, v)
+	C.bufferWriteFloat(b, v.x)
+	C.bufferWriteFloat(b, v.y)
+end
+
+Out.writeVec3 = function (b, v)
+	C.bufferWriteFloat(b, v.x)
+	C.bufferWriteFloat(b, v.y)
+	C.bufferWriteFloat(b, v.z)
+end
+
+In = { }
+In.readByte   = C.bufferReadByte;
+In.readShort  = C.bufferReadShort;
+In.readInt    = C.bufferReadInt;
+In.readLong   = C.bufferReadLong;
+In.readFloat  = C.bufferReadFloat;
+In.readDouble = C.bufferReadDouble
+
+
+Sensors = C.gGame.sensors
 
 vec2 = cfuns.typeof("vec2")
 
-
-local gClock = cfuns.C.gGame.clock;
+local gClock = C.gGame.clock;
 local function updateTime()
-	Time.total   = cfuns.C.clockTotal(gClock)
-	Time.elapsed = cfuns.C.clockElapsed(gClock)
+	Time.total   = C.clockTotal(gClock)
+	Time.elapsed = C.clockElapsed(gClock)
 end
-
 
 function coreUpdate()
 	updateTime();

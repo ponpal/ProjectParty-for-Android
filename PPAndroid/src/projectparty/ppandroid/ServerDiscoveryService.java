@@ -1,13 +1,13 @@
 package projectparty.ppandroid;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import android.app.Service;
 import android.content.Intent;
@@ -129,18 +129,32 @@ public class ServerDiscoveryService extends Service {
 		
 		private ServerInfo unpackBroadcastMessage(byte[] udpBuffer) throws IOException {
 			ServerInfo info = null;
-			DataInputStream dis = new DataInputStream(new ByteArrayInputStream(udpBuffer));
-
-			if(dis.readByte() == 'P' && dis.readByte() == 'P' && dis.readByte() == 'S') {
+			ByteBuffer buffer = ByteBuffer.wrap(udpBuffer);
+			buffer.order(ByteOrder.LITTLE_ENDIAN);
+			
+			if(buffer.get() == 'P' && buffer.get() == 'P' && buffer.get() == 'S') {
+				
 				byte[] ip = new byte[4];
-				dis.read(ip, 0, 4);
+				buffer.get(ip, 0, 4);
+				
+				//Swapping byte order to java wanted order.
+				byte tmp = ip[0];
+				ip[0] = ip[3];
+				ip[3] = tmp;
+				tmp = ip[1];
+				ip[1] = ip[2];
+				ip[2] = tmp;
+				
+				
+				
+				short p = buffer.getShort();
+				int port = ((p & 0xFF00) >> 8) << 8 | (p & 0xFF);
+				
 
-				int port = dis.readUnsignedShort();
-
-				int serverNameLength = dis.readInt();
+				int serverNameLength = buffer.getInt();
 				byte[] serverName = new byte[256];
 
-				dis.read(serverName, 0, serverNameLength);
+				buffer.get(serverName, 0, serverNameLength);
 
 				String name = new String(serverName, "UTF-8");
 				info = new ServerInfo(ip, port, name);

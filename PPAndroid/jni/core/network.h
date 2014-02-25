@@ -15,10 +15,17 @@
 
 extern "C"
 {
+	enum
+	{
+		NETWORK_ALIAS   = 0,
+		NETWORK_SENSOR  = 1,
+		NETWORK_FILE    = 2
+	};
+
 	typedef struct
 	{
-		Buffer in;
-		Buffer out;
+		Buffer* in_;
+		Buffer* out;
 	} Network;
 
 	int networkSend(Network* network);

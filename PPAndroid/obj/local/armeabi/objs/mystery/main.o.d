@@ -49,7 +49,8 @@ obj/local/armeabi/objs/mystery/main.o: jni/main.cpp jni/main.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/sensor.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h \
  jni/core/game.h jni/core/network.h jni/core/buffer.h jni/core/clock.h \
- jni/core/lua_core_private.h jni/core/android_helper.h
+ jni/core/lua_core_private.h jni/core/sensor.h jni/core/android_helper.h \
+ jni/core/sensor.h
 
 jni/main.h:
 
@@ -161,4 +162,8 @@ jni/core/clock.h:
 
 jni/core/lua_core_private.h:
 
+jni/core/sensor.h:
+
 jni/core/android_helper.h:
+
+jni/core/sensor.h:

@@ -49,6 +49,7 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/rect.h \
  jni/core/buffer.h jni/core/clock.h jni/core/lua_core_private.h \
+<<<<<<< HEAD
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/NDKHelper.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/gl3stub.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
@@ -79,6 +80,43 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/gestureDetector.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/sensor.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h
+=======
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/NDKHelper.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/gl3stub.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/shader.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/map \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES/gl.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES/glplatform.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/vecmath.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/math.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/tapCamera.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/interpolator.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/perfMonitor.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/list \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/gestureDetector.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/sensor.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h \
+ jni/core/sensor.h jni/core/asset_helper.h jni/core/android_helper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h
+>>>>>>> More scripting
 
 jni/core/game.h:
 
@@ -244,4 +282,22 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/sensor.h:
 
+<<<<<<< HEAD
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h:
+=======
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h:
+
+jni/core/sensor.h:
+
+jni/core/asset_helper.h:
+
+jni/core/android_helper.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h:
+>>>>>>> More scripting
