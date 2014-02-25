@@ -15,7 +15,7 @@
 
 jclass gNetworkServiceClass;
 jobject gNetworkServiceObject;
-jmethodID sendID, receiveID, isAliveID, reconnectID;
+jmethodID sendID, receiveID, isAliveID, reconnectID, connectID, shutdownID;
 
 void networkServiceClass(jclass clazz)
 {
@@ -48,8 +48,10 @@ Network* networkInitialize(android_app* app)
 
 	receiveID   = env->GetMethodID(clazz, "receive", "()I");
 	sendID      = env->GetMethodID(clazz, "send", "(I)I");
-	isAliveID   = env->GetMethodID(clazz, "isAlive", "()Z");
-	reconnectID = env->GetMethodID(clazz, "reconnect", "()Z");
+	isAliveID   = env->GetMethodID(clazz, "isAlive", "()I");
+	reconnectID = env->GetMethodID(clazz, "reconnect", "()I");
+	connectID   = env->GetMethodID(clazz, "connect", "()I");
+	shutdownID  = env->GetMethodID(clazz, "shutdown", "()I");
 
 	fi = env->GetFieldID(clazz, "inBuffer", "Ljava/nio/ByteBuffer;");
 	LOGI("Got the field id for inBuffer");
@@ -117,26 +119,38 @@ int networkReceive(Network* network)
 	return result;
 }
 
+int networkConnect(Network* network)
+{
+	auto env = gApp->activity->env;
+	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+	auto result = env->CallIntMethod(gNetworkServiceObject, connectID);
+	gApp->activity->vm->DetachCurrentThread();
+	return result;
+}
+
+int networkShutdown(Network* network)
+{
+	auto env = gApp->activity->env;
+	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+	auto result = env->CallIntMethod(gNetworkServiceObject, shutdownID);
+	gApp->activity->vm->DetachCurrentThread();
+	return result;
+}
+
 int networkIsAlive(Network* network)
 {
-//	auto env = app->activity->env;
-//	app->activity->vm->AttachCurrentThread( &env, NULL );
-//	auto result = env->CallBooleanMethod(gNetworkServiceObject, isAliveID);
-//	app->activity->vm->DetachCurrentThread();
-//
-//	return result;
-
-	return 1; //TBI
+	auto env = gApp->activity->env;
+	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+	auto result = env->CallIntMethod(gNetworkServiceObject, isAliveID);
+	gApp->activity->vm->DetachCurrentThread();
+	return result;
 }
 
 int networkReconnect(Network* network)
 {
-//	auto env = app->activity->env;
-//	app->activity->vm->AttachCurrentThread( &env, NULL );
-//	auto result = env->CallBooleanMethod(gNetworkServiceObject, isAliveID);
-//	app->activity->vm->DetachCurrentThread();
-//
-//	return result;
-
-	return 0; //TBI
+	auto env = gApp->activity->env;
+	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+	auto result = env->CallIntMethod(gNetworkServiceObject, isAliveID);
+	gApp->activity->vm->DetachCurrentThread();
+	return result;
 }

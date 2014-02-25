@@ -32,7 +32,10 @@ extern "C"
 	int networkReceive(Network* network);
 
 	int networkIsAlive(Network* network);
+	int networkConnect(Network* network);
 	int networkReconnect(Network* network);
+
+	int networkShutdown(Network* network);
 }
 
 void networkServiceClass(jclass clazz);

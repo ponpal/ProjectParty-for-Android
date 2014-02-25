@@ -29,6 +29,10 @@ function init()
 	frame = Loader.loadFrame("orb.png")
 	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
     rotation = 0
+
+    cfuns.C.networkConnect();
+
+
 end
 
 function term()
@@ -46,17 +50,25 @@ end
 function update()
 	updateTime();
 
+	if not cfuns.C.networkIsAlive(Network) then
+		log("We are not connected :(")
+		return;
+	end
+
 	local b = Network.out
 	--Send accelerometer data. (This should be in C/C++?)
-	Out.writeShort(b, 25)
-	Out.writeByte (b, sensorNetworkID)
+	
+	if useButtons then
+		--Send le buttons
+	else 
+		Out.writeShort(b, 25)
+		Out.writeByte (b, sensorNetworkID)
+		Out.writeVec3(b, Sensors.acceleration)
+		Out.writeVec3(b, Sensors.gyroscope)
+	
+	end
 
-	local acc = Sensors.acceleration;
 
-	Out.writeVec3(b, Sensors.acceleration)
-	Out.writeVec3(b, Sensors.gyroscope)
-
-	--Should this be done on the lua side?
 	cfuns.C.networkSend(Network)
 end
 
