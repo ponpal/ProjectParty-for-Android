@@ -126,6 +126,8 @@ public class ControllerService extends Service {
 			socketChan.write(sessionIdBuffer);
 
 			connected = true;
+			
+			sendAlias();
 			return 1;
 		} catch (IOException e) {
 			e.printStackTrace();
