@@ -91,12 +91,15 @@ cfuns.cdef[[
 	float  bufferReadFloat(Buffer* buffer);
 	double bufferReadDouble(Buffer* buffer);
 
-	//network.h
-	int networkSend(Network* network);
-	int networkReceive(Network* network);
+	//network.h    
+    int networkConnect(Network* network);
+    int networkDisconnect(Network* network);
 
-	int networkIsAlive(Network* network);
-	int networkReconnect(Network* network);
+    int networkSend(Network* network);
+    int networkReceive(Network* network);
+
+    int networkIsAlive(Network* network);
+    int networkReconnect(Network* network);
 ]]
 
 local C = cfuns.C
