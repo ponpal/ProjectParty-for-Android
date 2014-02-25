@@ -99,7 +99,7 @@ cfuns.cdef[[
     int networkReceive(Network* network);
 
     int networkIsAlive(Network* network);
-    int networkReconnect(Network* network);
+    int networkShutdown(Network* network);
 ]]
 
 local C = cfuns.C
