@@ -1,4 +1,4 @@
-package projectparty.ppandroid;
+package projectparty.ppandroid.services;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -8,6 +8,9 @@ import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+
+import projectparty.ppandroid.MainActivity;
+import projectparty.ppandroid.ServerInfo;
 
 import android.app.Service;
 import android.content.Intent;
