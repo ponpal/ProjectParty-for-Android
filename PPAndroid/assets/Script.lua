@@ -30,9 +30,7 @@ function init()
 	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
     rotation = 0
 
-    cfuns.C.networkConnect();
-
-
+    cfuns.C.networkConnect(Network);
 end
 
 function term()
