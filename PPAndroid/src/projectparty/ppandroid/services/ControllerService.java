@@ -137,7 +137,7 @@ public class ControllerService extends Service {
 		return connect();
 	}
 	
-	public int shutDown() {
+	public int shutdown() {
 		stopSelf();
 		return 1;
 	}
