@@ -26,9 +26,6 @@ import android.os.Message;
  *
  */
 public class ServerDiscoveryService extends Service {
-	/** String constant for broadcasted log messages */
-	public static final String LOG_MESSAGE = "projectparty.ppandroid.log";
-	
 	/** String constant for broadcasted "found server" messages */
 	public static final String FOUND_SERVER_MESSAGE = "projectparty.ppandroid.server";
 	
@@ -125,9 +122,9 @@ public class ServerDiscoveryService extends Service {
 			udpSocket.close();
 			udpSocket.disconnect();	
 
-			stopSelf();
-
 			notifyActivity(SEARCH_STOPPED_MESSAGE);
+			
+			stopSelf();
 		}
 		
 		private ServerInfo unpackBroadcastMessage(byte[] udpBuffer) throws IOException {
