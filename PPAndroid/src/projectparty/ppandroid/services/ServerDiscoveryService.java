@@ -145,8 +145,6 @@ public class ServerDiscoveryService extends Service {
 				ip[1] = ip[2];
 				ip[2] = tmp;
 				
-				
-				
 				short p = buffer.getShort();
 				int port = ((p & 0xFF00) >> 8) << 8 | (p & 0xFF);
 				

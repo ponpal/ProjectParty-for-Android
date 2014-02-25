@@ -38,7 +38,7 @@ Network* networkInitialize(android_app* app)
 
 	LOGI("Got a dummy static int! %d", (size_t)dummy);
 
-	auto fi = env->GetStaticFieldID(clazz, "instance", "Lprojectparty/ppandroid/ControllerService;");
+	auto fi = env->GetStaticFieldID(clazz, "instance", "Lprojectparty/ppandroid/services/ControllerService;");
 	LOGI("Fetched field ID! %d", (size_t)fi);
 	LOGI(":(");
 
