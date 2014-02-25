@@ -148,7 +148,7 @@ public class ServerDiscoveryService extends Service {
 				int port = ((p & 0xFF00) >> 8) << 8 | (p & 0xFF);
 				
 				int sn = buffer.getShort();
-				int serverNameLength = ((p & 0xFF00) >> 8) << 8 | (p & 0xFF);
+				int serverNameLength = ((sn & 0xFF00) >> 8) << 8 | (sn & 0xFF);
 				
 				byte[] serverName = new byte[256];
 
