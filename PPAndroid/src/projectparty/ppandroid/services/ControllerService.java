@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 
 import projectparty.ppandroid.ServerInfo;
@@ -30,8 +31,8 @@ public class ControllerService extends Service {
 	@Override
 	public void onCreate() {
 		instance = this;
-		this.inBuffer  = ByteBuffer.allocateDirect(1024);
-		this.outBuffer = ByteBuffer.allocateDirect(1024);
+		this.inBuffer  = ByteBuffer.allocateDirect(0xFFFF);
+		this.outBuffer = ByteBuffer.allocateDirect(0xFFFF);
 	}
 
 	@Override
@@ -62,16 +63,26 @@ public class ControllerService extends Service {
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
-	
+
+
+	public int receive() {
+		try {
+			inBuffer.position(0);
+			return socketChan.read(inBuffer);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return 0;
+		}
+	}
+
 	public int send(int size) {
 		if(size > 0) {
 			outBuffer.position(0);
 			outBuffer.limit(size);
 			try {
 				int written = socketChan.write(outBuffer);
-				if(written != size)
-
-					return written;
+				
+				return written;
 			} catch (IOException e) {
 				//e.printStackTrace();
 				return -1;
@@ -79,15 +90,6 @@ public class ControllerService extends Service {
 		}
 
 		return 0;
-	}
-
-	public int receive() {
-		try {
-			return socketChan.read(inBuffer);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return 0;
-		}
 	}
 	
 	public int isAlive() { 
@@ -101,6 +103,7 @@ public class ControllerService extends Service {
 					latestServer.getPort()));
 		
 			ByteBuffer sessionIdBuffer = ByteBuffer.allocateDirect(8);
+			sessionIdBuffer.order(ByteOrder.LITTLE_ENDIAN);
 
 			if(socketChan.finishConnect()) {
 				socketChan.configureBlocking(true);
@@ -142,6 +145,7 @@ public class ControllerService extends Service {
 		byte[] byteAlias = playerAlias.getBytes("UTF-8");
 
 		ByteBuffer aliasBuffer = ByteBuffer.allocateDirect(byteAlias.length + 3);
+		aliasBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		aliasBuffer.putShort((short) (byteAlias.length + 1));
 		aliasBuffer.put((byte) 0);
 		aliasBuffer.put(byteAlias);
@@ -160,3 +164,4 @@ public class ControllerService extends Service {
 		sendBroadcast(intent);
 	}
 }
+

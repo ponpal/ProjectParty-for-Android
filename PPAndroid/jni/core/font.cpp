@@ -9,6 +9,7 @@
 #include <string>
 #include <cmath>
 #include "font.h"
+#include "external_libs/utf8.h"
 
 namespace font
 {
@@ -17,8 +18,12 @@ namespace font
 		float width = 0, height = 0, cursor = 0;
 
 		auto spaceInfo = font[' '];
-		for(auto c : text)
+		auto itr = text.begin();
+		auto end   = text.end();
+
+		while(itr != end)
 		{
+			auto c = utf8::next(itr, end);
 			if(c == '\r') continue;
 
 			if(c == ' ') {

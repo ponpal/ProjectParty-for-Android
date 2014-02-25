@@ -11,6 +11,7 @@
 #include "network.h"
 #include "clock.h"
 #include "lua_core_private.h"
+#include "sensor.h"
 
 extern "C"
 {
@@ -18,12 +19,15 @@ extern "C"
 	{
 		Clock* clock;
 		Network* network;
+		SensorState* sensor;
 		//Loader* loader;
 		//Renderer* renderer;
 		bool paused;
 
 	} Game;
 
+	typedef void (*messageHandler)(uint8_t id, uint32_t length);
+	extern messageHandler gMessageHandler;
 	extern Game* gGame;
 }
 

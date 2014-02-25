@@ -54,7 +54,6 @@ extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved)
     return JNI_VERSION_1_6;
 }
 
-
 struct AppState
 {
 	bool isStarted,
@@ -67,11 +66,54 @@ struct AppState
 	{
 		return isFocused && isResumed && isStarted && hasSurface;
 	}
-
-
 };
 
 AppState gAppState;
+ASensorManager* gSensorManager;
+ASensor* gAccelerometerSensor;
+ASensorEventQueue* gSensorEventQueue;
+
+void initSensors()
+{
+	gSensorManager = ASensorManager_getInstance();
+	gAccelerometerSensor = (ASensor*)ASensorManager_getDefaultSensor(gSensorManager, ASENSOR_TYPE_ACCELEROMETER);
+	gSensorEventQueue = ASensorManager_createEventQueue(gSensorManager, gApp->looper, LOOPER_ID_USER, NULL, NULL);
+}
+
+void resumeSensors()
+{
+
+	ASensorEventQueue_enableSensor(gSensorEventQueue, gAccelerometerSensor);
+	ASensorEventQueue_setEventRate(gSensorEventQueue, gAccelerometerSensor, (1000L / 60) * 1000);
+}
+
+void pauseSensors()
+{
+	ASensorEventQueue_disableSensor(gSensorEventQueue, gAccelerometerSensor);
+}
+
+void processSensors(int32_t id)
+{
+	if(id == LOOPER_ID_USER)
+	{
+		ASensorEvent event;
+		while(ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1))
+		{
+			switch(event.type)
+			{
+				case ASENSOR_TYPE_ACCELEROMETER:
+					vec3 v;
+					v.x = event.acceleration.x;
+					v.y = event.acceleration.y;
+					v.z = event.acceleration.z;
+
+					LOGI("Updating sensor! x=%f y=%f z=%f", v.x, v.y, v.z);
+					gGame->sensor->acceleration = v;
+				break;
+			}
+		}
+	}
+}
 
 namespace lifecycle
 {
@@ -138,12 +180,14 @@ namespace lifecycle
 	{
 		LOGI("App gained focus");
 		gAppState.isFocused = true;
+		resumeSensors();
 	}
 
 	void lostFocus()
 	{
 		LOGI("App lost focus");
 		gAppState.isFocused = false;
+		pauseSensors();
 	}
 
 	//EGL calls
@@ -211,6 +255,7 @@ void android_main(android_app* state)
 	state->onInputEvent 	= &handle_input;
 	gApp = state;
 
+	initSensors();
 	lifecycle::create();
 
 	while(1)
@@ -222,6 +267,8 @@ void android_main(android_app* state)
 		{
 		   if(source)
 			   source->process(state, source);
+
+		   processSensors(ident);
 
 		   if(state->destroyRequested)
 			   return;
