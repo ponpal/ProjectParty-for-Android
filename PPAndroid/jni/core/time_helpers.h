@@ -30,4 +30,6 @@ extern "C"
 	void clockStop(Clock* clock);
 }
 
+uint64_t timeNowMonoliticNsecs();
+
 #endif

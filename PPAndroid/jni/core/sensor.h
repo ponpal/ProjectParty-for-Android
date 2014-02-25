@@ -8,7 +8,9 @@
 #ifndef SENSOR_H_
 #define SENSOR_H_
 
-typedef struct { float x, y, z; } vec3;
+#include <glm/vec3.hpp>
+
+using namespace glm;
 
 typedef struct
 {

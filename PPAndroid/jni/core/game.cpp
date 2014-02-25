@@ -14,19 +14,24 @@ messageHandler gMessageHandler;
 void gameInitialize(android_app* app)
 {
 	gGame = new Game();
-	gGame->clock = new Clock();
-	gGame->sensor = new SensorState();
-	gGame->network = networkInitialize(app);
+	gGame->clock	 = new Clock();
+	gGame->sensor 	 = new SensorState();
+	gGame->screen    = new Screen();
+	gGame->network	 = networkInitialize(app);
+	gGame->renderer  = rendererInitialize(1024);
 
 	LOGI("Initializing Game!");
-
 	initializeLuaCore();
 }
 
 void gameTerminate()
 {
 	delete gGame->clock;
-	delete gGame->network;
+	delete gGame->sensor;
+
+	networkDelete(gGame->network);
+	rendererDelete(gGame->renderer);
+
 	delete gGame;
 }
 
@@ -56,17 +61,20 @@ void gamePause()
 
 void gameSurfaceCreated()
 {
+	rendererActivate(gGame->renderer);
+	initializeLuaScripts();
 	initLuaCall();
 }
 
 void gameSurfaceDestroyed()
 {
-	termLuaCall();
 }
 
 void gameStop()
 {
 	networkDisconnect(gGame->network);
+//	rendererDeactivate(gGame->renderer);
+	termLuaCall();
 }
 
 void handleFileTransfer(Buffer* buffer) {
@@ -91,8 +99,6 @@ void handleFileTransfer(Buffer* buffer) {
 
 		count = networkReceive(gGame->network);
 	}
-
-
 }
 
 void gameHandleReceive()
@@ -101,8 +107,6 @@ void gameHandleReceive()
 	if(count == 0) return;
 
 	auto buffer = gGame->network->in_;
-	LOGI("Got count=%d", count);
-
 	size_t remaining;
 	while(true)
 	{
@@ -124,16 +128,15 @@ void gameHandleReceive()
 			buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
 		}
 	}
-
-	LOGI("I was wrong!");
 }
 
-void gameStep(ndk_helper::GLContext* context)
+void gameStep()
 {
 	clockStep(gGame->clock);
-	if(networkIsAlive(gGame->network))
+	if(networkIsAlive(gGame->network)) {
 		gameHandleReceive();
-
-	updateLuaCall();
-	renderLuaCall(context);
+		runLuaGarbageCollector(1);
+		updateLuaCall();
+		renderLuaCall();
+	}
 }

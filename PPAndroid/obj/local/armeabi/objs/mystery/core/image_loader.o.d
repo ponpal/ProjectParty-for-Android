@@ -100,30 +100,8 @@ obj/local/armeabi/objs/mystery/core/image_loader.o: \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/assert.h \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/NDKHelper.h \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/gl3stub.h \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
  C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/shader.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/map \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES/gl.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES/glplatform.h \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/vecmath.h \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/tapCamera.h \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/interpolator.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/perfMonitor.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/list \
- C:/Android/android-ndk-r9c/sources/android/ndk_helper/gestureDetector.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/sensor.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
 
@@ -415,50 +393,6 @@ jni/core/assert.h:
 
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib:
 
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/NDKHelper.h:
-
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/gl3stub.h:
-
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/GLContext.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
-
 C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h:
 
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/shader.h:
-
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/map:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES/gl.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES/glplatform.h:
-
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/vecmath.h:
-
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/tapCamera.h:
-
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/interpolator.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h:
-
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/perfMonitor.h:
-
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/list:
-
-C:/Android/android-ndk-r9c/sources/android/ndk_helper/gestureDetector.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/sensor.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:

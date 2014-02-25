@@ -3,13 +3,13 @@ cfuns = require("ffi")
 
 cfuns.cdef[[ 
 
-	typedef struct { float x; float y; } vec2;
-    typedef struct { float x; float y; float z; } vec3;
+	typedef struct { float x; float y; } vec2f;
+    typedef struct { float x; float y; float z; } vec3f;
 
 	typedef struct
 	{
-		vec3 acceleration;
-		vec3 gyroscope;
+		vec3f acceleration;
+		vec3f gyroscope;
 	} SensorState;
 
 	typedef struct
@@ -32,13 +32,21 @@ cfuns.cdef[[
 		Buffer* out;
 	} Network;
 
+	typedef struct
+	{
+		uint32_t width, height;
+	} Screen;
 
-	//game.h
+
+	typedef struct Renderer Renderer;
 	typedef struct
 	{
 		Clock* clock;
 		Network* network;
-		SensorState* sensors;
+		SensorState* sensor;
+		Renderer* renderer;
+		Screen* screen;
+		//Loader* loader;
 		bool paused;
 
 	} Game;
@@ -59,12 +67,12 @@ cfuns.cdef[[
 	float clockTotal(Clock* clock);
 
 
-	vec2 measureString(uint32_t font, const char* str);
+	vec2f measureString(uint32_t font, const char* str);
 
-	void addFrame(uint32_t frame, vec2 pos, vec2 dim, unsigned int color);
-	void addFrame2(uint32_t frame, vec2 pos, vec2 dim, unsigned int color,
-				  vec2 origin, float rotation, int mirrored);
-	void addText(uint32_t font, const char* str, vec2 pos, unsigned int  color);
+	void addFrame(uint32_t frame, vec2f pos, vec2f dim, unsigned int color);
+	void addFrame2(uint32_t frame, vec2f pos, vec2f dim, unsigned int color,
+				  vec2f origin, float rotation, int mirrored);
+	void addText(uint32_t font, const char* str, vec2f pos, unsigned int  color);
 
 	void luaLog(const char* toLog);
 
@@ -159,9 +167,10 @@ In.readFloat  = C.bufferReadFloat;
 In.readDouble = C.bufferReadDouble
 
 
-Sensors = C.gGame.sensors
+Sensors = C.gGame.sensor
+Screen  = C.gGame.screen;
 
-vec2 = cfuns.typeof("vec2")
+vec2 = cfuns.typeof("vec2f")
 
 local gClock = C.gGame.clock;
 local function updateTime()

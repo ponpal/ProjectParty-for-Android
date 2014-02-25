@@ -9,7 +9,7 @@
 #include <android_native_app_glue.h>
 #include <cstdlib>
 #include <cstring>
-#include "NDKHelper.h"
+#include "JNIHelper.h"
 #include "android_helper.h"
 
 
@@ -28,23 +28,12 @@ Network* networkInitialize(android_app* app)
 
 	auto env = app->activity->env;
 	app->activity->vm->AttachCurrentThread( &env, NULL );
-
-	LOGI("Attached thread to environment!");
 	auto clazz = gNetworkServiceClass;
-
-	LOGI("Got a class %d ", (size_t)clazz);
-
 	auto dummy = env->GetStaticFieldID(clazz, "toAccess", "I");
-
-	LOGI("Got a dummy static int! %d", (size_t)dummy);
-
 	auto fi = env->GetStaticFieldID(clazz, "instance", "Lprojectparty/ppandroid/services/ControllerService;");
-	LOGI("Fetched field ID! %d", (size_t)fi);
-	LOGI(":(");
-
 	auto obj = env->GetStaticObjectField(clazz, fi);
+
 	gNetworkServiceObject = env->NewGlobalRef(obj);
-	LOGI("Fetched the object!");
 
 	sendID       = env->GetMethodID(clazz, "send", "(I)I");
 	receiveID    = env->GetMethodID(clazz, "receive", "()I");
@@ -55,16 +44,13 @@ Network* networkInitialize(android_app* app)
 	shutdownID   = env->GetMethodID(clazz, "shutdown", "()I");
 
 	fi = env->GetFieldID(clazz, "inBuffer", "Ljava/nio/ByteBuffer;");
-	LOGI("Got the field id for inBuffer");
 
 	auto inBufferObj = env->GetObjectField(obj, fi);
-	LOGI("Got in Buffer! %d", (size_t)inBufferObj);
 
 	fi = env->GetFieldID(clazz, "outBuffer", "Ljava/nio/ByteBuffer;");
 
 	auto outBufferObj = env->GetObjectField(obj, fi);
 
-	LOGI("Got out Buffer! %d", (size_t)outBufferObj);
 
 	auto network = new Network();
 	network->in_  = new Buffer();
@@ -76,10 +62,16 @@ Network* networkInitialize(android_app* app)
 	network->in_->length  = env->GetDirectBufferCapacity(inBufferObj);
 	network->out->length = env->GetDirectBufferCapacity(outBufferObj);
 
-	LOGI("Got access to buffers!");
 	app->activity->vm->DetachCurrentThread();
 
 	return network;
+}
+
+void networkDelete(Network* network)
+{
+	delete network->in_;
+	delete network->out;
+	delete network;
 }
 
 int networkSend(Network* network)

@@ -9,19 +9,27 @@
 #define GAME_H_
 
 #include "network.h"
-#include "clock.h"
+#include "time_helpers.h"
 #include "lua_core_private.h"
 #include "sensor.h"
+#include "GLContext.h"
+#include "new_renderer.h"
 
 extern "C"
 {
 	typedef struct
 	{
+		uint32_t width, height;
+	} Screen;
+
+	typedef struct
+	{
 		Clock* clock;
 		Network* network;
 		SensorState* sensor;
+		Renderer* renderer;
+		Screen* screen;
 		//Loader* loader;
-		//Renderer* renderer;
 		bool paused;
 
 	} Game;
@@ -41,6 +49,6 @@ void gameSurfaceDestroyed();
 void gameStop();
 
 void gameTerminate();
-void gameStep(ndk_helper::GLContext* context);
+void gameStep();
 
 #endif /* GAME_H_ */

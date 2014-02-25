@@ -4,7 +4,7 @@
  *  Created on: Feb 21, 2014
  *      Author: Lukas_2
  */
-#include "clock.h"
+#include "time_helpers.h"
 #include <time.h>
 
 uint64_t toNsecs(timespec spec)
@@ -20,6 +20,11 @@ uint64_t getCurrentTime()
 	timespec spec;
 	clock_gettime(CLOCK_MONOTONIC, &spec);
 	return toNsecs(spec);
+}
+
+uint64_t timeNowMonoliticNsecs()
+{
+	return getCurrentTime();
 }
 
 void clockStart(Clock* clock)

@@ -12,17 +12,8 @@
 #include <GLES2/gl2ext.h>
 #include <glm/glm.hpp>
 
-struct Color
-{
-	uint32_t packedValue;
-
-	Color() : packedValue(0xFFFFFFFF)
-	{ }
-
-	Color(uint32_t hex)
-		: packedValue(hex)
-	{ }
-};
+typedef struct { float x; float y; } vec2f;
+typedef struct { float x; float y; float z; } vec3f;
 
 struct Texture
 {

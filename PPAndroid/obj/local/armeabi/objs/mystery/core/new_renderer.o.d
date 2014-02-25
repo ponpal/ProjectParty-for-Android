@@ -1,4 +1,15 @@
-obj/local/armeabi/objs/mystery/core/font.o: jni/core/font.cpp \
+obj/local/armeabi/objs/mystery/core/new_renderer.o: \
+ jni/core/new_renderer.cpp jni/core/new_renderer.h jni/core/types.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/api-level.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
  jni/glm/glm/glm.hpp jni/glm/glm/detail/_fixes.hpp \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cmath \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/climits \
@@ -63,18 +74,55 @@ obj/local/armeabi/objs/mystery/core/font.o: jni/core/font.cpp \
  jni/glm/glm/detail/../geometric.hpp jni/glm/glm/vector_relational.hpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstring \
- jni/core/font.h jni/core/types.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
+ jni/core/font.h \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
+ jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp jni/core/shader.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib \
  jni/external_libs/utf8.h jni/external_libs/utf8/checked.h \
  jni/external_libs/utf8/core.h \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
- jni/external_libs/utf8/unchecked.h
+ jni/external_libs/utf8/unchecked.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
+ C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/configuration.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/asset_manager.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/looper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_activity.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/input.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/keycodes.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/rect.h
+
+jni/core/new_renderer.h:
+
+jni/core/types.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/api-level.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
 
 jni/glm/glm/glm.hpp:
 
@@ -294,21 +342,17 @@ jni/glm/glm/detail/func_integer.hpp:
 
 jni/glm/glm/detail/func_integer.inl:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstring:
-
 jni/core/font.h:
 
-jni/core/types.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
-
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
+
+jni/glm/glm/vec2.hpp:
+
+jni/glm/glm/mat4x4.hpp:
+
+jni/core/shader.h:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib:
 
 jni/external_libs/utf8.h:
 
@@ -321,3 +365,35 @@ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator:
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
 
 jni/external_libs/utf8/unchecked.h:
+
+C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
+
+C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/poll.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/configuration.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/asset_manager.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/looper.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_activity.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/input.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/keycodes.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/rect.h:
