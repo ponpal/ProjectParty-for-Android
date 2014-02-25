@@ -33,6 +33,8 @@ extern "C"
 
 void gameInitialize(android_app* app);
 void gameStart();
+void gameStop();
+
 void gameTerminate();
 void gameStep(ndk_helper::GLContext* context);
 

@@ -19,6 +19,8 @@ void gameInitialize(android_app* app)
 	gGame->network = networkInitialize(app);
 
 	LOGI("Initializing Game!");
+
+	initializeLuaCore();
 }
 
 void gameTerminate()
@@ -31,10 +33,13 @@ void gameTerminate()
 void gameStart()
 {
 	LOGI("Staring game!");
-
-	initializeLuaCore();
 	initLuaCall();
 	clockStart(gGame->clock);
+}
+
+void gameStop()
+{
+	termLuaCall();
 }
 
 void handleFileTransfer(Buffer* buffer) {

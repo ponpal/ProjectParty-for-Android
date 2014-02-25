@@ -133,10 +133,6 @@ public class ControllerService extends Service {
 			return 0;
 		}
 	}
-
-	public int reconnect() {
-		return connect();
-	}
 	
 	public int shutdown() {
 		stopSelf();
