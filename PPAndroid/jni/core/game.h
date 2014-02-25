@@ -33,6 +33,11 @@ extern "C"
 
 void gameInitialize(android_app* app);
 void gameStart();
+void gameRestart();
+void gameResume();
+void gamePause();
+void gameSurfaceCreated();
+void gameSurfaceDestroyed();
 void gameStop();
 
 void gameTerminate();

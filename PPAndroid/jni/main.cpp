@@ -139,18 +139,24 @@ namespace lifecycle
 	{
 		LOGI("App was restarted!");
 		gAppState.isStarted = true;
+
+		gameRestart();
 	}
 
 	void freshStart()
 	{
 		LOGI("App was started!");
 		gAppState.isStarted = true;
+
+		gameStart();
 	}
 
 	void resume()
 	{
 		LOGI("App was resumed!");
 		gAppState.isResumed = true;
+
+		gameResume();
 	}
 
 	void pause()
@@ -159,6 +165,7 @@ namespace lifecycle
 		gAppState.isResumed = false;
 		gAppState.isFocused = false;
 
+		gamePause();
 	}
 
 	void stop()
@@ -167,6 +174,8 @@ namespace lifecycle
 
 		gAppState.wasStopped = true;
 		gAppState.isStarted  = false;
+
+		gameStop();
 	}
 
 	void destroy()
@@ -201,6 +210,8 @@ namespace lifecycle
 		gameStart();
 		isInitialized = true;
 
+		gameSurfaceCreated();
+
 	}
 
 	void surfaceDestroyed()
@@ -210,6 +221,8 @@ namespace lifecycle
 		gameStop();
 
 		context->Invalidate();
+
+		gameSurfaceDestroyed();
 	}
 
 	void surfaceChanged()

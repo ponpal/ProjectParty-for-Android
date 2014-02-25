@@ -15,7 +15,7 @@
 
 jclass gNetworkServiceClass;
 jobject gNetworkServiceObject;
-jmethodID sendID, receiveID, isAliveID, connectID, disconnectID, shutdownID;
+jmethodID sendID, receiveID, isAliveID, connectID, disconnectID, shutdownID, reconnectID;
 
 void networkServiceClass(jclass clazz)
 {
@@ -50,6 +50,7 @@ Network* networkInitialize(android_app* app)
 	receiveID    = env->GetMethodID(clazz, "receive", "()I");
 	isAliveID    = env->GetMethodID(clazz, "isAlive", "()I");
 	connectID    = env->GetMethodID(clazz, "connect", "()I");
+	reconnectID  = env->GetMethodID(clazz, "reconnect", "()I");
 	disconnectID = env->GetMethodID(clazz, "disconnect", "()I");
 	shutdownID   = env->GetMethodID(clazz, "shutdown", "()I");
 
@@ -95,7 +96,7 @@ int networkSend(Network* network)
 
 	if(result != length) {
 		LOGW("Network did not send enough bytes! Sent: %d, Excpected: %d",
-		      (uint32_t)result, (uint32_t)length);
+				(uint32_t)result, (uint32_t)length);
 	}
 
 	gApp->activity->vm->DetachCurrentThread();
@@ -140,10 +141,19 @@ int networkConnect(Network* network)
 int networkDisconnect(Network* network)
 {
 	auto env = gApp->activity->env;
-		gApp->activity->vm->AttachCurrentThread( &env, NULL );
-		auto result = env->CallIntMethod(gNetworkServiceObject, disconnectID);
-		gApp->activity->vm->DetachCurrentThread();
-		return result;
+	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+	auto result = env->CallIntMethod(gNetworkServiceObject, disconnectID);
+	gApp->activity->vm->DetachCurrentThread();
+	return result;
+}
+
+int networkReconnect(Network* network)
+{
+	auto env = gApp->activity->env;
+	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+	auto result = env->CallIntMethod(gNetworkServiceObject, reconnectID);
+	gApp->activity->vm->DetachCurrentThread();
+	return result;
 }
 
 int networkShutdown(Network* network)

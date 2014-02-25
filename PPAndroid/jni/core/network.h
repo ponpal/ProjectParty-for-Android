@@ -33,6 +33,7 @@ extern "C"
 
 	int networkIsAlive(Network* network);
 	int networkConnect(Network* network);
+	int networkReconnect(Network* network);
 	int networkDisconnect(Network* network);
 
 	int networkShutdown(Network* network);

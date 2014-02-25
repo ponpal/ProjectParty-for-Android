@@ -2,7 +2,6 @@ local sensorNetworkID = 1
 local deathNetworkID  = 50
 local score = 0
 
-
 --Timing related stuff below
 local fpsCounter = 0
 local fps = 0
@@ -27,15 +26,11 @@ function init()
 	frame = Loader.loadFrame("orb.png")
 	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
     rotation = 0
-
-    cfuns.C.networkConnect(Network);
 end
 
 function term()
 	Loader.unloadFrame(frame)
 	Loader.unloadFont(font)
-
-	cfuns.C.networkDisconnect(Network);
 end
 
 function handleMessage(id, length)
@@ -60,12 +55,11 @@ function update()
 		--Send le buttons
 	else 
 		Out.writeShort(b, 25)
-		Out.writeByte (b, sensorNetworkID)
+		Out.writeByte(b, sensorNetworkID)
 		Out.writeVec3(b, Sensors.acceleration)
 		Out.writeVec3(b, Sensors.gyroscope)
 	
 	end
-
 
 	cfuns.C.networkSend(Network)
 end
