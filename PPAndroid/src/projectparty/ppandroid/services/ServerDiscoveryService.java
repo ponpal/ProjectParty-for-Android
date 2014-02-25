@@ -27,10 +27,10 @@ import android.os.Message;
  */
 public class ServerDiscoveryService extends Service {
 	/** String constant for broadcasted "found server" messages */
-	public static final String FOUND_SERVER_MESSAGE = "projectparty.ppandroid.server";
+	public static final String FOUND_SERVER_MESSAGE = "projectparty.ppandroid.services.server";
 	
 	/** String constant for broadcasted "search stopped" message **/
-	public static final String SEARCH_STOPPED_MESSAGE = "projectparty.ppandroid.stopped";
+	public static final String SEARCH_STOPPED_MESSAGE = "projectparty.ppandroid.services.stopped";
 
 	/** Message looper */
 	private Looper looper;
@@ -90,13 +90,13 @@ public class ServerDiscoveryService extends Service {
 		 * @throws IOException
 		 */
 		public void refreshServerList() throws UnknownHostException, IOException {
-			int sameRepeated = 0;
-
 			DatagramSocket udpSocket = new DatagramSocket(null);
 			udpSocket.setSoTimeout(2500);
 			udpSocket.setReuseAddress(true);
 			udpSocket.bind(new InetSocketAddress(7331));
 
+			int sameRepeated = 0;
+			
 			while(true) {
 				try {
 					byte[] udpBuffer = new byte[32];
@@ -122,8 +122,7 @@ public class ServerDiscoveryService extends Service {
 			udpSocket.close();
 			udpSocket.disconnect();	
 
-			notifyActivity(SEARCH_STOPPED_MESSAGE);
-			
+			notifyActivity(SEARCH_STOPPED_MESSAGE);	
 			stopSelf();
 		}
 		
@@ -148,8 +147,9 @@ public class ServerDiscoveryService extends Service {
 				short p = buffer.getShort();
 				int port = ((p & 0xFF00) >> 8) << 8 | (p & 0xFF);
 				
-
-				int serverNameLength = buffer.getInt();
+				int sn = buffer.getShort();
+				int serverNameLength = ((p & 0xFF00) >> 8) << 8 | (p & 0xFF);
+				
 				byte[] serverName = new byte[256];
 
 				buffer.get(serverName, 0, serverNameLength);
@@ -161,6 +161,8 @@ public class ServerDiscoveryService extends Service {
 			return info;
 		}
 	}
+	
+	
 
 	private void notifyActivity(String message) {
 		Intent intent = new Intent(message);
