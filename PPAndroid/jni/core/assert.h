@@ -14,7 +14,7 @@
 
 #else
 #include <cstdlib>
-#include "NDKHelper.h"
+#include "JNIHelper.h"
 
 #define assert(b, msg) \
 if(!(b)) \

@@ -26,6 +26,8 @@ function init()
 	frame = Loader.loadFrame("orb.png")
 	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
     rotation = 0
+
+    log(string.format("Loaded %d, %d", frame, font));
 end
 
 function term()
@@ -66,11 +68,11 @@ end
 function render()
 	local pos = vec2(0, 0);
 	local text = string.format("Score: %d", score)
-	local dim = vec2(480, 800)
 
+	local dim = vec2(Screen.width, Screen.height)
 	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
 
-	pos.y = 700
+	pos.y = Screen.height - 50;
 	Renderer.addText(font, text, pos, 0xFF00cccc)
 
 	renderTime()

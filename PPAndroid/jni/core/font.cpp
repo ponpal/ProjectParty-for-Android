@@ -6,20 +6,20 @@
  */
 
 #include <glm/glm.hpp>
-#include <string>
+#include <cstring>
 #include <cmath>
 #include "font.h"
 #include "external_libs/utf8.h"
 
 namespace font
 {
-	glm::vec2 measure(const Font& font, const std::string& text)
+	glm::vec2 measure(const Font& font, const char* text)
 	{
 		float width = 0, height = 0, cursor = 0;
 
 		auto spaceInfo = font[' '];
-		auto itr = text.begin();
-		auto end   = text.end();
+		auto itr   = &text[0];
+		auto end   = &text[strlen(text)];
 
 		while(itr != end)
 		{

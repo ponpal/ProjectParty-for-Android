@@ -8,12 +8,16 @@
 #ifndef LUA_CORE_PRIVATE_H_
 #define LUA_CORE_PRIVATE_H_
 #include <android_native_app_glue.h>
-#include "NDKHelper.h"
+#include "JNIHelper.h"
 
 void initializeLuaCore();
+void initializeLuaScripts();
+void initializeRenderer();
+
 void initLuaCall();
 void termLuaCall();
 void updateLuaCall();
-void renderLuaCall(ndk_helper::GLContext* context);
+void renderLuaCall();
+void runLuaGarbageCollector(int milisecs);
 
 #endif /* LUA_CORE_PRIVATE_H_ */

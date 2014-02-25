@@ -157,14 +157,14 @@ uint64_t bufferReadLong(Buffer* buffer)
 	BOUNDS_CHECK(buffer, sizeof(uint64_t));
 
 	auto ptr = buffer->ptr;
-	uint32_t result = *(ptr++);
+	uint64_t result = *(ptr++);
 	result = result | (*(ptr++) << 8);
 	result = result | (*(ptr++) << 16);
 	result = result | (*(ptr++) << 24);
-	result = result | (*(ptr++) << 32);
-	result = result | (*(ptr++) << 40);
-	result = result | (*(ptr++) << 48);
-	result = result | (*(ptr++) << 56);
+	result = result | (((uint64_t)*(ptr++)) << 32);
+	result = result | (((uint64_t)*(ptr++)) << 40);
+	result = result | (((uint64_t)*(ptr++)) << 48);
+	result = result | (((uint64_t)*(ptr++)) << 56);
 	buffer->ptr = ptr;
 	return result;
 }

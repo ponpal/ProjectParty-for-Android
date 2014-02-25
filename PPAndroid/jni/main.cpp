@@ -7,7 +7,6 @@
 
 #include "main.h"
 
-#define HELPER_CLASS_NAME "projectparty/ppandroid/NDKHelper"
 
 static int32_t handle_input(android_app* app, AInputEvent* event)
 {
@@ -125,6 +124,8 @@ namespace lifecycle
 		gAppState.isFocused 	= false;
 		gAppState.hasSurface 	= false;
 		gAppState.wasStopped 	= false;
+
+		gameInitialize(gApp);
 	}
 
 	void start()
@@ -181,7 +182,7 @@ namespace lifecycle
 	void destroy()
 	{
 		LOGI("App was destroyed!");
-		networkShutdown(gGame->network);
+		gameTerminate();
 	}
 
 	//Focus Events
@@ -206,11 +207,8 @@ namespace lifecycle
 		gAppState.hasSurface = true;
 
 		context ->Init(gApp->window);
-
-		gameInitialize(gApp);
-		gameStart();
-		isInitialized = true;
-
+		gGame->screen->width  = context->GetScreenWidth();
+		gGame->screen->height = context->GetScreenHeight();
 		gameSurfaceCreated();
 
 	}
@@ -219,7 +217,6 @@ namespace lifecycle
 	{
 		LOGI("Surface Destroyed");
 		gAppState.hasSurface = false;
-		gameStop();
 
 		context->Invalidate();
 
@@ -229,6 +226,8 @@ namespace lifecycle
 	void surfaceChanged()
 	{
 		LOGI("Surface Changed");
+		gGame->screen->width  = context->GetScreenWidth();
+		gGame->screen->height = context->GetScreenHeight();
 	}
 }
 
@@ -255,12 +254,6 @@ void handle_cmd(android_app* app, int32_t cmd)
 	}
 }
 
-void render()
-{
-	if(!isInitialized) return;
-	updateLuaCall();
-	renderLuaCall(context);
-}
 
 void android_main(android_app* state)
 {
@@ -289,7 +282,10 @@ void android_main(android_app* state)
 		}
 
 		if(gAppState.fullyActive()) {
-			gameStep(context);
+			gGame->screen->width  = context->GetScreenWidth();
+			gGame->screen->height = context->GetScreenHeight();
+			gameStep();
+			context->Swap();
 		}
 	}
 

@@ -41,5 +41,6 @@ extern "C"
 
 void networkServiceClass(jclass clazz);
 Network* networkInitialize(android_app* app);
+void networkDelete(Network* network);
 
 #endif /* NETWORK_INTERNAL_H_ */

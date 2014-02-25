@@ -82,7 +82,7 @@ struct Font
 
 namespace font
 {
-	glm::vec2 measure(const Font& f, const std::string& text);
+	glm::vec2 measure(const Font& f, const char* text);
 }
 
 

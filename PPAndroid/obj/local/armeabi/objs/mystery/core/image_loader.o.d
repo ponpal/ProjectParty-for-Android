@@ -101,6 +101,7 @@ obj/local/armeabi/objs/mystery/core/image_loader.o: \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/assert.h \
+<<<<<<< HEAD
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/NDKHelper.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/gl3stub.h \
@@ -143,6 +144,29 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h:
+=======
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/api-level.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h:
+>>>>>>> Did some changes to the renderer and worked on the lifecycle.
 
 jni/external_libs/lodepng.h:
 
@@ -418,6 +442,7 @@ jni/glm/glm/detail/func_integer.inl:
 
 jni/core/assert.h:
 
+<<<<<<< HEAD
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/NDKHelper.h:
@@ -465,3 +490,10 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/sensor.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window_jni.h:
+=======
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib:
+
+C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
+>>>>>>> Did some changes to the renderer and worked on the lifecycle.

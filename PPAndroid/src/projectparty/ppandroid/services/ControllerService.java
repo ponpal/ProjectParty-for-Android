@@ -81,7 +81,7 @@ public class ControllerService extends Service {
 
 				return written;
 			} catch (IOException e) {
-				//e.printStackTrace();
+				e.printStackTrace();
 				return -1;
 			}
 		}
@@ -127,6 +127,10 @@ public class ControllerService extends Service {
 	}
 
 	public int reconnect() {
+		if(sessionID == null) {
+			return COULD_NOT_RECONNECT;
+		}
+
 		try {
 			socketChan = SocketChannel.open();
 			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
@@ -135,18 +139,28 @@ public class ControllerService extends Service {
 			ByteBuffer buffer = ByteBuffer.allocateDirect(8);
 			buffer.order(ByteOrder.LITTLE_ENDIAN);
 
-			if(sessionID == null) {
-				return COULD_NOT_RECONNECT;
+			if(socketChan.finishConnect()) {
+				socketChan.configureBlocking(true);
+				socketChan.read(buffer);
+			} else {
+				handleNetworkError();
 			}
 
+			buffer.position(0);
 			buffer.putLong(sessionID);
-
+			buffer.flip();
+			socketChan.write(buffer);
+			
+			buffer.position(0);
+			buffer.limit(1);
 			socketChan.read(buffer);
-			if(buffer.get() == 0)
+			buffer.position(0);
+			if(buffer.get(0) == 0)
 			{
 				socketChan.close();
 				return SERVER_REFUSED_RECONNECT;
 			}
+			socketChan.configureBlocking(false);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return 0;

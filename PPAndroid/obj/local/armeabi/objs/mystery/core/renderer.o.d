@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 obj/local/armeabi/objs/mystery/core/renderer.o: jni/core/renderer.cpp \
  jni/core/renderer.h jni/core/types.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
@@ -358,3 +359,6 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/stdexcept:
 
 jni/external_libs/utf8/unchecked.h:
+=======
+obj/local/armeabi/objs/mystery/core/renderer.o: jni/core/renderer.cpp
+>>>>>>> Did some changes to the renderer and worked on the lifecycle.
