@@ -144,9 +144,10 @@ public class ControllerService extends Service {
 				handleNetworkError();
 			}
 
+			sessionIdBuffer.flip();
 			sessionID = sessionIdBuffer.getLong();
 			
-			sessionIdBuffer.flip();
+			sessionIdBuffer.position(0);
 			socketChan.write(sessionIdBuffer);
 			connected = true;
 			
