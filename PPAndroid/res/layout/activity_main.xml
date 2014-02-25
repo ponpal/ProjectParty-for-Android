@@ -4,12 +4,40 @@
     android:layout_height="match_parent"
     android:layout_margin="16dp"
     tools:context=".MainActivity" >
+    
+    <LinearLayout
+        android:id="@+id/aliasLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:orientation="horizontal"
+        android:focusable="true" 
+        android:focusableInTouchMode="true" >
+
+        <TextView
+            android:id="@+id/aliasLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/alias"
+            android:textAppearance="@android:style/TextAppearance.Medium" />
+
+        <EditText
+            android:id="@+id/aliasField"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:hint="@string/aliasHint"
+            android:maxLength="12" >
+        </EditText>
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/listHeaderLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_below="@+id/aliasLayout"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp" >
 
         <TextView
             android:id="@+id/serversLabel"
@@ -40,14 +68,11 @@
 
     <LinearLayout
         android:id="@+id/listLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/aliasLayout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentBottom="true"
         android:layout_below="@+id/listHeaderLayout"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:orientation="vertical" >
 
         <ListView
@@ -55,34 +80,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
         </ListView>
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/aliasLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal"
-        android:focusable="true" 
-        android:focusableInTouchMode="true" >
-
-        <TextView
-            android:id="@+id/aliasLabel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/alias"
-            android:textAppearance="@android:style/TextAppearance.Medium" />
-
-        <EditText
-            android:id="@+id/aliasField"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:hint="@string/aliasHint"
-            android:maxLength="12" >
-        </EditText>
     </LinearLayout>
 
 </RelativeLayout>

@@ -93,6 +93,7 @@ cfuns.cdef[[
 
 	//network.h    
     int networkConnect(Network* network);
+    int networkReconnect(Network* network);
     int networkDisconnect(Network* network);
 
     int networkSend(Network* network);

@@ -32,14 +32,41 @@ void gameTerminate()
 
 void gameStart()
 {
-	LOGI("Staring game!");
-	initLuaCall();
+	LOGI("Starting game!");
 	clockStart(gGame->clock);
+	networkConnect(gGame->network);
+}
+
+void gameRestart()
+{
+	LOGI("Restarting game!");
+	clockStart(gGame->clock);
+	networkReconnect(gGame->network);
+}
+
+void gameResume()
+{
+	gGame->paused = false;
+}
+
+void gamePause()
+{
+	gGame->paused = true;
+}
+
+void gameSurfaceCreated()
+{
+	initLuaCall();
+}
+
+void gameSurfaceDestroyed()
+{
+	termLuaCall();
 }
 
 void gameStop()
 {
-	termLuaCall();
+	networkDisconnect(gGame->network);
 }
 
 void handleFileTransfer(Buffer* buffer) {

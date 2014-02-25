@@ -14,6 +14,8 @@ import android.os.IBinder;
 
 public class ControllerService extends Service {
 	public static final String ERROR_MESSAGE = "projectparty.ppandroid.error";
+	public static final int COULD_NOT_RECONNECT = 500;
+	private static final int SERVER_REFUSED_RECONNECT = 250;
 
 	private SocketChannel socketChan;
 	private boolean connected = false;
@@ -26,7 +28,7 @@ public class ControllerService extends Service {
 	public ByteBuffer outBuffer;
 	public static ControllerService instance;
 	public static int toAccess;
-	public static Long sessionID;
+	public Long sessionID;
 
 	@Override
 	public void onCreate() {
@@ -40,7 +42,7 @@ public class ControllerService extends Service {
 		ServerInfo info = (ServerInfo) intent.getSerializableExtra("server");
 		this.playerAlias = intent.getStringExtra("playerAlias");
 		this.latestServer = info;
-		
+
 		return START_STICKY;
 	}
 
@@ -76,7 +78,7 @@ public class ControllerService extends Service {
 			outBuffer.limit(size);
 			try {
 				int written = socketChan.write(outBuffer);
-				
+
 				return written;
 			} catch (IOException e) {
 				//e.printStackTrace();
@@ -86,41 +88,36 @@ public class ControllerService extends Service {
 
 		return 0;
 	}
-	
+
 	public int isAlive() { 
 		return socketChan.isConnected() ? 1 : 0;
 	}
-	
+
 	public int connect() {
 		try {
 			socketChan = SocketChannel.open();
 			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
 					latestServer.getPort()));
-		
-			ByteBuffer sessionIdBuffer = ByteBuffer.allocateDirect(8);
-			sessionIdBuffer.order(ByteOrder.LITTLE_ENDIAN);
+
+			ByteBuffer buffer = ByteBuffer.allocateDirect(8);
+			buffer.order(ByteOrder.LITTLE_ENDIAN);
 
 			if(socketChan.finishConnect()) {
 				socketChan.configureBlocking(true);
-				socketChan.read(sessionIdBuffer);
-				socketChan.configureBlocking(false);
+				socketChan.read(buffer);
 			} else {
 				handleNetworkError();
 			}
-	
-			sessionIdBuffer.flip();
-			
-			if(sessionID == null) {
-				sessionID = sessionIdBuffer.getLong();
-			} else {
-				sessionIdBuffer.putLong(sessionID);
-			}
 
-			sessionIdBuffer.position(0);
-			socketChan.write(sessionIdBuffer);
+			buffer.flip();
+			sessionID = buffer.getLong();
+
+			buffer.position(0);
+			socketChan.write(buffer);
 
 			connected = true;
-			
+			socketChan.configureBlocking(false);
+
 			sendAlias();
 			return 1;
 		} catch (IOException e) {
@@ -128,7 +125,36 @@ public class ControllerService extends Service {
 			return 0;
 		}
 	}
-	
+
+	public int reconnect() {
+		try {
+			socketChan = SocketChannel.open();
+			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
+					latestServer.getPort()));
+
+			ByteBuffer buffer = ByteBuffer.allocateDirect(8);
+			buffer.order(ByteOrder.LITTLE_ENDIAN);
+
+			if(sessionID == null) {
+				return COULD_NOT_RECONNECT;
+			}
+
+			buffer.putLong(sessionID);
+
+			socketChan.read(buffer);
+			if(buffer.get() == 0)
+			{
+				socketChan.close();
+				return SERVER_REFUSED_RECONNECT;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			return 0;
+		}
+
+		return 1;
+	}
+
 	public int disconnect() {
 		try {
 			socketChan.close();
@@ -139,7 +165,7 @@ public class ControllerService extends Service {
 		connected = false;
 		return 1;
 	}
-	
+
 	public int shutdown() {
 		stopSelf();
 		return 1;
@@ -162,7 +188,7 @@ public class ControllerService extends Service {
 		stopSelf();
 		notifyActivity();
 	}
-	
+
 	public void notifyActivity() {
 		Intent intent = new Intent(ERROR_MESSAGE);
 		sendBroadcast(intent);
