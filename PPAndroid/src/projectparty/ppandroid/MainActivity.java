@@ -3,6 +3,9 @@ package projectparty.ppandroid;
 import java.util.ArrayList;
 import java.util.List;
 
+import projectparty.ppandroid.services.ControllerService;
+import projectparty.ppandroid.services.ServerDiscoveryService;
+
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -65,7 +68,6 @@ public class MainActivity extends Activity {
 		super.onResume();
 		registerReceiver(serverReceiver, new IntentFilter(ServerDiscoveryService.FOUND_SERVER_MESSAGE));
 		registerReceiver(serviceStoppedReceiver, new IntentFilter(ServerDiscoveryService.SEARCH_STOPPED_MESSAGE));
-		registerReceiver(connectedReceiver, new IntentFilter(ControllerService.CONNECTED_MESSAGE));
 		refresh();
 	}
 
@@ -74,7 +76,6 @@ public class MainActivity extends Activity {
 		super.onPause();
 		unregisterReceiver(serverReceiver);
 		unregisterReceiver(serviceStoppedReceiver);
-		unregisterReceiver(connectedReceiver);
 	}
 	
 	/**
@@ -164,6 +165,9 @@ public class MainActivity extends Activity {
 		serviceIntent.putExtra("server", server);
 		serviceIntent.putExtra("playerAlias", playerAlias);
 		startService(serviceIntent);
+		
+		Intent activityIntent = new Intent(this, MyNativeActivity.class);
+		startActivity(activityIntent);
 	}
 
 	/**
@@ -176,19 +180,6 @@ public class MainActivity extends Activity {
 			adapter.notifyDataSetChanged();
 		}
 	};
-
-	private BroadcastReceiver connectedReceiver = new BroadcastReceiver() {
-		
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			launchNativeActivity();
-		}
-	};
-	
-	private void launchNativeActivity() {
-		Intent activityIntent = new Intent(this, MyNativeActivity.class);
-		startActivity(activityIntent);
-	}
 	
 	/**
 	 * Receives and handles a broadcast when the ServerDiscoveryService has stopped its search.

@@ -38,7 +38,7 @@
         </activity>
 
         <service
-            android:name="projectparty.ppandroid.ServerDiscoveryService"
+            android:name="projectparty.ppandroid.services.ServerDiscoveryService"
             android:exported="false" />
 
         <activity 
@@ -50,7 +50,7 @@
         	<meta-data android:name="android.app.lib_name" android:value="mystery" />   
        	</activity>
 
-        <service android:name="projectparty.ppandroid.ControllerService" >
+        <service android:name = "projectparty.ppandroid.services.ControllerService" >
         </service>
     </application>
 
