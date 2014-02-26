@@ -11,15 +11,14 @@
 #include "types.h"
 #include "assert.h"
 
-Texture loadTexture(const char* path)
+Texture loadTexture(uint8_t* buffer, uint32_t length)
 {
 
-	Asset asset(path);
 	AutoPtr<uint8_t> pngData;
 
 	uint32_t width, height;
-	auto err = lodepng_decode32(&pngData.ptr, &width, &height, asset.buffer, asset.length);
-	assertf(err == 0, "Failed to load png! %s", path);
+	auto err = lodepng_decode32(&pngData.ptr, &width, &height, buffer, length);
+	assert(err == 0, "Failed to load png!");
 
 	GLuint name;
 	glGenTextures(1, &name);
