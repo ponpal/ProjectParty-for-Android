@@ -29,6 +29,9 @@
 							<tool id="com.android.gcc.compiler.489852302" name="Android GCC Compiler" superClass="com.android.gcc.compiler">
 								<option id="com.android.gcc.option.includePath.1185558288" superClass="com.android.gcc.option.includePath" valueType="includePath">
 									<listOptionValue builtIn="false" value="../jni/external_libs/utf8"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\Gustav\Documents\Programming\android-ndk-r9c-windows-x86_64\android-ndk-r9c\sources\cxx-stl\gnu-libstdc++\4.8\include\backward&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\Gustav\Documents\Programming\android-ndk-r9c-windows-x86_64\android-ndk-r9c\sources\cxx-stl\gnu-libstdc++\4.8\libs\armeabi\include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:\Users\Gustav\Documents\Programming\android-ndk-r9c-windows-x86_64\android-ndk-r9c\sources\cxx-stl\gnu-libstdc++\4.8\include&quot;"/>
 								</option>
 								<inputType id="com.android.gcc.inputType.1838939119" superClass="com.android.gcc.inputType"/>
 							</tool>
@@ -54,4 +57,11 @@
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId="com.android.AndroidPerProjectProfile"/>
 		</scannerConfigBuildInfo>
 	</storageModule>
+	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default">
+			<resource resourceType="PROJECT" workspacePath="/MainActivity"/>
+		</configuration>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
 </cproject>

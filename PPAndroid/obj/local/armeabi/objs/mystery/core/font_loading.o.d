@@ -1,19 +1,19 @@
 obj/local/armeabi/objs/mystery/core/font_loading.o: \
  jni/core/font_loading.cpp jni/core/font.h jni/glm/glm/glm.hpp \
  jni/glm/glm/detail/_fixes.hpp \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cmath \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/climits \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cfloat \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/limits \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cassert \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/climits \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/limits \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert \
  jni/glm/glm/fwd.hpp jni/glm/glm/detail/type_int.hpp \
  jni/glm/glm/detail/setup.hpp \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdint \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdint \
  jni/glm/glm/detail/type_float.hpp jni/glm/glm/detail/type_vec.hpp \
  jni/glm/glm/detail/precision.hpp jni/glm/glm/detail/type_int.hpp \
  jni/glm/glm/detail/type_mat.hpp jni/glm/glm/vec2.hpp \
  jni/glm/glm/detail/type_vec2.hpp jni/glm/glm/detail/type_vec.hpp \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstddef \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef \
  jni/glm/glm/detail/type_vec2.inl jni/glm/glm/vec3.hpp \
  jni/glm/glm/detail/type_vec3.hpp jni/glm/glm/detail/type_vec3.inl \
  jni/glm/glm/vec4.hpp jni/glm/glm/detail/type_vec4.hpp \
@@ -65,14 +65,14 @@ obj/local/armeabi/objs/mystery/core/font_loading.o: \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/types.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/stdexcept \
  jni/core/log.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h
 
 jni/core/font.h:
 
@@ -80,15 +80,15 @@ jni/glm/glm/glm.hpp:
 
 jni/glm/glm/detail/_fixes.hpp:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cmath:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/climits:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/climits:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cfloat:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/limits:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/limits:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cassert:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert:
 
 jni/glm/glm/fwd.hpp:
 
@@ -96,7 +96,7 @@ jni/glm/glm/detail/type_int.hpp:
 
 jni/glm/glm/detail/setup.hpp:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdint:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdint:
 
 jni/glm/glm/detail/type_float.hpp:
 
@@ -114,7 +114,7 @@ jni/glm/glm/detail/type_vec2.hpp:
 
 jni/glm/glm/detail/type_vec.hpp:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstddef:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef:
 
 jni/glm/glm/detail/type_vec2.inl:
 
@@ -296,18 +296,18 @@ jni/glm/glm/detail/func_integer.inl:
 
 jni/core/types.h:
 
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
 
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
 
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/stdexcept:
 
 jni/core/log.h:
 
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
