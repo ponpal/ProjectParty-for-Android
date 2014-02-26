@@ -37,7 +37,7 @@ end
 
 function handleMessage(id, length)
 	if id == deathNetworkID then
-		score = In.readShort(Network.in_)
+		score = In.readShort()
 	end
 end
 
@@ -49,17 +49,13 @@ function update()
 		return;
 	end
 
-	local b = Network.out
-	--Send accelerometer data. (This should be in C/C++?)
-	
 	if useButtons then
 		--Send le buttons
 	else 
-		Out.writeShort(b, 25)
-		Out.writeByte(b, sensorNetworkID)
-		Out.writeVec3(b, Sensors.acceleration)
-		Out.writeVec3(b, Sensors.gyroscope)
-	
+		Out.writeShort(25)
+		Out.writeByte(sensorNetworkID)
+		Out.writeVec3(Sensors.acceleration)
+		Out.writeVec3(Sensors.gyroscope)
 	end
 
 	cfuns.C.networkSend(Network)
@@ -69,7 +65,7 @@ function render()
 	local pos = vec2(0, 0);
 	local text = string.format("Score: %d", score)
 
-	local dim = vec2(Screen.width, Screen.height)
+	local dim = vec2(Screen.height, Screen.width)
 	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
 
 	pos.y = Screen.height - 50;
