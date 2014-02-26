@@ -64,8 +64,11 @@ obj/local/armeabi/objs/mystery/core/font.o: jni/core/font.cpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
 <<<<<<< HEAD
+<<<<<<< HEAD
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
 =======
+=======
+>>>>>>> Prototypical resource loading
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstring \
 >>>>>>> Did some changes to the renderer and worked on the lifecycle.
  jni/core/font.h jni/core/types.h \
@@ -85,7 +88,18 @@ obj/local/armeabi/objs/mystery/core/font.o: jni/core/font.cpp \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
  jni/external_libs/utf8/unchecked.h
+<<<<<<< HEAD
 >>>>>>> More scripting
+=======
+=======
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
+ jni/core/font.h jni/core/types.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h
+>>>>>>> Prototypical resource loading
+>>>>>>> Prototypical resource loading
 
 jni/glm/glm/glm.hpp:
 
@@ -306,10 +320,17 @@ jni/glm/glm/detail/func_integer.hpp:
 jni/glm/glm/detail/func_integer.inl:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
 =======
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstring:
 >>>>>>> Did some changes to the renderer and worked on the lifecycle.
+=======
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstring:
+=======
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
+>>>>>>> Prototypical resource loading
+>>>>>>> Prototypical resource loading
 
 jni/core/font.h:
 
@@ -322,8 +343,11 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
 =======
+=======
+>>>>>>> Prototypical resource loading
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
 
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
@@ -339,4 +363,10 @@ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator:
 C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
 
 jni/external_libs/utf8/unchecked.h:
+<<<<<<< HEAD
 >>>>>>> More scripting
+=======
+=======
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
+>>>>>>> Prototypical resource loading
+>>>>>>> Prototypical resource loading
