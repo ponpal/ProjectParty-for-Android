@@ -6,6 +6,7 @@
 #include "lua_core_private.h"
 #include <cstring>
 #include "game.h"
+#include <cmath>
 
 #include "new_renderer.h"
 #include <vector>
@@ -161,6 +162,9 @@ void renderLuaCall()
 
 	glm::mat4 matrix = glm::ortho(0.0f, (float)gGame->screen->width,
 		  0.0f, (float)gGame->screen->height);
+	matrix = translate(matrix, glm::vec3(800,0,0));
+	matrix = rotate(matrix, (float)M_PI_2, glm::vec3(0,0,1));
+
 	rendererSetTransform(gGame->renderer, &matrix);
 	callEmptyLuaFunction("render()");
 	rendererDraw(gGame->renderer);

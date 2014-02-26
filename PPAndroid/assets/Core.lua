@@ -25,7 +25,6 @@ cfuns.cdef[[
 		uint32_t length;
 	} Buffer;
 
-
 	typedef struct
 	{
 		Buffer* in_;
@@ -36,7 +35,6 @@ cfuns.cdef[[
 	{
 		uint32_t width, height;
 	} Screen;
-
 
 	typedef struct Renderer Renderer;
 	typedef struct
@@ -122,7 +120,7 @@ Loader.unloadFont  = C.unloadFont
 Loader.unloadFrame = C.unloadFrame
 
 Renderer = {} 
-Renderer.addFrame  = C.addFrame 
+Renderer.addFrame  = C.addFrame
 Renderer.addFrame2 = C.addFrame2 
 Renderer.addText   = C.addText 
 
@@ -140,44 +138,73 @@ C.gMessageHandler = function (id, length)
 end
 
 Out = { }
-Out.writeByte   = C.bufferWriteByte;
-Out.writeShort  = C.bufferWriteShort;
-Out.writeInt    = C.bufferWriteInt;
-Out.writeLong   = C.bufferWriteLong;
-Out.writeFloat  = C.bufferWriteFloat;
-Out.writeDouble = C.bufferWriteDouble;
-
-Out.writeVec2 = function (b, v)
-	C.bufferWriteFloat(b, v.x)
-	C.bufferWriteFloat(b, v.y)
+ function Out.writeByte(byte)
+	C.bufferWriteByte(C.gGame.network.out, byte)
 end
-
-Out.writeVec3 = function (b, v)
-	C.bufferWriteFloat(b, v.x)
-	C.bufferWriteFloat(b, v.y)
-	C.bufferWriteFloat(b, v.z)
+function Out.writeShort(short)
+	C.bufferWriteShort(C.gGame.network.out, short)
+end
+function Out.writeInt(int)
+	C.bufferWriteInt(C.gGame.network.out, int)
+end
+function Out.writeLong(long)
+	C.bufferWriteShort(C.gGame.network.out, long)
+end
+function Out.writeFloat(float)
+	C.bufferWriteFloat(C.gGame.network.out, float)
+end 
+function Out.writeDouble(double)
+	C.bufferWriteDouble(C.gGame.network.out, double)
+end
+function Out.writeVec2(v)
+	Out.writeFloat(v.x)
+	Out.writeFloat(v.y)
+end
+function Out.writeVec3(v)
+	Out.writeFloat(v.x)
+	Out.writeFloat(v.y)
+	Out.writeFloat(v.z)
 end
 
 In = { }
-In.readByte   = C.bufferReadByte;
-In.readShort  = C.bufferReadShort;
-In.readInt    = C.bufferReadInt;
-In.readLong   = C.bufferReadLong;
-In.readFloat  = C.bufferReadFloat;
-In.readDouble = C.bufferReadDouble
-
+In.readByte  = function()
+	return C.bufferReadByte(C.gGame.network.in_)
+end 
+In.readShort = function()
+	return C.bufferReadShort(C.gGame.network.in_)
+end
+In.readInt  = function()
+	return C.bufferReadInt(C.gGame.network.in_)
+end 
+In.readLong = function()
+	return C.bufferReadLong(C.gGame.network.in_)
+end
+In.readFloat = function()
+	return C.bufferReadFloat(C.gGame.network.in_)
+end
+In.readDouble = function()
+	return C.bufferReadDouble(C.gGame.network.in_)
+end
+In.readVec2 = function()
+	return vec2(In.readFloat(), In.readFloat())
+end
+In.readVec3 = function()
+	return vec3(In.readFloat(), In.readFloat(), In.readFloat())
+end
 
 Sensors = C.gGame.sensor
 Screen  = C.gGame.screen;
 
 vec2 = cfuns.typeof("vec2f")
 
-local gClock = C.gGame.clock;
 local function updateTime()
-	Time.total   = C.clockTotal(gClock)
-	Time.elapsed = C.clockElapsed(gClock)
+	Time.total   = C.clockTotal(C.gGame.clock)
+	Time.elapsed = C.clockElapsed(C.gGame.clock)
 end
 
 function coreUpdate()
+	Sensors = C.gGame.sensor
+	Screen  = C.gGame.screen
+
 	updateTime();
 end
