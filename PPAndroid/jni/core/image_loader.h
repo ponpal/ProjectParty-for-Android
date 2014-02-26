@@ -11,7 +11,7 @@
 #include "types.h"
 #include <jni.h>
 
-Texture loadTexture(const char* path);
+Texture loadTexture(uint8_t* buffer, uint32_t length);
 //uint8_t* loadBinary(const char* path, size_t& size);
 
 

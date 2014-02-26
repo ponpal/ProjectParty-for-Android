@@ -1,3 +1,7 @@
+#Ndk generated files
+*.o
+*.o.d
+
 # built application files
 *.apk
 *.ap_

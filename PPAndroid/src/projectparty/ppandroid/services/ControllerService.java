@@ -35,6 +35,7 @@ public class ControllerService extends Service {
 		instance = this;
 		this.inBuffer  = ByteBuffer.allocateDirect(0xFFFF);
 		this.outBuffer = ByteBuffer.allocateDirect(0xFFFF);
+
 	}
 
 	@Override
@@ -60,7 +61,6 @@ public class ControllerService extends Service {
 	public IBinder onBind(Intent arg0) {
 		return null;
 	}
-
 
 	public int receive() {
 		try {

@@ -90,6 +90,14 @@ void initializeLuaCore()
 	luaState = luaL_newstate();
 	luaL_openlibs(luaState);
 
+	const char* fileName = "app_config.xml";
+
+	const char* content = "asdfjkl;asdfjkl;\0";
+	{
+        ExternalAsset assetWrite = ExternalAsset(std::string(fileName), content, 17);
+	}
+	ExternalAsset assetRead = ExternalAsset(content);
+
 
 	Asset coreScript("Core.lua");
 	int error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "Cheader");
