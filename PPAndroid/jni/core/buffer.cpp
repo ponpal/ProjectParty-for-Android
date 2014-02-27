@@ -9,7 +9,7 @@
 #include "assert.h"
 
 #define BOUNDS_CHECK(buffer, len) \
-	assert(bufferBytesRemaining(buffer) >= len, "Buffer Overflow");
+	ASSERT(bufferBytesRemaining(buffer) >= len, "Buffer Overflow");
 
 
 uint32_t bufferBytesRemaining(Buffer* buffer)

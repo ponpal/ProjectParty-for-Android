@@ -8,6 +8,7 @@
 #ifndef CONTENT_H_
 #define CONTENT_H_
 
+#include "JNIHelper.h"
 #include "resource_table.h"
 #include "types.h"
 #include "font.h"

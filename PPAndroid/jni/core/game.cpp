@@ -7,6 +7,10 @@
 
 #include "game.h"
 #include "asset_helper.h"
+#include "stdlib.h"
+#include <string>
+#include "sys/stat.h"
+#include "errno.h"
 
 Game* gGame;
 messageHandler gMessageHandler;
@@ -78,6 +82,7 @@ void gameStop()
 }
 
 void handleFileTransfer(Buffer* buffer) {
+
 	auto type = bufferReadByte(buffer);
 	AutoPtr<char> path;
 	auto stringSize = bufferReadUTF8(buffer, &path.ptr);
@@ -86,19 +91,40 @@ void handleFileTransfer(Buffer* buffer) {
 	LOGI("Received a file! name=%s type=%d size=%llu", path.ptr, type, fileSize);
 
 	//Open Asset here - or do something else that is nice.
-	AutoPtr < uint8_t > asset;
-	asset.ptr = new uint8_t[0xFFFF];
-
 	auto count = bufferBytesRemaining(buffer);
+	auto externalsDir = gApp->activity->externalDataPath;
+	std::string filePath(externalsDir);
+	filePath += "/";
+	for(int i = 0; i < stringSize; i++) {
+		if(path.ptr[i] == '/') {
+			int err = mkdir(filePath.c_str(), 0770);
+			if(err != 0 && errno != 17)
+				LOGI("Failed to make directory: %d %s", errno, strerror(errno));
+		}
+		filePath += path.ptr[i];
+	}
+
+	auto file = fopen(filePath.c_str(), "w+");
+	if(file == NULL) {
+		LOGE("Unable to write/create file: %s", filePath.c_str());
+	} else {
+		LOGI("Created file %s", filePath.c_str());
+	}
+
+	AutoPtr<uint8_t> chunckBuffer(0xFFFF);
 	while (true) {
 		auto toRead = fileSize < count ? fileSize : count;
-		auto read = bufferReadBytes(buffer, asset.ptr, toRead);
+		auto read = bufferReadBytes(buffer, chunckBuffer.ptr, toRead);
+		fwrite(chunckBuffer.ptr, sizeof(uint8_t), read, file);
 		fileSize -= read;
 		if (fileSize == 0)
 			break;
 
 		count = networkReceive(gGame->network);
 	}
+
+	fclose(file);
+	LOGI("SUCESSFULLY WROTE A FILE!");
 }
 
 void gameHandleReceive()

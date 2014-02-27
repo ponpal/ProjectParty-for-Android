@@ -8,7 +8,6 @@
 #include "content.h"
 #include "image_loader.h"
 #include "font_loading.h"
-#include "log.h"
 
 Frame internalLoadFrame(const std::string& path)
 {
@@ -24,7 +23,7 @@ uint32_t Content::loadFont(std::string fontPath)
 	ExternalAsset asset(fontPath);
 	auto framePath = std::string(fontPath);
 	framePath.erase(fontPath.size() - 4, 4);
-	LOGI(framePath.c_str());
+	LOGI("%s", framePath.c_str());
 	framePath += "_0.png";
 	auto fi = loadFrame(framePath);
 	auto font = constructFont(asset.buffer, asset.length, getFrame(fi));
@@ -53,7 +52,7 @@ uint32_t Content::reloadFont(std::string fontPath)
 	ExternalAsset asset(fontPath);
 	auto framePath = std::string(fontPath);
 	framePath.erase(fontPath.size() - 4, 4);
-	LOGI(framePath.c_str());
+	LOGI("%s", framePath.c_str());
 	framePath += "_0.png";
 	auto fi = reloadFrame(framePath);
 	auto font = constructFont(asset.buffer, asset.length, getFrame(fi));
@@ -79,3 +78,16 @@ uint32_t Content::indexOfFrame(std::string path)
 {
 	return frames.indexOf(path);
 }
+
+bool Content::isFontLoaded(std::string path)
+{
+	return indexOfFont(path) != -1;
+}
+
+bool Content::isFrameLoaded(std::string path)
+{
+	return indexOfFrame(path) != -1;
+}
+
+
+

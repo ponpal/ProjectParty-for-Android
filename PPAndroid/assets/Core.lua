@@ -37,6 +37,7 @@ cfuns.cdef[[
 	} Screen;
 
 	typedef struct Renderer Renderer;
+	typedef struct Content  Content;
 	typedef struct
 	{
 		Clock* clock;
@@ -44,7 +45,7 @@ cfuns.cdef[[
 		SensorState* sensor;
 		Renderer* renderer;
 		Screen* screen;
-		//Loader* loader;
+		Content* content;
 		bool paused;
 
 	} Game;

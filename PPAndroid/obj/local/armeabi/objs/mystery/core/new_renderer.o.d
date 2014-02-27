@@ -11,19 +11,19 @@ obj/local/armeabi/objs/mystery/core/new_renderer.o: \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
  jni/glm/glm/glm.hpp jni/glm/glm/detail/_fixes.hpp \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cmath \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/climits \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cfloat \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/limits \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cassert \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/climits \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/limits \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert \
  jni/glm/glm/fwd.hpp jni/glm/glm/detail/type_int.hpp \
  jni/glm/glm/detail/setup.hpp \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdint \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdint \
  jni/glm/glm/detail/type_float.hpp jni/glm/glm/detail/type_vec.hpp \
  jni/glm/glm/detail/precision.hpp jni/glm/glm/detail/type_int.hpp \
  jni/glm/glm/detail/type_mat.hpp jni/glm/glm/vec2.hpp \
  jni/glm/glm/detail/type_vec2.hpp jni/glm/glm/detail/type_vec.hpp \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstddef \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef \
  jni/glm/glm/detail/type_vec2.inl jni/glm/glm/vec3.hpp \
  jni/glm/glm/detail/type_vec3.hpp jni/glm/glm/detail/type_vec3.inl \
  jni/glm/glm/vec4.hpp jni/glm/glm/detail/type_vec4.hpp \
@@ -75,17 +75,17 @@ obj/local/armeabi/objs/mystery/core/new_renderer.o: \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/font.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
  jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp jni/core/shader.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  jni/external_libs/utf8.h jni/external_libs/utf8/checked.h \
  jni/external_libs/utf8/core.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/iterator \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/stdexcept \
  jni/external_libs/utf8/unchecked.h \
  C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
  C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h \
@@ -128,15 +128,15 @@ jni/glm/glm/glm.hpp:
 
 jni/glm/glm/detail/_fixes.hpp:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cmath:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/climits:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/climits:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cfloat:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/limits:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/limits:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cassert:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert:
 
 jni/glm/glm/fwd.hpp:
 
@@ -144,7 +144,7 @@ jni/glm/glm/detail/type_int.hpp:
 
 jni/glm/glm/detail/setup.hpp:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdint:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdint:
 
 jni/glm/glm/detail/type_float.hpp:
 
@@ -162,7 +162,7 @@ jni/glm/glm/detail/type_vec2.hpp:
 
 jni/glm/glm/detail/type_vec.hpp:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstddef:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef:
 
 jni/glm/glm/detail/type_vec2.inl:
 
@@ -344,7 +344,7 @@ jni/glm/glm/detail/func_integer.inl:
 
 jni/core/font.h:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
 
 jni/glm/glm/vec2.hpp:
 
@@ -352,7 +352,7 @@ jni/glm/glm/mat4x4.hpp:
 
 jni/core/shader.h:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/cstdlib:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
 
 jni/external_libs/utf8.h:
 
@@ -360,9 +360,9 @@ jni/external_libs/utf8/checked.h:
 
 jni/external_libs/utf8/core.h:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/iterator:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/iterator:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/stdexcept:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/stdexcept:
 
 jni/external_libs/utf8/unchecked.h:
 
@@ -370,7 +370,7 @@ C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
 

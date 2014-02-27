@@ -97,7 +97,7 @@ public:
 
 	const Resource& operator[](uint32_t index)
 	{
-		assertf(index >= maxResources, "Trying to access resource out of bounds. Index: %d MaxIndex: %d", index, maxResources);
+		ASSERTF(index >= maxResources, "Trying to access resource out of bounds. Index: %d MaxIndex: %d", index, maxResources);
 		return resources[index];
 	}
 };

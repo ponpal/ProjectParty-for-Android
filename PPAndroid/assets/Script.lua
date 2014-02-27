@@ -19,20 +19,20 @@ end
 local function renderTime()
 	local pos  = vec2(0,0);
 	local text = string.format("FPS: %d Total %.2f \nElapsed %.3f" , fps, Time.total, Time.elapsed)
-	Renderer.addText(font, text, pos, 0xFF03cc42);	
+--	Renderer.addText(font, text, pos, 0xFF03cc42);	
 end
 
 function init()
-	frame = Loader.loadFrame("orb.png")
-	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
+--	frame = Loader.loadFrame("orb.png")
+--	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
     rotation = 0
 
     log(string.format("Loaded %d, %d", frame, font));
 end
 
 function term()
-	Loader.unloadFrame(frame)
-	Loader.unloadFont(font)
+--	Loader.unloadFrame(frame)
+--	Loader.unloadFont(font)
 end
 
 function handleMessage(id, length)
@@ -66,11 +66,10 @@ function render()
 	local text = string.format("Score: %d", score)
 
 	local dim = vec2(Screen.height, Screen.width)
-	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
+--	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
 
 	pos.y = Screen.height - 50;
-	Renderer.addText(font, text, pos, 0xFF00cccc)
+--	Renderer.addText(font, text, pos, 0xFF00cccc)
 
 	renderTime()
 end
-

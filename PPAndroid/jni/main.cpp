@@ -6,7 +6,8 @@
  */
 
 #include "main.h"
-
+#include "sys/stat.h"
+#include "errno.h"
 
 static int32_t handle_input(android_app* app, AInputEvent* event)
 {
@@ -254,6 +255,21 @@ void handle_cmd(android_app* app, int32_t cmd)
 	}
 }
 
+void initializeFileSystem()
+{
+	//On some phones the directory does not exist so we create it :)
+	auto externalsDir = gApp->activity->externalDataPath;
+	std::string d(externalsDir);
+	d.erase(d.size() - 6, 6);
+
+	int err = mkdir(d.c_str(), 0770);
+	if(err != 0&& errno != 17)
+		LOGI("Error is: %d %s", errno, strerror(errno));
+
+	err = mkdir(externalsDir, 0770);
+	if(err != 0 && errno != 17)
+		LOGI("Error is: %d %s", errno, strerror(errno));
+}
 
 void android_main(android_app* state)
 {
@@ -262,6 +278,7 @@ void android_main(android_app* state)
 	state->onInputEvent 	= &handle_input;
 	gApp = state;
 
+	initializeFileSystem();
 	initSensors();
 	lifecycle::create();
 

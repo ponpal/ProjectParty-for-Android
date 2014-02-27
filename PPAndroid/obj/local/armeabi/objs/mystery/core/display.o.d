@@ -47,8 +47,8 @@ obj/local/armeabi/objs/mystery/core/display.o: jni/core/display.cpp \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
  C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
  C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h \
@@ -157,9 +157,9 @@ C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/vector:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector:
 
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.6/include/string:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
 
 C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h:
 

@@ -9,20 +9,19 @@
 #define ASSERT_H_
 
 #ifdef NO_ASSERTS
-#define assertf(b, fmt, msg)
-#define assert(b, msg)
-
+#define ASSERT(b, msg)
+#define ASSERTF(b, fmt, msg)
 #else
 #include <cstdlib>
 #include "JNIHelper.h"
 
-#define assert(b, msg) \
+#define ASSERT(b, msg) \
 if(!(b)) \
 { \
 	LOGI("Assertion Failure: File: %s Line: %d Msg: %s", __FILE__, __LINE__, msg); \
 	exit(-1); \
 }
-#define assertf(b, fmt, ...) \
+#define ASSERTF(b, fmt, ...) \
 if(!(b)) \
 { \
 	LOGI("Assertion Failure: File: %s Line: %d \n" fmt, __FILE__, __LINE__, __VA_ARGS__); \

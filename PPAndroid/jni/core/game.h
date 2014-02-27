@@ -14,6 +14,7 @@
 #include "sensor.h"
 #include "GLContext.h"
 #include "new_renderer.h"
+#include "content.h"
 
 extern "C"
 {
@@ -29,7 +30,7 @@ extern "C"
 		SensorState* sensor;
 		Renderer* renderer;
 		Screen* screen;
-		//Loader* loader;
+		Content* content;
 		bool paused;
 
 	} Game;

@@ -18,7 +18,7 @@ Texture loadTexture(uint8_t* buffer, uint32_t length)
 
 	uint32_t width, height;
 	auto err = lodepng_decode32(&pngData.ptr, &width, &height, buffer, length);
-	assert(err == 0, "Failed to load png!");
+	ASSERT(err == 0, "Failed to load png!");
 
 	GLuint name;
 	glGenTextures(1, &name);

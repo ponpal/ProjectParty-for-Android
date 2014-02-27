@@ -5,10 +5,10 @@
  *      Author: Lukas_2
  */
 
+#include "JNIHelper.h"
 #include "font.h"
 #include "types.h"
 #include <stdexcept>
-#include "log.h"
 
 #pragma pack(1)
 struct InfoHeader

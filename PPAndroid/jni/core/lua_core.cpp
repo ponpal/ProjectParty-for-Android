@@ -24,21 +24,11 @@
 #include <lua.hpp>
 #include "android_helper.h"
 #include "asset_helper.h"
-
-
-std::vector<Font> fonts;
-std::vector<Frame> frames;
+#include "content.h"
 
 uint32_t loadFont(const char* frameName, const char* fontName)
 {
-	auto frame = loadFrame(frameName);
-	auto mgr   = gApp->activity->assetManager;
-
-	Asset asset(fontName);
-	auto font = constructFont(asset.buffer, asset.length, frames[frame]);
-	fonts.push_back(font);
-
-	return fonts.size() - 1;
+	return gGame->content->loadFont(fontName);
 }
 
 void unloadFont(uint32_t fontHandle)
@@ -47,7 +37,7 @@ void unloadFont(uint32_t fontHandle)
 
 vec2f measureString(uint32_t fontHandle, const char* str)
 {
-	auto f = fonts[fontHandle];
+	auto f = gGame->content->getFont(fontHandle);
 	auto vec = font::measure(f, str);
 
 	vec2f v;
@@ -58,30 +48,26 @@ vec2f measureString(uint32_t fontHandle, const char* str)
 
 uint32_t loadFrame(const char* name)
 {
-	auto texture = loadTexture(name);
-	auto frame   = Frame(texture, glm::vec4(0,1,1,-1));
-	frames.push_back(frame);
-	return frames.size() - 1;
-}
-
-void unloadFrame(uint32_t frameHandle)
-{
+	return gGame->content->loadFrame(name);
 }
 
 void addFrame(uint32_t frameHandle, vec2f pos, vec2f dim, uint32_t color)
 {
-	rendererAddFrame(gGame->renderer, &frames[frameHandle], pos, dim, color);
+	auto frame = gGame->content->getFrame(frameHandle);
+	rendererAddFrame(gGame->renderer, &frame, pos, dim, color);
 }
 
 void addFrame2(uint32_t frameHandle, vec2f pos, vec2f dim, uint32_t color,
 		vec2f origin, float rotation, int mirror)
 {
-	rendererAddFrame2(gGame->renderer, &frames[frameHandle], pos, dim, color, origin, rotation, mirror);
+	auto frame = gGame->content->getFrame(frameHandle);
+	rendererAddFrame2(gGame->renderer, &frame, pos, dim, color, origin, rotation, mirror);
 }
 
 void addText(uint32_t fontHandle, const char* str, vec2f pos, uint32_t color)
 {
-	rendererAddText(gGame->renderer, &fonts[fontHandle], str, pos, color);
+	auto font = gGame->content->getFont(fontHandle);
+	rendererAddText(gGame->renderer, &font, str, pos, color);
 }
 
 lua_State* luaState;
@@ -89,15 +75,6 @@ void initializeLuaCore()
 {
 	luaState = luaL_newstate();
 	luaL_openlibs(luaState);
-
-	const char* fileName = "app_config.xml";
-
-	const char* content = "asdfjkl;asdfjkl;\0";
-	{
-        ExternalAsset assetWrite = ExternalAsset(std::string(fileName), content, 17);
-	}
-	ExternalAsset assetRead = ExternalAsset(content);
-
 
 	Asset coreScript("Core.lua");
 	int error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "Cheader");

@@ -11,7 +11,7 @@
 #include <android/asset_manager.h>
 #include "android_helper.h"
 #include "stdlib.h"
-
+#include "JNIHelper.h"
 #include <stdio.h>
 
 struct Asset
@@ -38,6 +38,10 @@ template< typename T>
 struct AutoPtr
 {
 	T* ptr;
+	AutoPtr(size_t size)
+	{
+		ptr = new T[size];
+	}
 	AutoPtr(T* _ptr) : ptr(_ptr) { }
 	AutoPtr() : ptr(NULL) { }
 
@@ -48,7 +52,6 @@ struct AutoPtr
 	}
 };
 
-#include "log.h"
 struct ExternalAsset
 {
 	size_t 		length;

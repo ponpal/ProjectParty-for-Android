@@ -6,7 +6,7 @@
  */
 
 #include "shader.h"
-#include "log.h"
+#include "JNIHelper.h"
 
 #include <stdlib.h>
 
