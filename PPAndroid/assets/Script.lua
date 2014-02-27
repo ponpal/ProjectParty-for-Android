@@ -23,16 +23,14 @@ local function renderTime()
 end
 
 function init()
---	frame = Loader.loadFrame("orb.png")
---	font  = Loader.loadFont("Arial32_0.png", "Arial32.fnt")
+	frame = Loader.loadFrame("fonts/Blocked72_0.png")
+	--font  = Loader.loadFont("fonts/Blocked72.fnt")
     rotation = 0
 
-    log(string.format("Loaded %d, %d", frame, font));
+    --log(string.format("Loaded %d, %d", frame, font));
 end
 
 function term()
---	Loader.unloadFrame(frame)
---	Loader.unloadFont(font)
 end
 
 function handleMessage(id, length)
@@ -65,11 +63,11 @@ function render()
 	local pos = vec2(0, 0);
 	local text = string.format("Score: %d", score)
 
-	local dim = vec2(Screen.height, Screen.width)
---	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
+	local dim = vec2(Screen.width, Screen.height)
+	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
 
 	pos.y = Screen.height - 50;
---	Renderer.addText(font, text, pos, 0xFF00cccc)
+	--Renderer.addText(font, text, pos, 0xFF00cccc)
 
 	renderTime()
 end

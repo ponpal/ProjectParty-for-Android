@@ -64,6 +64,11 @@ struct Font
 		defaultChar = chars['/'];
 	}
 
+	void obliterate()
+	{
+		delete chars;
+	}
+
 	inline const CharInfo& operator[](size_t index) const
 	{
 		if(index > charsLength)

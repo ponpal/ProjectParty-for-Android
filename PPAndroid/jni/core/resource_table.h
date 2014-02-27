@@ -10,7 +10,7 @@
 template <class Resource>
 class ResourceTable
 {
-	typedef void (*Obliterator)(Resource);
+	typedef void (*Obliterator)(Resource*);
 
 private:
 	uint32_t maxResources;
@@ -32,11 +32,18 @@ public:
 		{
 			resourcePaths[i] = NO_RESOURCE_ID;
 		}
+	}
 
-		for (auto& resource : resources)
+	~ResourceTable()
+	{
+		for(uint32_t i = 0; i < maxResources; i++)
 		{
-			resource = Resource();
+			if (resourcePaths[i] != NO_RESOURCE_ID)
+				obliterator(&resources[i]);
+			delete &resourcePaths[i];
 		}
+		delete resourcePaths;
+		delete resources;
 	}
 
 	uint32_t add(const std::string& path, Resource resource)
@@ -64,10 +71,20 @@ public:
 		if (i == maxResources)
 			return false;
 
-		obliterator(resources[i]);
+		obliterator(&resources[i]);
 		resourcePaths[i] = NO_RESOURCE_ID;
 		return true;
 	}
+
+	bool remove(uint32_t handle)
+	{
+		if (resourcePaths[handle] == NO_RESOURCE_ID)
+			return false;
+		obliterator(&resources[handle]);
+		resourcePaths[handle] = NO_RESOURCE_ID;
+		return true;
+	}
+
 	uint32_t replace(const std::string& path, Resource r)
 	{
 		uint32_t i = 0;
@@ -79,11 +96,23 @@ public:
 		if (i == maxResources)
 			return -1;
 
-		obliterator(resources[i]);
+		obliterator(&resources[i]);
 		resources[i] = r;
 		return i;
 
 	}
+
+	void removeAll()
+	{
+		for(uint32_t i = 0; i < maxResources; i++)
+		{
+			if (resourcePaths[i] != NO_RESOURCE_ID) {
+				obliterator(&resources[i]);
+                resourcePaths[i] = NO_RESOURCE_ID;
+			}
+		}
+	}
+
 	uint32_t indexOf(const std::string& path)
 	{
 		uint32_t i = 0;
@@ -95,9 +124,15 @@ public:
         return i != maxResources ? i : -1;
 	}
 
+	const std::string& pathOf(uint32_t index)
+	{
+		ASSERTF(index < maxResources, "Trying to access resource out of bounds. Index: %d MaxIndex: %d", index, maxResources);
+		return resourcePaths[index];
+	}
+
 	const Resource& operator[](uint32_t index)
 	{
-		ASSERTF(index >= maxResources, "Trying to access resource out of bounds. Index: %d MaxIndex: %d", index, maxResources);
+		ASSERTF(index < maxResources, "Trying to access resource out of bounds. Index: %d MaxIndex: %d", index, maxResources);
 		return resources[index];
 	}
 };

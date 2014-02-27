@@ -36,11 +36,21 @@ struct Frame
 	glm::vec4 coords;
 
 	Frame() { }
+	Frame(Texture tex)
+	: texture(tex),
+	  coords(glm::vec4(0,1,1,-1))
+	{
+	}
 	Frame(Texture tex,
 		  glm::vec4 _coords)
 	: texture(tex),
 	  coords(_coords)
 	{
+	}
+
+	void obliterate()
+	{
+		glDeleteTextures(1, &texture.glName);
 	}
 };
 

@@ -109,6 +109,9 @@ int networkReceive(Network* network)
 
 	gApp->activity->vm->DetachCurrentThread();
 
+	if (result == -1)
+		LOGI("network error");
+
 	return result;
 }
 
@@ -123,37 +126,49 @@ int networkIsAlive(Network* network)
 
 int networkConnect(Network* network)
 {
+	LOGI("Connecting to network.");
 	auto env = gApp->activity->env;
 	gApp->activity->vm->AttachCurrentThread( &env, NULL );
 	auto result = env->CallIntMethod(gNetworkServiceObject, connectID);
 	gApp->activity->vm->DetachCurrentThread();
+	if (result == 1)
+        LOGI("Connected to network.");
 	return result;
 }
 
 int networkDisconnect(Network* network)
 {
+	LOGI("Disconnecting from network.");
 	auto env = gApp->activity->env;
 	gApp->activity->vm->AttachCurrentThread( &env, NULL );
 	auto result = env->CallIntMethod(gNetworkServiceObject, disconnectID);
 	gApp->activity->vm->DetachCurrentThread();
+	if (result == 1)
+        LOGI("Disconnected from network.");
 	return result;
 }
 
 int networkReconnect(Network* network)
 {
+    LOGI("Reconnecting to network.");
 	auto env = gApp->activity->env;
 	gApp->activity->vm->AttachCurrentThread( &env, NULL );
 	auto result = env->CallIntMethod(gNetworkServiceObject, reconnectID);
 	gApp->activity->vm->DetachCurrentThread();
+	if (result == 1)
+        LOGI("Reconnected to network.");
 	return result;
 }
 
 int networkShutdown(Network* network)
 {
+	LOGI("Shutting down network.");
 	auto env = gApp->activity->env;
 	gApp->activity->vm->AttachCurrentThread( &env, NULL );
 	auto result = env->CallIntMethod(gNetworkServiceObject, shutdownID);
 	gApp->activity->vm->DetachCurrentThread();
+	if (result == 1)
+        LOGI("Shut down network.");
 	return result;
 }
 

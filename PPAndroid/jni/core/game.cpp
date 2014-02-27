@@ -11,9 +11,12 @@
 #include <string>
 #include "sys/stat.h"
 #include "errno.h"
+#include "loading_screen.h"
 
 Game* gGame;
 messageHandler gMessageHandler;
+bool hasLoadedResources;
+LoadingScreen loadingScreen;
 
 void gameInitialize(android_app* app)
 {
@@ -23,6 +26,9 @@ void gameInitialize(android_app* app)
 	gGame->screen    = new Screen();
 	gGame->network	 = networkInitialize(app);
 	gGame->renderer  = rendererInitialize(1024);
+	gGame->content   = new Content(128);
+
+	loadingScreen = LoadingScreen();
 
 	LOGI("Initializing Game!");
 	initializeLuaCore();
@@ -41,6 +47,7 @@ void gameTerminate()
 
 void gameStart()
 {
+	hasLoadedResources = false;
 	LOGI("Starting game!");
 	clockStart(gGame->clock);
 	networkConnect(gGame->network);
@@ -67,7 +74,8 @@ void gameSurfaceCreated()
 {
 	rendererActivate(gGame->renderer);
 	initializeLuaScripts();
-	initLuaCall();
+	if (!hasLoadedResources)
+		loadingScreen.load();
 }
 
 void gameSurfaceDestroyed()
@@ -78,6 +86,7 @@ void gameStop()
 {
 	networkDisconnect(gGame->network);
 //	rendererDeactivate(gGame->renderer);
+	gGame->content->unloadAll();
 	termLuaCall();
 }
 
@@ -91,7 +100,6 @@ void handleFileTransfer(Buffer* buffer) {
 	LOGI("Received a file! name=%s type=%d size=%llu", path.ptr, type, fileSize);
 
 	//Open Asset here - or do something else that is nice.
-	auto count = bufferBytesRemaining(buffer);
 	auto externalsDir = gApp->activity->externalDataPath;
 	std::string filePath(externalsDir);
 	filePath += "/";
@@ -111,20 +119,41 @@ void handleFileTransfer(Buffer* buffer) {
 		LOGI("Created file %s", filePath.c_str());
 	}
 
+	auto count = bufferBytesRemaining(buffer);
+	LOGI("Count: %d, Filesize: %d", count, fileSize);
 	AutoPtr<uint8_t> chunckBuffer(0xFFFF);
 	while (true) {
-		auto toRead = fileSize < count ? fileSize : count;
+		uint32_t toRead = fileSize < count ? fileSize : count;
 		auto read = bufferReadBytes(buffer, chunckBuffer.ptr, toRead);
+
 		fwrite(chunckBuffer.ptr, sizeof(uint8_t), read, file);
 		fileSize -= read;
 		if (fileSize == 0)
 			break;
 
 		count = networkReceive(gGame->network);
+		if (count != 0)
+			LOGI("count %d, filesize %d", count, fileSize);
 	}
 
 	fclose(file);
 	LOGI("SUCESSFULLY WROTE A FILE!");
+}
+
+void handleAllResourcesLoaded()
+{
+	hasLoadedResources = true;
+	loadingScreen.unload();
+    initLuaCall();
+}
+
+void handleFileReload(Buffer* buf, size_t size)
+{
+	AutoPtr<char> path;
+	auto stringSize = bufferReadUTF8(buf, &path.ptr);
+	std::string str(path.ptr);
+	gGame->content->reloadAsset(str);
+	LOGI("File reloaded!");
 }
 
 void gameHandleReceive()
@@ -144,10 +173,15 @@ void gameHandleReceive()
 		auto size = bufferReadShort(buffer);
 		auto id   = bufferReadByte(buffer);
 
+		//LOGI("Received a message SIZE: %d, ID: %d", size, id);
 		if(id == NETWORK_FILE) {
 			handleFileTransfer(buffer);
+		} else if (id == NETWORK_ALLFILES) {
+			handleAllResourcesLoaded();
+		} else if (id == NETWORK_FILERELOAD) {
+			handleFileReload(buffer, size);
 		} else {
-		auto end = buffer->ptr + size - 1;
+            auto end = buffer->ptr + size - 1;
 			if(gMessageHandler != NULL) {
 				gMessageHandler(id, size - 1);
 			}
@@ -156,13 +190,18 @@ void gameHandleReceive()
 	}
 }
 
-void gameStep()
+void gameStep(ndk_helper::GLContext* context)
 {
 	clockStep(gGame->clock);
-	if(networkIsAlive(gGame->network)) {
+	if(hasLoadedResources && networkIsAlive(gGame->network)) {
 		gameHandleReceive();
 		runLuaGarbageCollector(1);
 		updateLuaCall();
 		renderLuaCall();
+		context->Swap();
+	} else if (!hasLoadedResources){
+		loadingScreen.draw(gGame->renderer, glm::vec2(gGame->screen->width, gGame->screen->height));
+		context->Swap();
+		gameHandleReceive();
 	}
 }

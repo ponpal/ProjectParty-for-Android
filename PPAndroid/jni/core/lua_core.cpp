@@ -26,13 +26,14 @@
 #include "asset_helper.h"
 #include "content.h"
 
-uint32_t loadFont(const char* frameName, const char* fontName)
+uint32_t loadFont(const char* fontName)
 {
 	return gGame->content->loadFont(fontName);
 }
 
 void unloadFont(uint32_t fontHandle)
 {
+	gGame->content->unloadFont(fontHandle);
 }
 
 vec2f measureString(uint32_t fontHandle, const char* str)
@@ -49,6 +50,11 @@ vec2f measureString(uint32_t fontHandle, const char* str)
 uint32_t loadFrame(const char* name)
 {
 	return gGame->content->loadFrame(name);
+}
+
+void unloadFrame(uint32_t frameHandle)
+{
+	gGame->content->unloadFrame(frameHandle);
 }
 
 void addFrame(uint32_t frameHandle, vec2f pos, vec2f dim, uint32_t color)

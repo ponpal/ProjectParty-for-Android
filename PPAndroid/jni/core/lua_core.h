@@ -15,9 +15,9 @@ using namespace glm;
 extern "C"
 {
 	unsigned int loadFrame(const char* name);
-	unsigned int loadFont(const char* frameName, const char* fontName);
-	void unloadFrame(unsigned int frame);
-	void unloadFont(unsigned int font);
+	unsigned int loadFont(const char* fontName);
+	void unloadFrame(uint32_t frame);
+	void unloadFont(uint32_t font);
 
 	vec2f measureString(unsigned int font, const char* str);
 	void addFrame(unsigned int frame, vec2f pos, vec2f dim, unsigned int color);

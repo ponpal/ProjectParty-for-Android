@@ -57,7 +57,7 @@ cfuns.cdef[[
 
 
 	uint32_t loadFrame(const char* name);
-	uint32_t loadFont(const char* frameName, const char* fontName);
+	uint32_t loadFont(const char* fontName);
 	void unloadFrame(uint32_t frame);
 	void unloadFont(uint32_t font);
 	

@@ -50,6 +50,6 @@ void gameSurfaceDestroyed();
 void gameStop();
 
 void gameTerminate();
-void gameStep();
+void gameStep(ndk_helper::GLContext* context);
 
 #endif /* GAME_H_ */

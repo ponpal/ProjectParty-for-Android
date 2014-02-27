@@ -301,8 +301,7 @@ void android_main(android_app* state)
 		if(gAppState.fullyActive()) {
 			gGame->screen->width  = context->GetScreenWidth();
 			gGame->screen->height = context->GetScreenHeight();
-			gameStep();
-			context->Swap();
+			gameStep(context);
 		}
 	}
 

@@ -17,9 +17,11 @@ extern "C"
 {
 	enum
 	{
-		NETWORK_ALIAS   = 0,
-		NETWORK_SENSOR  = 1,
-		NETWORK_FILE    = 2
+		NETWORK_ALIAS      = 0,
+		NETWORK_SENSOR     = 1,
+		NETWORK_FILE       = 2,
+		NETWORK_ALLFILES   = 3,
+		NETWORK_FILERELOAD = 4
 	};
 
 	typedef struct

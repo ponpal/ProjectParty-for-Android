@@ -33,8 +33,8 @@ public class ControllerService extends Service {
 	@Override
 	public void onCreate() {
 		instance = this;
-		this.inBuffer  = ByteBuffer.allocateDirect(0xFFFF);
-		this.outBuffer = ByteBuffer.allocateDirect(0xFFFF);
+		this.inBuffer  = ByteBuffer.allocateDirect(0xFFFFF);
+		this.outBuffer = ByteBuffer.allocateDirect(0xFFFFF);
 
 	}
 
@@ -65,8 +65,14 @@ public class ControllerService extends Service {
 	public int receive() {
 		try {
 			inBuffer.position(0);
-			return socketChan.read(inBuffer);
-		} catch (IOException e) {
+			inBuffer.limit(0xFFFF);
+			int read = socketChan.read(inBuffer);
+			if (read == -1)
+				System.err.println("WTGGGFFFFFF");
+			return read;
+			//return socketChan.read(inBuffer);
+		} catch (Throwable e) {
+
 			e.printStackTrace();
 			return 0;
 		}

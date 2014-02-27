@@ -14,10 +14,15 @@
 #include "font.h"
 #include <string>
 
+#define FRAME_FILE_ENDING ".png"
+#define FONT_FILE_ENDING ".fnt"
+
 struct Content
 {
 	ResourceTable<Frame> frames;
 	ResourceTable<Font> fonts;
+
+	Content(uint32_t max);
 
 	uint32_t loadFrame(std::string path);
 	uint32_t loadFont(std::string path);
@@ -28,11 +33,18 @@ struct Content
 	bool unloadFrame(std::string path);
 	bool unloadFont(std::string path);
 
+	bool unloadFrame(uint32_t handle);
+	bool unloadFont(uint32_t handle);
+
+	void unloadAll();
+
 	bool isFrameLoaded(std::string path);
 	bool isFontLoaded(std::string path);
 
 	uint32_t indexOfFrame(std::string path);
 	uint32_t indexOfFont(std::string path);
+
+	void reloadAsset(std::string path);
 
 	inline const Font& getFont(uint32_t index)
 	{

@@ -13,6 +13,8 @@
 #include "stdlib.h"
 #include "JNIHelper.h"
 #include <stdio.h>
+#include "assert.h"
+#include <errno.h>
 
 struct Asset
 {
@@ -56,7 +58,6 @@ struct ExternalAsset
 {
 	size_t 		length;
 	uint8_t* 	buffer;
-	FILE* 		file;
 
 	ExternalAsset(std::string fileStr)
 	{
@@ -64,34 +65,25 @@ struct ExternalAsset
 		std::string dirStr(externalsDir);
 		std::string filePath = dirStr + "/" + fileStr;
 
-        file = fopen(filePath.c_str(), "r+");
-		buffer = file->_p;
-		length = file->_r;
-	}
+		LOGI("Trying to load file %s", filePath.c_str());
+        auto file = fopen(filePath.c_str(), "r+");
+        ASSERTF(file != NULL, "Couldn't open file. %s", filePath.c_str());
 
-	ExternalAsset(std::string fileStr, const char* buf, uint32_t size)
-	{
-		auto externalsDir = gApp->activity->externalDataPath;
-		std::string dirStr(externalsDir);
-		std::string filePath = dirStr + "/" + fileStr;
 
-        file = fopen(filePath.c_str(), "w+");
-        if (file != NULL) {
-        	fwrite(buf, sizeof(char), size, file);
-        	fclose(file);
-        } else {
-            LOGE("Unable to write/create file: %s", filePath.c_str());
-        }
-        file = fopen(filePath.c_str(), "r+");
+        fseek( file, 0L, SEEK_END);
+        length = ftell(file);
+        rewind(file);
+        LOGI("ftell: %d", length);
 
-		buffer = file->_p;
-		length = file->_r;
+        buffer = new uint8_t[length];
+
+        fread(buffer, length, 1, file);
+		fclose(file);
 	}
 
 	~ExternalAsset()
 	{
-		fflush(file);
-		fclose(file);
+		delete buffer;
 	}
 };
 

@@ -9,6 +9,7 @@
 #include "font.h"
 #include "types.h"
 #include <stdexcept>
+#include "buffer.h"
 
 #pragma pack(1)
 struct InfoHeader
@@ -72,43 +73,73 @@ struct KerningPair
 
 struct Reader
 {
-	uint8_t* data;
-	size_t size;
+	Buffer buf;
+	uint8_t* saved;
 
 	Reader(uint8_t* _data, size_t _size)
-	: data(_data), size(_size)
-	{ }
+	{
+		buf.base = buf.ptr = _data;
+		buf.length = _size;
+		saved = buf.base;
+	}
 
 	uint8_t readByte()
 	{
-		uint8_t byte = *data++;
-		size--;
-		return byte;
+		return bufferReadByte(&buf);
 	}
 
-	uint8_t* readBytes(size_t count)
+	void readBytes(uint8_t* ptr, size_t count)
 	{
-		uint8_t* bytes = data;
-		data += count;
-		size -= count;
-		return bytes;
-	}
-
-	uint16_t readShort()
-	{
-		//Add some native decoding here maby?
-		uint16_t result = *(uint32_t*)data;
-		data += sizeof(uint16_t);
-		size -= sizeof(uint16_t);
-		return result;
+		bufferReadBytes(&buf, ptr, count);
 	}
 
 	uint32_t readInt()
 	{
-		uint32_t result = *((uint32_t*)data);
-		data += sizeof(uint32_t);
-		size -= sizeof(uint32_t);
-		return result;
+		return bufferReadInt(&buf);
+	}
+
+	void readInfoHeader(InfoHeader* ih)
+	{
+		bufferReadBytes(&buf, (uint8_t*)ih, sizeof(InfoHeader));
+	}
+
+	void readCommonHeader(CommonHeader* ch)
+	{
+		bufferReadBytes(&buf, (uint8_t*)ch, sizeof(CommonHeader));
+	}
+
+	uint32_t size()
+	{
+		return bufferBytesRemaining(&buf);
+	}
+
+	char* readName(uint32_t size)
+	{
+		auto p = buf.ptr;
+		buf.ptr += size;
+		return (char*)p;
+	}
+
+	CharRaw readCharRaw()
+	{
+		CharRaw r;
+		bufferReadBytes(&buf, (uint8_t*)&r, sizeof(CharRaw));
+		return r;
+	}
+
+	void savePosition()
+	{
+		saved = buf.ptr;
+	}
+
+	void resetPosition()
+	{
+		buf.ptr = saved;
+	}
+
+	void skip(uint32_t size)
+	{
+		buf.ptr += size;
 	}
 };
 
@@ -118,6 +149,7 @@ Font constructFont(uint8_t* data, size_t dataSize, const Frame& page)
 
 	auto reader = Reader(data, dataSize);
 
+		LOGI("while font.");
 	if(reader.readByte() != 'B' ||
 	   reader.readByte() != 'M' ||
 	   reader.readByte() != 'F' ||
@@ -126,6 +158,7 @@ Font constructFont(uint8_t* data, size_t dataSize, const Frame& page)
 		throw std::domain_error("Data supplied was not a BMF font");
 	}
 
+		LOGI("while font.");
 	InfoHeader    iHeader;
 	char*        fontName;
 	size_t       fontNameLength;
@@ -133,15 +166,11 @@ Font constructFont(uint8_t* data, size_t dataSize, const Frame& page)
 	char*        pageName;
 	size_t       pageNameLength;
 
-	CharRaw*     rawCharInfo;
 	size_t       numCharacters;
+	CharInfo*    chars;
+	size_t		 max = 0;
 
-	KerningPair* kerningInfo;
-	size_t       numKernings;
-
-
-
-	while(reader.size > 0)
+	while(reader.size() > 0)
 	{
 		uint8_t type   = reader.readByte();
 		uint32_t  size = reader.readInt();
@@ -149,61 +178,63 @@ Font constructFont(uint8_t* data, size_t dataSize, const Frame& page)
 		switch(type)
 		{
 			case BLOCKTYPE_INFO:
-				iHeader = *(InfoHeader*)reader.readBytes(sizeof(InfoHeader));
-				fontName = (char*)reader.readBytes(size - sizeof(InfoHeader));
+				reader.readInfoHeader(&iHeader);
+				fontName = reader.readName(size - sizeof(InfoHeader));
 				fontNameLength = size - sizeof(InfoHeader) - 1; //Excluding null terminator.
 				break;
 			case BLOCKTYPE_COMMON:
-				cHeader = *(CommonHeader*)reader.readBytes(sizeof(CommonHeader));
+				reader.readCommonHeader(&cHeader);
 
 				if(cHeader.pages != 1)
 					throw std::domain_error("Currently fonts are only allowed to have one texture assosiated with them!");
 				break;
 			case BLOCKTYPE_PAGES:
-				pageName = (char*)reader.readBytes(size);
+				pageName = reader.readName(size);
+
 				pageNameLength = size - 1;
 
 				break;
 			case BLOCKTYPE_CHARS:
-				rawCharInfo   = (CharRaw*)reader.readBytes(size);
 				numCharacters = size / sizeof(CharRaw);
+				reader.savePosition();
+				size_t minChar;
+				minChar = 0xFFFFFFFF;
+				for(int i = 0; i < numCharacters; i++) {
+					auto id = reader.readCharRaw().id;
+					if(id < minChar) minChar = id;
+					if(id > max) max = id;
+				}
+				reader.resetPosition();
+				//Do we need the min? It could save some space but gives runtime lookup overhead.
+				chars = new CharInfo[max + 1];
+
+				for(int i = 0; i < max + 1; i++)
+				{
+					chars[i] = CharInfo();
+				}
+
+			    for(int i = 0; i < numCharacters; i++) {
+			        auto r = reader.readCharRaw();
+
+			        float advance  = r.xAdvance;
+			        auto srcRect  = glm::vec4(r.x, r.y + r.height, r.width, -r.height);
+
+			        auto offset   = glm::vec2(r.xOffset, cHeader.base - r.yOffset);
+			        auto texCoord = glm::vec4(srcRect.x / cHeader.scaleW,
+			                                 (srcRect.y + srcRect.w) / cHeader.scaleH,
+			                                 (srcRect.x + srcRect.z) / cHeader.scaleW,
+			                                  srcRect.y / cHeader.scaleH);
+
+			        chars[r.id] = CharInfo(texCoord, srcRect, offset, advance);
+			    }
+
 				break;
 			case BLOCKTYPE_KERNING_PAIRS:
-				kerningInfo   = (KerningPair*)reader.readBytes(size);
-				numKernings = size / sizeof(KerningPair);
+				reader.skip(size);
 				break;
 			default:
 				throw std::domain_error("Corrupt BMF file!");
 		}
-	}
-
-	size_t min = 0xFFFFFFFF, max = 0;
-	for(int i = 0; i < numCharacters; i++) {
-		auto id = rawCharInfo[i].id;
-		if(id < min) min = id;
-		if(id > max) max = id;
-	}
-
-	//Do we need the min? It could save some space but gives runtime lookup overhead.
-	CharInfo* chars = new CharInfo[max + 1];
-	for(int i = 0; i < max + 1; i++)
-	{
-		chars[i] = CharInfo();
-	}
-
-	for(int i = 0; i < numCharacters; i++) {
-		auto r = rawCharInfo[i];
-
-		float advance  = r.xAdvance;
-		auto srcRect  = glm::vec4(r.x, r.y + r.height, r.width, -r.height);
-
-		auto offset   = glm::vec2(r.xOffset, cHeader.base - r.yOffset);
-		auto texCoord = glm::vec4(srcRect.x / cHeader.scaleW,
-								 (srcRect.y + srcRect.w) / cHeader.scaleH,
-								 (srcRect.x + srcRect.z) / cHeader.scaleW,
-								  srcRect.y / cHeader.scaleH);
-
-		chars[r.id] = CharInfo(texCoord, srcRect, offset, advance);
 	}
 
 	return Font(iHeader.fontSize, cHeader.base, cHeader.lineHeight, page, chars, max + 1);
