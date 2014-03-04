@@ -5,11 +5,16 @@ cfuns.cdef[[
 
 	typedef struct { float x; float y; } vec2f;
     typedef struct { float x; float y; float z; } vec3f;
-
+    
+    typedef void (*touchHandler) (int x, int y, int pointerIndex);
+    typedef void (*tapHandler) (int x, int y);
+    
 	typedef struct
 	{
 		vec3f acceleration;
 		vec3f gyroscope;
+		touchHandler onTouch;
+		tapHandler   onTap;
 	} SensorState;
 
 	typedef struct
@@ -74,8 +79,6 @@ cfuns.cdef[[
 				  vec2f origin, float rotation, int mirrored);
 	void addText(uint32_t font, const char* str, vec2f pos, unsigned int  color);
 
-	void luaLog(const char* toLog);
-
 	//buffer.h
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 
@@ -113,7 +116,11 @@ cfuns.cdef[[
 
 local C = cfuns.C
 
-log = C.luaLog;
+function log(s)
+	Out.writeShort(#s + 3);
+	Out.writeByte(5); 
+	Out.writeUTF8(s);
+end
 
 Loader = {} 
 Loader.loadFrame   = C.loadFrame 
@@ -137,6 +144,14 @@ Time.elapsed = 0
 
 C.gMessageHandler = function (id, length)
 	handleMessage(id, length)
+end
+
+C.gGame.sensor.onTouch = function (x, y, index) 
+	if onTouch then onTouch(x, y, index) end
+end
+
+C.gGame.sensor.onTap = function (x, y) 
+	if onTap then onTap(x, y) end
 end
 
 Out = { }
@@ -166,6 +181,9 @@ function Out.writeVec3(v)
 	Out.writeFloat(v.x)
 	Out.writeFloat(v.y)
 	Out.writeFloat(v.z)
+end
+function Out.writeUTF8(s) 
+	C.bufferWriteUTF8(C.gGame.network.out, s);
 end
 
 In = { }

@@ -8,17 +8,30 @@
 #include "main.h"
 #include "sys/stat.h"
 #include "errno.h"
+#include "core/sensor.h"
+
+ndk_helper::GLContext* context;
+TapDetector tap_detector;
 
 static int32_t handle_input(android_app* app, AInputEvent* event)
 {
 	auto type = AInputEvent_getType(event);
+
 	if(type == AINPUT_EVENT_TYPE_MOTION)
 	{
+		GESTURE_STATE tapState = tapDetect(&tap_detector, event);
+		if(tapState == MY_GESTURE_STATE_ACTION) {
+			if(gGame->sensor->onTap != NULL) {
+				gGame->sensor->onTap(tap_detector.x, context->GetScreenHeight() - tap_detector.y);
+			}
+		}
+
 		size_t pointerCount = AMotionEvent_getPointerCount(event);
 		for(size_t i = 0; i < pointerCount; i++)
 		{
-			LOGI("Received motion event from pointer %zu: (%.2f %.2f)",
-				 i, AMotionEvent_getX(event, i), AMotionEvent_getY(event, i));
+			if(gGame->sensor->onTouch != NULL) {
+				gGame->sensor->onTouch(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i), i);
+			}
 		}
 		return 1;
 	}
@@ -30,12 +43,6 @@ static int32_t handle_input(android_app* app, AInputEvent* event)
 
 	return 0;
 }
-
-ndk_helper::GLContext* context;
-
-bool isInitialized;
-bool noRender;
-
 
 extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
