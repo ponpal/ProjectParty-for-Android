@@ -12,6 +12,7 @@
 #include "sys/stat.h"
 #include "errno.h"
 #include "loading_screen.h"
+#include "content.h"
 
 Game* gGame;
 messageHandler gMessageHandler;
@@ -73,7 +74,6 @@ void gamePause()
 void gameSurfaceCreated()
 {
 	rendererActivate(gGame->renderer);
-	initializeLuaScripts();
 	if (!hasLoadedResources)
 		loadingScreen.load();
 }
@@ -120,7 +120,7 @@ void handleFileTransfer(Buffer* buffer) {
 	}
 
 	auto count = bufferBytesRemaining(buffer);
-	LOGI("Count: %d, Filesize: %d", count, fileSize);
+	LOGI("Count: %d, Filesize: %d", count, (int)fileSize);
 	AutoPtr<uint8_t> chunckBuffer(0xFFFF);
 	while (true) {
 		uint32_t toRead = fileSize < count ? fileSize : count;
@@ -133,17 +133,20 @@ void handleFileTransfer(Buffer* buffer) {
 
 		count = networkReceive(gGame->network);
 		if (count != 0)
-			LOGI("count %d, filesize %d", count, fileSize);
+			LOGI("count %d, filesize %d", count, (int)fileSize);
 	}
 
 	fclose(file);
 	LOGI("SUCESSFULLY WROTE A FILE!");
 }
 
-void handleAllResourcesLoaded()
+void handleAllResourcesLoaded(Buffer* buffer)
 {
 	hasLoadedResources = true;
 	loadingScreen.unload();
+
+	bufferReadUTF8(buffer, &gGame->name);
+	initializeLuaScripts(gGame->name);
     initLuaCall();
 }
 
@@ -177,7 +180,7 @@ void gameHandleReceive()
 		if(id == NETWORK_FILE) {
 			handleFileTransfer(buffer);
 		} else if (id == NETWORK_ALLFILES) {
-			handleAllResourcesLoaded();
+			handleAllResourcesLoaded(buffer);
 		} else if (id == NETWORK_FILERELOAD) {
 			handleFileReload(buffer, size);
 		} else {

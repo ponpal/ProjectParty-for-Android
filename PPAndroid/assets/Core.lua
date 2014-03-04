@@ -47,6 +47,7 @@ cfuns.cdef[[
 		Screen* screen;
 		Content* content;
 		bool paused;
+		char* name;
 
 	} Game;
 

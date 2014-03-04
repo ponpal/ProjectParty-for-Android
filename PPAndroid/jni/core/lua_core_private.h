@@ -11,7 +11,7 @@
 #include "JNIHelper.h"
 
 void initializeLuaCore();
-void initializeLuaScripts();
+void initializeLuaScripts(const std::string& gameName);
 void initializeRenderer();
 
 void initLuaCall();
@@ -19,5 +19,6 @@ void termLuaCall();
 void updateLuaCall();
 void renderLuaCall();
 void runLuaGarbageCollector(int milisecs);
+void loadLuaScript(const std::string& relativeScriptPath);
 
 #endif /* LUA_CORE_PRIVATE_H_ */

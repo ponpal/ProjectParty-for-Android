@@ -64,7 +64,7 @@ function render()
 	local text = string.format("Score: %d", score)
 
 	local dim = vec2(Screen.width, Screen.height)
-	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
+	Renderer.addFrame(frame, pos, dim, 0xFF0000FF)
 
 	pos.y = Screen.height - 50;
 	--Renderer.addText(font, text, pos, 0xFF00cccc)

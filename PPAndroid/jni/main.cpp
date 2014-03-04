@@ -260,7 +260,9 @@ void initializeFileSystem()
 	//On some phones the directory does not exist so we create it :)
 	auto externalsDir = gApp->activity->externalDataPath;
 	std::string d(externalsDir);
+	LOGI("EXTERNALSDIR: %s", d.c_str());
 	d.erase(d.size() - 6, 6);
+	LOGI("ERASED: %s", d.c_str());
 
 	int err = mkdir(d.c_str(), 0770);
 	if(err != 0&& errno != 17)

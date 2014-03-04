@@ -8,6 +8,7 @@
 #include "content.h"
 #include "image_loader.h"
 #include "font_loading.h"
+#include "path.h"
 
 void obliterateFont(Font* font)
 {
@@ -123,21 +124,11 @@ bool Content::isFrameLoaded(std::string path)
 	return indexOfFrame(path) != -1;
 }
 
-static bool endsWith(const std::string& str, const std::string& ending)
-{
-	if (str.length() >= ending.length()) {
-		return (0 == str.compare(str.length() - ending.length(),
-				ending.length(),ending));
-	} else {
-		return false;
-	}
-}
-
 void Content::reloadAsset(std::string path)
 {
-	if (endsWith(path, FRAME_FILE_ENDING))
+	if (path::hasExtension(path, FRAME_FILE_ENDING))
 		reloadFrame(path);
-	else if (endsWith(path, FONT_FILE_ENDING))
+	else if (path::hasExtension(path, FONT_FILE_ENDING))
 		reloadFont(path);
 	else
 		ASSERTF(false, "Unrecognized file ending in path %s", path.c_str());

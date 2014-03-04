@@ -125,8 +125,7 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/font.h jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp \
- jni/core/content.h jni/core/resource_table.h jni/core/asset_helper.h \
- jni/core/android_helper.h \
+ jni/core/asset_helper.h jni/core/android_helper.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
@@ -143,7 +142,7 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h \
- jni/core/loading_screen.h
+ jni/core/loading_screen.h jni/core/content.h jni/core/resource_table.h
 
 jni/core/game.h:
 
@@ -503,10 +502,6 @@ jni/glm/glm/vec2.hpp:
 
 jni/glm/glm/mat4x4.hpp:
 
-jni/core/content.h:
-
-jni/core/resource_table.h:
-
 jni/core/asset_helper.h:
 
 jni/core/android_helper.h:
@@ -544,3 +539,7 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h:
 
 jni/core/loading_screen.h:
+
+jni/core/content.h:
+
+jni/core/resource_table.h:

@@ -25,6 +25,7 @@
 #include "android_helper.h"
 #include "asset_helper.h"
 #include "content.h"
+#include "path.h"
 
 uint32_t loadFont(const char* fontName)
 {
@@ -90,9 +91,34 @@ void initializeLuaCore()
 		LOGI("LUA CORE ERROR %s", lua_tostring(luaState, -1));
 }
 
-void initializeLuaScripts()
+#include "dirent.h"
+
+void initializeLuaScripts(const std::string& dirName)
 {
-	Asset script("Script.lua");
+	std::string scriptsDir;
+	scriptsDir += gApp->activity->externalDataPath;
+	scriptsDir += "/" + dirName + "/scripts/";
+	DIR* dir;
+	struct dirent* ent;
+	if ((dir = opendir (scriptsDir.c_str())) != NULL) {
+		while ((ent = readdir (dir)) != NULL) {
+			if(path::hasExtension(ent->d_name, ".lua")) {
+				std::string scriptPath = "/scripts/";
+				scriptPath += ent->d_name;
+				loadLuaScript(scriptPath);
+			}
+		}
+		closedir(dir);
+	} else {
+		LOGE("Couldn't open directory %s", scriptsDir.c_str());
+		exit(-1);
+	}
+}
+
+void loadLuaScript(const std::string& pathInFiles)
+{
+	ExternalAsset script(pathInFiles);
+
 	int error = luaL_loadbuffer(luaState, (const char*)script.buffer, script.length, "CData");
 	error |= lua_pcall(luaState, 0, 0, 0);
 
@@ -145,8 +171,8 @@ void renderLuaCall()
 
 	glm::mat4 matrix = glm::ortho(0.0f, (float)gGame->screen->width,
 		  0.0f, (float)gGame->screen->height);
-	matrix = translate(matrix, glm::vec3(800,0,0));
-	matrix = rotate(matrix, (float)M_PI_2, glm::vec3(0,0,1));
+	//matrix = translate(matrix, glm::vec3(800,0,0));
+	//matrix = rotate(matrix, (float)M_PI_2, glm::vec3(0,0,1));
 
 	rendererSetTransform(gGame->renderer, &matrix);
 	callEmptyLuaFunction("render()");

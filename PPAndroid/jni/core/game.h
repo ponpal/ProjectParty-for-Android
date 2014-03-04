@@ -14,7 +14,8 @@
 #include "sensor.h"
 #include "GLContext.h"
 #include "new_renderer.h"
-#include "content.h"
+
+typedef struct Content Content;
 
 extern "C"
 {
@@ -32,6 +33,7 @@ extern "C"
 		Screen* screen;
 		Content* content;
 		bool paused;
+		char* name;
 
 	} Game;
 
