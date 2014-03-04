@@ -1,15 +1,16 @@
 obj/local/armeabi/objs/mystery/core/image_loader.o: \
  jni/core/image_loader.cpp \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/api-level.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/api-level.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h \
  jni/external_libs/lodepng.h \
+<<<<<<< HEAD
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/string.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/malloc.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
@@ -70,6 +71,76 @@ obj/local/armeabi/objs/mystery/core/image_loader.o: \
  jni/glm/glm/detail/type_mat4x3.inl jni/glm/glm/mat4x4.hpp \
  jni/glm/glm/detail/type_mat4x4.hpp jni/glm/glm/detail/type_mat4x4.inl \
  jni/glm/glm/trigonometric.hpp jni/glm/glm/detail/func_trigonometric.hpp \
+=======
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/string.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/malloc.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
+ jni/core/asset_helper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/asset_manager.h \
+ jni/core/android_helper.h \
+ C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/configuration.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/looper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_activity.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/input.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/keycodes.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/rect.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
+ jni/core/assert.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
+ jni/core/types.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h \
+ jni/glm/glm/glm.hpp jni/glm/glm/detail/_fixes.hpp \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/climits \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/limits \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert \
+ jni/glm/glm/fwd.hpp jni/glm/glm/detail/type_int.hpp \
+ jni/glm/glm/detail/setup.hpp jni/glm/glm/detail/type_float.hpp \
+ jni/glm/glm/detail/type_vec.hpp jni/glm/glm/detail/precision.hpp \
+ jni/glm/glm/detail/type_int.hpp jni/glm/glm/detail/type_mat.hpp \
+ jni/glm/glm/vec2.hpp jni/glm/glm/detail/type_vec2.hpp \
+ jni/glm/glm/detail/type_vec.hpp \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef \
+ jni/glm/glm/detail/type_vec2.inl jni/glm/glm/vec3.hpp \
+ jni/glm/glm/detail/type_vec3.hpp jni/glm/glm/detail/type_vec3.inl \
+ jni/glm/glm/vec4.hpp jni/glm/glm/detail/type_vec4.hpp \
+ jni/glm/glm/detail/type_vec4.inl jni/glm/glm/mat2x2.hpp \
+ jni/glm/glm/detail/type_mat2x2.hpp jni/glm/glm/detail/../fwd.hpp \
+ jni/glm/glm/detail/type_vec2.hpp jni/glm/glm/detail/type_mat.hpp \
+ jni/glm/glm/detail/type_mat2x2.inl jni/glm/glm/mat2x3.hpp \
+ jni/glm/glm/detail/type_mat2x3.hpp jni/glm/glm/detail/type_vec3.hpp \
+ jni/glm/glm/detail/type_mat2x3.inl jni/glm/glm/mat2x4.hpp \
+ jni/glm/glm/detail/type_mat2x4.hpp jni/glm/glm/detail/type_vec4.hpp \
+ jni/glm/glm/detail/type_mat2x4.inl jni/glm/glm/mat3x2.hpp \
+ jni/glm/glm/detail/type_mat3x2.hpp jni/glm/glm/detail/type_mat3x2.inl \
+ jni/glm/glm/mat3x3.hpp jni/glm/glm/detail/type_mat3x3.hpp \
+ jni/glm/glm/detail/type_mat3x3.inl jni/glm/glm/mat3x4.hpp \
+ jni/glm/glm/detail/type_mat3x4.hpp jni/glm/glm/detail/type_mat3x4.inl \
+ jni/glm/glm/mat4x2.hpp jni/glm/glm/detail/type_mat4x2.hpp \
+ jni/glm/glm/detail/type_mat4x2.inl jni/glm/glm/mat4x3.hpp \
+ jni/glm/glm/detail/type_mat4x3.hpp jni/glm/glm/detail/type_mat4x3.inl \
+ jni/glm/glm/mat4x4.hpp jni/glm/glm/detail/type_mat4x4.hpp \
+ jni/glm/glm/detail/type_mat4x4.inl jni/glm/glm/trigonometric.hpp \
+ jni/glm/glm/detail/func_trigonometric.hpp \
+>>>>>>> Object files etc. Shouldn't be needed but w/e
  jni/glm/glm/detail/func_trigonometric.inl \
  jni/glm/glm/detail/_vectorize.hpp jni/glm/glm/detail/type_vec1.hpp \
  jni/glm/glm/detail/type_vec1.inl jni/glm/glm/exponential.hpp \
@@ -113,78 +184,103 @@ obj/local/armeabi/objs/mystery/core/image_loader.o: \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2platform.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/KHR/khrplatform.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/cdefs_elf.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/api-level.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/api-level.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdint.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/_types.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/_types.h:
 
 jni/external_libs/lodepng.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/string.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/string.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/malloc.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/malloc.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
 
 jni/core/asset_helper.h:
 
+<<<<<<< HEAD
 jni/core/game.h:
+=======
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/asset_manager.h:
+>>>>>>> Object files etc. Shouldn't be needed but w/e
 
 jni/core/network.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h:
+C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/poll.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/poll.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/configuration.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/configuration.h:
 
+<<<<<<< HEAD
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/asset_manager.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/looper.h:
+=======
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/looper.h:
+>>>>>>> Object files etc. Shouldn't be needed but w/e
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_activity.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_activity.h:
 
+<<<<<<< HEAD
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/input.h:
+=======
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/keycodes.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/input.h:
+>>>>>>> Object files etc. Shouldn't be needed but w/e
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/keycodes.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/rect.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window.h:
 
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/rect.h:
+
+<<<<<<< HEAD
 jni/core/buffer.h:
 
 jni/core/time_helpers.h:
 
 jni/core/lua_core_private.h:
+=======
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h:
+>>>>>>> Object files etc. Shouldn't be needed but w/e
+
+C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
 
 jni/core/sensor.h:
 
+<<<<<<< HEAD
 jni/glm/glm/vec3.hpp:
 
 jni/glm/glm/detail/type_vec3.hpp:
@@ -210,23 +306,41 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h:
 
 jni/core/new_renderer.h:
+=======
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h:
+>>>>>>> Object files etc. Shouldn't be needed but w/e
 
 jni/core/types.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/GLES2/gl2ext.h:
 
 jni/glm/glm/glm.hpp:
 
 jni/glm/glm/detail/_fixes.hpp:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cmath:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/climits:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/climits:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cfloat:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/limits:
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/limits:
 
+<<<<<<< HEAD
+=======
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cassert:
+
+>>>>>>> Object files etc. Shouldn't be needed but w/e
 jni/glm/glm/fwd.hpp:
 
 jni/glm/glm/detail/type_int.hpp:
@@ -241,6 +355,13 @@ jni/glm/glm/vec2.hpp:
 
 jni/glm/glm/detail/type_vec2.hpp:
 
+<<<<<<< HEAD
+=======
+jni/glm/glm/detail/type_vec.hpp:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstddef:
+
+>>>>>>> Object files etc. Shouldn't be needed but w/e
 jni/glm/glm/detail/type_vec2.inl:
 
 jni/glm/glm/vec3.hpp:
