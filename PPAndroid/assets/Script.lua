@@ -19,15 +19,15 @@ end
 local function renderTime()
 	local pos  = vec2(0,0);
 	local text = string.format("FPS: %d Total %.2f \nElapsed %.3f" , fps, Time.total, Time.elapsed)
---	Renderer.addText(font, text, pos, 0xFF03cc42);	
+	Renderer.addText(font, text, pos, 0xFF03cc42);	
 end
 
 function init()
 	frame = Loader.loadFrame("fonts/Blocked72_0.png")
-	--font  = Loader.loadFont("fonts/Blocked72.fnt")
+	font  = Loader.loadFont("fonts/Blocked72.fnt")
     rotation = 0
 
-    --log(string.format("Loaded %d, %d", frame, font));
+    log(string.format("Loaded %d, %d", frame, font));
 end
 
 function term()
@@ -63,11 +63,16 @@ function render()
 	local pos = vec2(0, 0);
 	local text = string.format("Score: %d", score)
 
+<<<<<<< HEAD
 	local dim = vec2(Screen.width, Screen.height)
 	Renderer.addFrame(frame, pos, dim, 0xFF0000FF)
+=======
+	local dim = vec2(Screen.height, Screen.width)
+	Renderer.addFrame(frame, pos, dim, 0xFFFFFFFF)
+>>>>>>> Log message
 
 	pos.y = Screen.height - 50;
-	--Renderer.addText(font, text, pos, 0xFF00cccc)
+	Renderer.addText(font, text, pos, 0xFF00cccc)
 
 	renderTime()
 end

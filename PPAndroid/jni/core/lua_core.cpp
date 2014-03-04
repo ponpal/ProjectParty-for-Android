@@ -123,7 +123,7 @@ void loadLuaScript(const std::string& pathInFiles)
 	error |= lua_pcall(luaState, 0, 0, 0);
 
 	if(error)
-		LOGI("LUA SCRIPT ERROR %s", lua_tostring(luaState, -1));
+		LOGE("LUA SCRIPT ERROR %s", lua_tostring(luaState, -1));
 }
 
 void runLuaGarbageCollector(int milisecs)
