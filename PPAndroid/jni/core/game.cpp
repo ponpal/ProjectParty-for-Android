@@ -13,6 +13,7 @@
 #include "errno.h"
 #include "loading_screen.h"
 #include "content.h"
+#include "path.h"
 
 Game* gGame;
 messageHandler gMessageHandler;
@@ -85,20 +86,16 @@ void gameSurfaceDestroyed()
 void gameStop()
 {
 	networkDisconnect(gGame->network);
-//	rendererDeactivate(gGame->renderer);
 	gGame->content->unloadAll();
 	termLuaCall();
 }
 
 void handleFileTransfer(Buffer* buffer) {
-
-	//TODO: We don't send a type from the server yet.
-	auto type = 0;//bufferReadByte(buffer);
 	AutoPtr<char> path;
 	auto stringSize = bufferReadUTF8(buffer, &path.ptr);
 	auto fileSize = bufferReadLong(buffer);
 
-	LOGI("Received a file! name=%s type=%d size=%llu", path.ptr, type, fileSize);
+	LOGI("Received a file! name=%s size=%llu", path.ptr, fileSize);
 
 	//Open Asset here - or do something else that is nice.
 	auto externalsDir = gApp->activity->externalDataPath;
@@ -147,6 +144,7 @@ void handleAllResourcesLoaded(Buffer* buffer)
 	loadingScreen.unload();
 
 	bufferReadUTF8(buffer, &gGame->name);
+	LOGI("Game %s", gGame->name);
 	initializeLuaScripts(gGame->name);
     initLuaCall();
 }
@@ -156,8 +154,12 @@ void handleFileReload(Buffer* buf, size_t size)
 	AutoPtr<char> path;
 	auto stringSize = bufferReadUTF8(buf, &path.ptr);
 	std::string str(path.ptr);
-	gGame->content->reloadAsset(str);
-	LOGI("File reloaded!");
+	if(path::hasExtension(str, ".lua"))
+		loadLuaScript(str);
+	else
+		gGame->content->reloadAsset(str);
+
+	LOGI("File reloaded! %s", str.c_str());
 }
 
 void gameHandleReceive()
