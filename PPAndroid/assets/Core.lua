@@ -101,6 +101,8 @@ cfuns.cdef[[
 
 	float  bufferReadFloat(Buffer* buffer);
 	double bufferReadDouble(Buffer* buffer);
+	const char* bufferReadLuaString(Buffer* buffer);
+	const char* testStr();
 
 	//network.h    
     int networkConnect(Network* network);
@@ -143,6 +145,8 @@ Time.total   = 0
 Time.elapsed = 0
 
 C.gMessageHandler = function (id, length)
+    log("got message")
+    cfuns.C.networkSend(Network)
 	handleMessage(id, length)
 end
 
@@ -210,6 +214,12 @@ In.readVec2 = function()
 end
 In.readVec3 = function()
 	return vec3(In.readFloat(), In.readFloat(), In.readFloat())
+end
+In.readUTF8 = function()
+	log("trying to call READUTF8 IKKK")
+    cfuns.C.networkSend(Network)
+	
+	return cfuns.string(C.bufferReadLuaString(C.gGame.network.in_))
 end
 
 Sensors = C.gGame.sensor

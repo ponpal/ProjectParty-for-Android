@@ -14,6 +14,7 @@
 #include "loading_screen.h"
 #include "content.h"
 #include "path.h"
+#include "lua_core.h"
 
 Game* gGame;
 messageHandler gMessageHandler;
@@ -188,9 +189,7 @@ void gameHandleReceive()
 			handleFileReload(buffer, size);
 		} else {
             auto end = buffer->ptr + size - 1;
-			if(gMessageHandler != NULL) {
-				gMessageHandler(id, size - 1);
-			}
+            callLuaHandleMessage(id, size - 1);
 			buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
 		}
 	}

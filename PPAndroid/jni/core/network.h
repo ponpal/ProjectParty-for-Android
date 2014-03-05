@@ -21,7 +21,9 @@ extern "C"
 		NETWORK_SENSOR     = 1,
 		NETWORK_FILE       = 2,
 		NETWORK_ALLFILES   = 3,
-		NETWORK_FILERELOAD = 4
+		NETWORK_FILERELOAD = 4,
+		NETWORK_LUALOG	   = 5, //unused
+		NETWORK_TRANSITION = 6
 	};
 
 	typedef struct

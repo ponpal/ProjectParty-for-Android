@@ -51,12 +51,19 @@ vec2f measureString(uint32_t fontHandle, const char* str)
 	return v;
 }
 
-char* bufferReadLuaString(Buffer* buffer)
+const char* bufferReadLuaString(Buffer* buffer)
 {
-	char** str;
+	char* str;
 
-	bufferReadUTF8(buffer, str);
-	return *str;
+	bufferReadUTF8(buffer, &str);
+	LOGE("OHNO WE CALL READSTR");
+	LOGE("%s", str);
+	return str;
+}
+
+const char* testStr()
+{
+	return "a";
 }
 
 uint32_t loadFrame(const char* name)
@@ -102,7 +109,7 @@ void initializeLuaCore()
 	error = error | lua_pcall(luaState, 0,0,0);
 
 	if(error)
-		LOGI("LUA CORE ERROR %s", lua_tostring(luaState, -1));
+		LOGE("LUA CORE ERROR %s", lua_tostring(luaState, -1));
 }
 
 #include "dirent.h"
@@ -156,7 +163,7 @@ void callEmptyLuaFunction(const char* buffer)
 	error = error | lua_pcall(luaState, 0, 0, 0);
 
 	if(error) {
-		LOGI("LUA Execution Error %s", lua_tostring(luaState, -1));
+		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
 		lua_pop(luaState, 1);
 	}
 }
@@ -174,6 +181,22 @@ void termLuaCall()
 void updateLuaCall()
 {
 	callEmptyLuaFunction("coreUpdate() update()");
+}
+
+
+void callLuaHandleMessage(uint32_t id, uint32_t length)
+{
+	char buffer[128];
+	sprintf(buffer, "handleMessage(%d,%d)", id, length);
+
+	LOGE("%s", buffer);
+	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "HandlingMessage");
+	error = error | lua_pcall(luaState, 0, 0, 0);
+
+	if(error) {
+		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
+	}
 }
 
 void renderLuaCall()

@@ -10,6 +10,7 @@
 
 
 #include "types.h"
+#include "buffer.h"
 using namespace glm;
 
 extern "C"
@@ -26,5 +27,9 @@ extern "C"
 	void addText(unsigned int font, const char* str, vec2f pos, unsigned int  color);
 
 	void luaLog(const char* toLog);
+	const char* bufferReadLuaString(Buffer* buffer);
+
+	const char* testStr();
+    void callLuaHandleMessage(uint32_t id, uint32_t length);
 }
 #endif /* LUA_CORE_H_ */
