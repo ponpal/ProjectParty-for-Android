@@ -92,7 +92,8 @@ void gameStop()
 
 void handleFileTransfer(Buffer* buffer) {
 
-	auto type = bufferReadByte(buffer);
+	//TODO: We don't send a type from the server yet.
+	auto type = 0;//bufferReadByte(buffer);
 	AutoPtr<char> path;
 	auto stringSize = bufferReadUTF8(buffer, &path.ptr);
 	auto fileSize = bufferReadLong(buffer);
