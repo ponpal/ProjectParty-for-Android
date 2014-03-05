@@ -280,11 +280,45 @@ static inline void rendererDrawChar(Renderer* renderer, Texture texture, const C
 	renderer->elements += 4;
 }
 
+inline static glm::vec2 measureFont(const Font& font, const char* text)
+{
+	float width = 0, height = 0, cursor = 0;
+
+	auto spaceInfo = font[' '];
+	auto itr   = &text[0];
+	auto end   = &text[strlen(text)];
+
+	while(itr != end)
+	{
+		auto c = utf8::next(itr, end);
+		if(c == '\r') continue;
+
+		if(c == ' ') {
+			cursor += spaceInfo.advance;
+			continue;
+		} else if(c == '\n') {
+			height += font.lineHeight;
+			width  = fmaxf(cursor, width);
+			cursor = 0;
+			continue;
+		} else if(c == '\t') {
+			cursor += spaceInfo.advance * 4;
+		}
+
+		CharInfo info = font.chars[c];
+		cursor += info.advance;
+	}
+
+	width = fmaxf(width, cursor);
+	height += font.base;
+	return glm::vec2(width, height);
+}
+
 void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec2f inPos, uint32_t color)
 {
 	using namespace glm;
 	vec2 pos = vec2(inPos.x, inPos.y);
-	vec2 size = font::measure(*font, text);
+	vec2 size = measureFont(*font, text);
 	vec2 cursor = vec2(0, size.y - font->base);
 	CharInfo spaceInfo = (*font)[' '];
 

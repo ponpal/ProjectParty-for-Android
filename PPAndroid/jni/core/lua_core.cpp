@@ -29,7 +29,10 @@
 
 uint32_t loadFont(const char* fontName)
 {
-	return gGame->content->loadFont(fontName);
+	std::string path(gGame->name);
+	path += "/";
+	path += fontName;
+	return gGame->content->loadFont(path);
 }
 
 void unloadFont(uint32_t fontHandle)
@@ -50,7 +53,10 @@ vec2f measureString(uint32_t fontHandle, const char* str)
 
 uint32_t loadFrame(const char* name)
 {
-	return gGame->content->loadFrame(name);
+	std::string path(gGame->name);
+	path += "/";
+	path += name;
+	return gGame->content->loadFrame(path);
 }
 
 void unloadFrame(uint32_t frameHandle)
@@ -103,9 +109,10 @@ void initializeLuaScripts(const std::string& dirName)
 	if ((dir = opendir (scriptsDir.c_str())) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
 			if(path::hasExtension(ent->d_name, ".lua")) {
-				std::string scriptPath = "/scripts/";
+				std::string scriptPath = "/" + dirName + "/scripts/";
 				scriptPath += ent->d_name;
 				loadLuaScript(scriptPath);
+				LOGI("Loading script %s", scriptPath.c_str());
 			}
 		}
 		closedir(dir);

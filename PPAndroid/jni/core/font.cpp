@@ -39,12 +39,11 @@ namespace font
 			}
 
 			CharInfo info = font.chars[c];
-
 			cursor += info.advance;
+			height = fmax(height, -info.srcRect.w);
 		}
 
 		width = fmaxf(width, cursor);
-		height += font.base;
 		return glm::vec2(width, height);
 	}
 }

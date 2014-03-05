@@ -95,25 +95,17 @@ obj/local/armeabi/objs/mystery/main.o: jni/main.cpp jni/main.h \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/font.h jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp \
- jni/core/content.h jni/core/resource_table.h jni/core/asset_helper.h \
- jni/core/android_helper.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h \
- jni/core/assert.h \
- C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
  jni/core/android_helper.h jni/core/sensor.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/stat.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/stat.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h
 
 jni/main.h:
 
@@ -415,36 +407,6 @@ jni/glm/glm/vec2.hpp:
 
 jni/glm/glm/mat4x4.hpp:
 
-jni/core/content.h:
-
-jni/core/resource_table.h:
-
-jni/core/asset_helper.h:
-
-jni/core/android_helper.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h:
-
-jni/core/assert.h:
-
-C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h:
-
-C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h:
-
 jni/core/android_helper.h:
 
 jni/core/sensor.h:
@@ -458,3 +420,13 @@ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h:
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h:
+
+C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h:

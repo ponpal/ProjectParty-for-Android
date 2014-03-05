@@ -26,9 +26,7 @@ ExternalAsset::ExternalAsset(std::string fileStr)
 {
     auto externalsDir = gApp->activity->externalDataPath;
     std::string dirStr(externalsDir);
-    std::string filePath = dirStr + "/";
-    filePath += gGame->name;
-    filePath += "/" + fileStr;
+    std::string filePath = dirStr + "/" + fileStr;
 
     LOGI("Trying to load file %s", filePath.c_str());
     auto file = fopen(filePath.c_str(), "r+");
