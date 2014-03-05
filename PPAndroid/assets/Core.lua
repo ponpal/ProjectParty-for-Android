@@ -93,7 +93,7 @@ cfuns.cdef[[
 	void bufferWriteDouble(Buffer* buffer,double data);
 
 	void bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes);
-	void bufferReadUTF8(Buffer* buffer, const char* dest);
+	void bufferReadUTF8(Buffer* buffer, const char** dest);
 	uint8_t  bufferReadByte(Buffer* buffer);
 	uint16_t bufferReadShort(Buffer* buffer);
 	uint32_t bufferReadInt(Buffer* buffer);
@@ -210,6 +210,9 @@ In.readVec2 = function()
 end
 In.readVec3 = function()
 	return vec3(In.readFloat(), In.readFloat(), In.readFloat())
+end
+In.readUTF8 = function()
+	return C.bufferReadUTF8(C.gGame.network.in_)
 end
 
 Sensors = C.gGame.sensor

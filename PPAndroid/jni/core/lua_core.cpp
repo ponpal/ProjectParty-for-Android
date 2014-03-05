@@ -51,6 +51,14 @@ vec2f measureString(uint32_t fontHandle, const char* str)
 	return v;
 }
 
+char* bufferReadLuaString(Buffer* buffer)
+{
+	char** str;
+
+	bufferReadUTF8(buffer, str);
+	return *str;
+}
+
 uint32_t loadFrame(const char* name)
 {
 	std::string path(gGame->name);
