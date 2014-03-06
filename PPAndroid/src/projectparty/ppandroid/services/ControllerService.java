@@ -102,8 +102,8 @@ public class ControllerService extends Service {
 	public int connect() {
 		try {
 			socketChan = SocketChannel.open();
-			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
-					latestServer.getPort()));
+			socketChan.socket().connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
+					latestServer.getPort()), 1000);
 
 			ByteBuffer buffer = ByteBuffer.allocateDirect(8);
 			buffer.order(ByteOrder.LITTLE_ENDIAN);

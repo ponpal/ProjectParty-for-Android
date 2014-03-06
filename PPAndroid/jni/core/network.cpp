@@ -133,6 +133,10 @@ int networkConnect(Network* network)
 	gApp->activity->vm->DetachCurrentThread();
 	if (result == 1)
         LOGI("Connected to network.");
+	else if (result == 0) {
+		LOGE("NETWORK FAILURE");
+		ANativeActivity_finish(gApp->activity);
+	}
 	return result;
 }
 

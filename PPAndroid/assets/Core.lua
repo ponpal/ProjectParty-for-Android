@@ -58,10 +58,6 @@ cfuns.cdef[[
 
 	extern Game* gGame;
 
-	typedef void (*messageHandler)(uint8_t id, uint32_t length);
-	extern messageHandler gMessageHandler;
-
-
 	uint32_t loadFrame(const char* name);
 	uint32_t loadFont(const char* fontName);
 	void unloadFrame(uint32_t frame);
@@ -138,17 +134,22 @@ Renderer.addText   = C.addText
 Font = {}
 Font.measure =  C.measureString;
 
-Network = C.gGame.network;
+Network = {
+	messages = {
+		sensor       = 1,
+		transition   = 6
+	},
+	send = function()
+	    cfuns.C.networkSend(C.gGame.network)
+	end,
+	isAlive = function()
+		cfuns.C.networkIsAlive(C.gGame.network)
+	end
+}
 
 Time = {}
 Time.total   = 0
 Time.elapsed = 0
-
-C.gMessageHandler = function (id, length)
-    log("got message")
-    cfuns.C.networkSend(Network)
-	handleMessage(id, length)
-end
 
 C.gGame.sensor.onTouch = function (x, y, index) 
 	if onTouch then onTouch(x, y, index) end
@@ -216,9 +217,6 @@ In.readVec3 = function()
 	return vec3(In.readFloat(), In.readFloat(), In.readFloat())
 end
 In.readUTF8 = function()
-	log("trying to call READUTF8 IKKK")
-    cfuns.C.networkSend(Network)
-	
 	return cfuns.string(C.bufferReadLuaString(C.gGame.network.in_))
 end
 
