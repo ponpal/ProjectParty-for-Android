@@ -1,14 +1,14 @@
 
-cfuns = require("ffi") 
+cfuns = require("ffi")
 
-cfuns.cdef[[ 
+cfuns.cdef[[
 
 	typedef struct { float x; float y; } vec2f;
     typedef struct { float x; float y; float z; } vec3f;
-    
+
     typedef void (*touchHandler) (int x, int y, int pointerIndex);
     typedef void (*tapHandler) (int x, int y);
-    
+
 	typedef struct
 	{
 		vec3f acceleration;
@@ -62,7 +62,7 @@ cfuns.cdef[[
 	uint32_t loadFont(const char* fontName);
 	void unloadFrame(uint32_t frame);
 	void unloadFont(uint32_t font);
-	
+
 	//clock.h
 	float clockElapsed(Clock* clock);
 	float clockTotal(Clock* clock);
@@ -100,7 +100,7 @@ cfuns.cdef[[
 	const char* bufferReadLuaString(Buffer* buffer);
 	const char* testStr();
 
-	//network.h    
+	//network.h
     int networkConnect(Network* network);
     int networkReconnect(Network* network);
     int networkDisconnect(Network* network);
@@ -116,20 +116,20 @@ local C = cfuns.C
 
 function log(s)
 	Out.writeShort(#s + 3);
-	Out.writeByte(5); 
+	Out.writeByte(5);
 	Out.writeUTF8(s);
 end
 
-Loader = {} 
-Loader.loadFrame   = C.loadFrame 
-Loader.loadFont    = C.loadFont 
-Loader.unloadFont  = C.unloadFont 
+Loader = {}
+Loader.loadFrame   = C.loadFrame
+Loader.loadFont    = C.loadFont
+Loader.unloadFont  = C.unloadFont
 Loader.unloadFrame = C.unloadFrame
 
-Renderer = {} 
+Renderer = {}
 Renderer.addFrame  = C.addFrame
-Renderer.addFrame2 = C.addFrame2 
-Renderer.addText   = C.addText 
+Renderer.addFrame2 = C.addFrame2
+Renderer.addText   = C.addText
 
 Font = {}
 Font.measure =  C.measureString;
@@ -151,11 +151,11 @@ Time = {}
 Time.total   = 0
 Time.elapsed = 0
 
-C.gGame.sensor.onTouch = function (x, y, index) 
+C.gGame.sensor.onTouch = function (x, y, index)
 	if onTouch then onTouch(x, y, index) end
 end
 
-C.gGame.sensor.onTap = function (x, y) 
+C.gGame.sensor.onTap = function (x, y)
 	if onTap then onTap(x, y) end
 end
 
@@ -174,7 +174,7 @@ function Out.writeLong(long)
 end
 function Out.writeFloat(float)
 	C.bufferWriteFloat(C.gGame.network.out, float)
-end 
+end
 function Out.writeDouble(double)
 	C.bufferWriteDouble(C.gGame.network.out, double)
 end
@@ -187,20 +187,20 @@ function Out.writeVec3(v)
 	Out.writeFloat(v.y)
 	Out.writeFloat(v.z)
 end
-function Out.writeUTF8(s) 
+function Out.writeUTF8(s)
 	C.bufferWriteUTF8(C.gGame.network.out, s);
 end
 
 In = { }
 In.readByte  = function()
 	return C.bufferReadByte(C.gGame.network.in_)
-end 
+end
 In.readShort = function()
 	return C.bufferReadShort(C.gGame.network.in_)
 end
 In.readInt  = function()
 	return C.bufferReadInt(C.gGame.network.in_)
-end 
+end
 In.readLong = function()
 	return C.bufferReadLong(C.gGame.network.in_)
 end

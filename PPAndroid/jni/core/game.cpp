@@ -53,7 +53,8 @@ void gameStart()
 	hasLoadedResources = false;
 	LOGI("Starting game!");
 	clockStart(gGame->clock);
-	networkConnect(gGame->network);
+	if(networkConnect(gGame->network) == -1)
+		gameFinish(); //To be replaced by reconnect screen eventually.
 }
 
 void gameRestart()

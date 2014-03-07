@@ -136,7 +136,7 @@ int networkConnect(Network* network)
         LOGI("Connected to network.");
 	else if (result == 0) {
 		LOGE("NETWORK FAILURE");
-		ANativeActivity_finish(gApp->activity);
+		return -1;
 	}
 	return result;
 }

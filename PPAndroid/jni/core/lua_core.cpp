@@ -187,9 +187,8 @@ void updateLuaCall()
 void callLuaHandleMessage(uint32_t id, uint32_t length)
 {
 	char buffer[128];
-	//sprintf(buffer, "handleMessage(%d,%d)", id, length);
+	sprintf(buffer, "handleMessage(%d,%d)", id, length);
 
-	LOGE("%s", buffer);
 	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "HandlingMessage");
 	error = error | lua_pcall(luaState, 0, 0, 0);
 
