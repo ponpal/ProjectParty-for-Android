@@ -131,6 +131,7 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h \
  jni/core/assert.h \
+<<<<<<< HEAD
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
@@ -142,6 +143,19 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h \
+=======
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/stat.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/stat.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h \
+>>>>>>> Native app now exits without lua errors etc.
  jni/core/loading_screen.h jni/core/content.h jni/core/resource_table.h \
  jni/core/path.h jni/core/lua_core.h
 

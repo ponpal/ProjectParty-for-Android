@@ -109,8 +109,9 @@ int networkReceive(Network* network)
 
 	gApp->activity->vm->DetachCurrentThread();
 
-	if (result == -1)
+	if (result == -1) {
 		LOGI("network error");
+	}
 
 	return result;
 }

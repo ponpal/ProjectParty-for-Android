@@ -53,5 +53,6 @@ void gameStop();
 
 void gameTerminate();
 void gameStep(ndk_helper::GLContext* context);
+void gameFinish();
 
 #endif /* GAME_H_ */

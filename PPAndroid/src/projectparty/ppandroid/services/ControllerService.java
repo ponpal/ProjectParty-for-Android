@@ -96,7 +96,8 @@ public class ControllerService extends Service {
 	}
 
 	public int isAlive() { 
-		return socketChan.isConnected() ? 1 : 0;
+		boolean b = socketChan.isConnected();
+		return b ? 1 : 0;
 	}
 
 	public int connect() {

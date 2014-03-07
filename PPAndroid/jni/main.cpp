@@ -303,8 +303,10 @@ void android_main(android_app* state)
 
 		   processSensors(ident);
 
-		   if(state->destroyRequested)
+		   if(state->destroyRequested) {
+			   LOGI("Native Activity Was Fully Destroyed!");
 			   return;
+		   }
 		}
 
 		if(gAppState.fullyActive()) {
@@ -314,5 +316,4 @@ void android_main(android_app* state)
 		}
 	}
 
-	LOGI("Native Activity Was Fully Destroyed!");
 }

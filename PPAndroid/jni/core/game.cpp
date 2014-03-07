@@ -166,7 +166,13 @@ void handleFileReload(Buffer* buf, size_t size)
 void gameHandleReceive()
 {
 	auto count = networkReceive(gGame->network);
-	if(count == 0) return;
+	if(count == 0)
+		return;
+	else if(count == -1)
+	{
+		gameFinish();
+		return;
+	}
 
 	auto buffer = gGame->network->in_;
 	size_t remaining;
@@ -198,15 +204,21 @@ void gameHandleReceive()
 void gameStep(ndk_helper::GLContext* context)
 {
 	clockStep(gGame->clock);
-	if(hasLoadedResources && networkIsAlive(gGame->network)) {
+	if(hasLoadedResources) {
 		gameHandleReceive();
 		runLuaGarbageCollector(1);
 		updateLuaCall();
 		renderLuaCall();
 		context->Swap();
-	} else if (!hasLoadedResources){
+	} else {
 		loadingScreen.draw(gGame->renderer, glm::vec2(gGame->screen->width, gGame->screen->height));
 		context->Swap();
 		gameHandleReceive();
 	}
+}
+
+void gameFinish()
+{
+	networkShutdown(gGame->network);
+	ANativeActivity_finish(gApp->activity);
 }

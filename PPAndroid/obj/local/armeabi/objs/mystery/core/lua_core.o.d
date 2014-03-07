@@ -75,6 +75,7 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/buffer.h jni/core/lua_core_private.h \
+<<<<<<< HEAD
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h \
@@ -111,6 +112,44 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
+=======
+ C:/Android/android-ndk-r9c/sources/android/native_app_glue/android_native_app_glue.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/poll.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/pthread.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/time.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/time.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/time.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/siginfo.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/siginfo.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/signal.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/string.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/malloc.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/signal.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/signal.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/sigcontext.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sched.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/configuration.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/asset_manager.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/looper.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_activity.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/jni.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/input.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/keycodes.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/native_window.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/rect.h \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/JNIHelper.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
+ jni/core/game.h jni/core/network.h jni/core/time_helpers.h \
+ jni/core/sensor.h jni/glm/glm/vec3.hpp \
+ C:/Android/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
+>>>>>>> Native app now exits without lua errors etc.
  jni/core/new_renderer.h jni/core/font.h jni/glm/glm/vec2.hpp \
  jni/glm/glm/mat4x4.hpp jni/core/font_loading.h jni/core/image_loader.h \
  jni/glm/glm/gtx/transform.hpp jni/glm/glm/gtx/../glm.hpp \
