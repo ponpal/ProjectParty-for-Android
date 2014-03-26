@@ -20,6 +20,8 @@ Game* gGame;
 messageHandler gMessageHandler;
 bool hasLoadedResources;
 LoadingScreen loadingScreen;
+uint8_t tempBuffer[0xffff];
+uint32_t tempBufferLength = 0;
 
 void gameInitialize(android_app* app)
 {
@@ -131,13 +133,14 @@ void handleFileTransfer(Buffer* buffer) {
 		if (fileSize == 0)
 			break;
 
-		count = networkReceive(gGame->network);
+		count = networkReceive(gGame->network, tempBuffer, 0);
 		if (count != 0)
 			LOGI("count %d, filesize %d", count, (int)fileSize);
 	}
 
 	fclose(file);
 	LOGI("SUCESSFULLY WROTE A FILE!");
+	LOGI("Remaining: %d", bufferBytesRemaining(buffer));
 }
 
 void handleAllResourcesLoaded(Buffer* buffer)
@@ -164,43 +167,110 @@ void handleFileReload(Buffer* buf, size_t size)
 	LOGI("File reloaded! %s", str.c_str());
 }
 
+bool readMessage(Buffer* buffer)
+{
+    auto remaining = bufferBytesRemaining(buffer);
+    if (remaining == 0) {
+    	return true;
+    } else if (remaining == 1) {
+    	tempBufferLength = 1;
+    	tempBuffer[0] = bufferReadByte(buffer);
+    	return false;
+    }
+
+    auto size = bufferReadShort(buffer);
+    remaining = bufferBytesRemaining(buffer);
+    if (remaining < size) {
+        (*(uint16_t*)tempBuffer) = size;
+        bufferReadBytes(buffer, tempBuffer + 2, remaining);
+    	//LOGI("Got a temporary message. Size: %d, Remaining: %d",
+    	//		size, remaining);
+        tempBufferLength = remaining + 2;
+        return false;
+    }
+
+    auto id = bufferReadByte(buffer);
+    if(id == NETWORK_FILE) {
+    	LOGI("Transfer");
+        handleFileTransfer(buffer);
+    } else if (id == NETWORK_ALLFILES) {
+        handleAllResourcesLoaded(buffer);
+    } else if (id == NETWORK_FILERELOAD) {
+    	LOGI("Reload");
+        handleFileReload(buffer, size);
+    } else {
+        auto end = buffer->ptr + size - 1;
+        callLuaHandleMessage(id, size - 1);
+        buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
+    }
+    return true;
+}
+
 void gameHandleReceive()
 {
-	auto count = networkReceive(gGame->network);
-	if(count == 0)
-		return;
-	else if(count == -1)
-	{
-		gameFinish();
-		return;
-	}
+	while(true) {
+        auto count = networkReceive(gGame->network, tempBuffer, tempBufferLength);
+        tempBufferLength = 0;
+        auto buffer = gGame->network->in_;
 
-	auto buffer = gGame->network->in_;
-	size_t remaining;
-	while(true)
-	{
-		if((remaining = bufferBytesRemaining(buffer)) == 0) {
-			count = networkReceive(gGame->network);
-			if(count == 0) return;
-		}
-
-		auto size = bufferReadShort(buffer);
-		auto id   = bufferReadByte(buffer);
-
-		//LOGI("Received a message SIZE: %d, ID: %d", size, id);
-		if(id == NETWORK_FILE) {
-			handleFileTransfer(buffer);
-		} else if (id == NETWORK_ALLFILES) {
-			handleAllResourcesLoaded(buffer);
-		} else if (id == NETWORK_FILERELOAD) {
-			handleFileReload(buffer, size);
-		} else {
-            auto end = buffer->ptr + size - 1;
-            callLuaHandleMessage(id, size - 1);
-			buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
-		}
+        while (readMessage(buffer)) {
+            auto remaining = bufferBytesRemaining(buffer);
+            if(remaining == 0)
+                return;
+        }
 	}
 }
+
+//
+//	auto count = networkReceive(gGame->network, tempBuffer, tempBufferLength);
+//	if(count == 0)
+//		return;
+//	else if(count == -1)
+//	{
+//		gameFinish();
+//		return;
+//	}
+//
+//	auto buffer = gGame->network->in_;
+//	size_t remaining;
+//	while(true)
+//	{
+//		if((remaining = bufferBytesRemaining(buffer)) == 0) {
+//			return;
+//		}
+//		LOGI("Bytes remaining: %d", bufferBytesRemaining(buffer));
+//
+//		auto size = bufferReadShort(buffer);
+//
+//		if (size > bufferBytesRemaining(buffer)) {
+//			tempBufferLength = bufferBytesRemaining(buffer);
+//			(*((uint16_t*)tempBuffer)) = size;
+//			bufferReadBytes(buffer, tempBuffer + 2, tempBufferLength);
+//			return;
+//		}
+//
+//		auto id  = bufferReadByte(buffer);
+//
+//		LOGI("Received a message SIZE: %d, ID: %d", size, id);
+//		if(id == NETWORK_FILE) {
+//			handleFileTransfer(buffer);
+//		} else if (id == NETWORK_ALLFILES) {
+//			handleAllResourcesLoaded(buffer);
+//		} else if (id == NETWORK_FILERELOAD) {
+//			handleFileReload(buffer, size);
+//		} else {
+//			LOGI("Handling LUA message");
+//            auto end = buffer->ptr + size - 1;
+//			LOGI("Bytes remaining: %d", bufferBytesRemaining(buffer));
+//            callLuaHandleMessage(id, size - 1);
+//			LOGI("Bufpointer: %d", (size_t) buffer->ptr);
+//			LOGI("End: %d", (size_t) end);
+//			buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
+//			LOGI("Bytes remaining: %d", bufferBytesRemaining(buffer));
+//		}
+//	}
+//	tempBufferLength = 0;
+
 
 void gameStep(ndk_helper::GLContext* context)
 {

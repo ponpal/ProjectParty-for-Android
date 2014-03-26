@@ -236,6 +236,7 @@ Font constructFont(uint8_t* data, size_t dataSize, const Frame& page)
 				throw std::domain_error("Corrupt BMF file!");
 		}
 	}
+	LOGI("No error");
 
 	return Font(iHeader.fontSize, cHeader.base, cHeader.lineHeight, page, chars, max + 1);
 }

@@ -151,6 +151,7 @@ Time = {}
 Time.total   = 0
 Time.elapsed = 0
 
+
 C.gGame.sensor.onTouch = function (x, y, index)
 	if onTouch then onTouch(x, y, index) end
 end
@@ -218,6 +219,14 @@ In.readVec3 = function()
 end
 In.readUTF8 = function()
 	return cfuns.string(C.bufferReadLuaString(C.gGame.network.in_))
+end
+In.readByteArray = function()
+	local len = In.readShort()
+	local array = {}
+	for i=0, len-1, 1 do
+		array[i] = In.readByte()
+	end
+	return array
 end
 
 Sensors = C.gGame.sensor

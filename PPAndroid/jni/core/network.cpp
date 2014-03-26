@@ -36,7 +36,7 @@ Network* networkInitialize(android_app* app)
 	gNetworkServiceObject = env->NewGlobalRef(obj);
 
 	sendID       = env->GetMethodID(clazz, "send", "(I)I");
-	receiveID    = env->GetMethodID(clazz, "receive", "()I");
+	receiveID    = env->GetMethodID(clazz, "receive", "(I)I");
 	isAliveID    = env->GetMethodID(clazz, "isAlive", "()I");
 	connectID    = env->GetMethodID(clazz, "connect", "()I");
 	reconnectID  = env->GetMethodID(clazz, "reconnect", "()I");
@@ -96,24 +96,26 @@ int networkSend(Network* network)
 	out->ptr = out->base;
 	return 1;
 }
-int networkReceive(Network* network)
+int networkReceive(Network* network, uint8_t* tempBuffer, uint32_t size)
 {
 	auto in = network->in_;
 	in->ptr = in->base;
+	memcpy(in->ptr, tempBuffer, size);
 
 	auto env = gApp->activity->env;
 	gApp->activity->vm->AttachCurrentThread( &env, NULL );
 
-	auto result = env->CallIntMethod(gNetworkServiceObject, receiveID);
-	in->length = result;
+	auto result = env->CallIntMethod(gNetworkServiceObject, receiveID, size);
+	in->length = size + result;
 
 	gApp->activity->vm->DetachCurrentThread();
 
 	if (result == -1) {
 		LOGI("network error");
+		return -1;
 	}
 
-	return result;
+	return size + result;
 }
 
 int networkIsAlive(Network* network)

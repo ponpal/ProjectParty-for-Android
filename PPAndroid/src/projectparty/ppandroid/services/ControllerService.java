@@ -62,9 +62,9 @@ public class ControllerService extends Service {
 		return null;
 	}
 
-	public int receive() {
+	public int receive(int size) {
 		try {
-			inBuffer.position(0);
+			inBuffer.position(size);
 			inBuffer.limit(0xFFFF);
 			int read = socketChan.read(inBuffer);
 			if (read == -1)

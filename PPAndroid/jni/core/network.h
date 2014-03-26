@@ -33,7 +33,7 @@ extern "C"
 	} Network;
 
 	int networkSend(Network* network);
-	int networkReceive(Network* network);
+	int networkReceive(Network* network, uint8_t* buffer, uint32_t size);
 
 	int networkIsAlive(Network* network);
 	int networkConnect(Network* network);
