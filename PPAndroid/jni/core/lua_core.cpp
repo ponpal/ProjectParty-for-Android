@@ -168,7 +168,7 @@ void callEmptyLuaFunction(const char* buffer)
 	}
 }
 
-void callIntIntLuaFunction(const char* methodName, int x, int y)
+void callInt2LuaFunction(const char* methodName, int x, int y)
 {
 	char buffer[128];
 	sprintf(buffer, "%s(%d,%d)", methodName, x, y);
@@ -182,7 +182,7 @@ void callIntIntLuaFunction(const char* methodName, int x, int y)
 	}
 }
 
-void callIntIntLuaFunction(const char* methodName, int x, int y, int z)
+void callInt3LuaFunction(const char* methodName, int x, int y, int z)
 {
 	char buffer[128];
 	sprintf(buffer, "%s(%d,%d,%d)", methodName, x, y, z);
@@ -196,12 +196,26 @@ void callIntIntLuaFunction(const char* methodName, int x, int y, int z)
 	}
 }
 
-void callFloatFloatLuaFunction(const char* methodName, float x, float y)
+void callFloat2LuaFunction(const char* methodName, float x, float y)
 {
 	char buffer[128];
 	sprintf(buffer, "%s(%f,%f)", methodName, x, y);
 
 	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "float float");
+	error = error | lua_pcall(luaState, 0, 0, 0);
+
+	if(error) {
+		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
+	}
+}
+
+void callFloat4LuaFunction(const char* methodName, float x1, float y1, float x2, float y2)
+{
+	char buffer[256];
+	sprintf(buffer, "%s(%f,%f,%f,%f)", methodName, x1, y1, x2, y2);
+
+	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "float4");
 	error = error | lua_pcall(luaState, 0, 0, 0);
 
 	if(error) {
@@ -266,25 +280,37 @@ void luaLog(const char* toLog)
 
 void luaOnTap(int x, int y)
 {
-	callIntIntLuaFunction("onTap", x, y);
+	callInt2LuaFunction("onTap", x, y);
 }
 
 void luaOnTouch(int x, int y, int pointerIndex)
 {
-	callIntIntLuaFunction("onTouch", x, y, pointerIndex);
+	callInt3LuaFunction("onTouch", x, y, pointerIndex);
 }
 
 void luaOnDrag(float x, float y)
 {
-	callFloatFloatLuaFunction("onDrag", x, y);
+	callFloat2LuaFunction("onDrag", x, y);
 }
 
 void luaOnDragBegin(float x, float y)
 {
-	callFloatFloatLuaFunction("onDragBegin", x, y);
+	callFloat2LuaFunction("onDragBegin", x, y);
 }
 
 void luaOnDragEnd(float x, float y)
 {
-	callFloatFloatLuaFunction("onDragEnd", x, y);
+	callFloat2LuaFunction("onDragEnd", x, y);
 }
+
+void luaOnPinchBegin(float x1, float y1, float x2, float y2)
+{
+	callFloat4LuaFunction("onPinchBegin", x1, y1, x2, y2);
+}
+
+void luaOnPinch(float x1, float y1, float x2, float y2)
+{
+	callFloat4LuaFunction("onPinch", x1, y1, x2, y2);
+}
+
+

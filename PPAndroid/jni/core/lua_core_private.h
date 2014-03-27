@@ -26,5 +26,10 @@ void luaOnTouch(int x, int y, int pointerIndex);
 void luaOnDrag(float x, float y);
 void luaOnDragBegin(float x, float y);
 void luaOnDragEnd(float x, float y);
+void luaOnPinchBegin(float x1, float y1, float x2, float y2);
+void luaOnPinch(float x1, float y1, float x2, float y2);
 
 #endif /* LUA_CORE_PRIVATE_H_ */
+
+
+
