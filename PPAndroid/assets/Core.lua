@@ -209,6 +209,9 @@ end
 In.readUTF8 = function()
 	return cfuns.string(C.bufferReadLuaString(C.gGame.network.in_))
 end
+
+
+
 In.readByteArray = function()
 	local len = In.readShort()
 	local array = {}
