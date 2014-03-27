@@ -7,7 +7,7 @@
 
 #ifndef MAIN_H_
 #define MAIN_H_
-
+#include "NDKHelper.h"
 #include "JNIHelper.h"
 #include "core/display.h"
 #include <android/sensor.h>

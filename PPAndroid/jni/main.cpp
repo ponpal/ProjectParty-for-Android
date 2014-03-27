@@ -11,6 +11,7 @@
 #include "core/sensor.h"
 
 ndk_helper::GLContext* context;
+ndk_helper::DragDetector drag_detector;
 TapDetector tap_detector;
 
 static int32_t handle_input(android_app* app, AInputEvent* event)
@@ -21,17 +22,40 @@ static int32_t handle_input(android_app* app, AInputEvent* event)
 	{
 		GESTURE_STATE tapState = tapDetect(&tap_detector, event);
 		if(tapState == MY_GESTURE_STATE_ACTION) {
-			if(gGame->sensor->onTap != NULL) {
-				gGame->sensor->onTap(tap_detector.x, context->GetScreenHeight() - tap_detector.y);
-			}
+			luaOnTap(tap_detector.x, context->GetScreenHeight() - tap_detector.y);
+		}
+		GESTURE_STATE dragState = drag_detector.Detect(event);
+		 //Handle drag state
+		if( dragState & ndk_helper::GESTURE_STATE_START )
+		{
+			//Otherwise, start dragging
+			ndk_helper::Vec2 v;
+			drag_detector.GetPointer( v );
+			float x, y;
+			v.Value(x, y);
+			luaOnDragBegin(x, context->GetScreenHeight() - y);
+		}
+		else if( dragState & ndk_helper::GESTURE_STATE_MOVE )
+		{
+			ndk_helper::Vec2 v;
+			drag_detector.GetPointer( v );
+			float x, y;
+			v.Value(x, y);
+			luaOnDrag(x, context->GetScreenHeight() - y);
+		}
+		else if( dragState & ndk_helper::GESTURE_STATE_END )
+		{
+			ndk_helper::Vec2 v;
+			drag_detector.GetPointer( v );
+			float x, y;
+			v.Value(x, y);
+			luaOnDragEnd(x, context->GetScreenHeight() - y);
 		}
 
 		size_t pointerCount = AMotionEvent_getPointerCount(event);
 		for(size_t i = 0; i < pointerCount; i++)
 		{
-			if(gGame->sensor->onTouch != NULL) {
-				gGame->sensor->onTouch(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i), i);
-			}
+			luaOnTouch(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i), i);
 		}
 		return 1;
 	}

@@ -13,15 +13,10 @@
 
 using namespace glm;
 
-typedef void (*touchHandler) (int x, int y, int pointerIndex);
-typedef void (*tapHandler) (int x, int y);
-
 typedef struct
 {
 	vec3 acceleration;
 	vec3 gyroscope;
-	touchHandler onTouch;
-	tapHandler onTap;
 } SensorState;
 
 
@@ -48,6 +43,5 @@ typedef struct
 } TapDetector;
 
 GESTURE_STATE tapDetect(TapDetector* detector, const AInputEvent* motion_event);
-
 
 #endif /* SENSOR_H_ */

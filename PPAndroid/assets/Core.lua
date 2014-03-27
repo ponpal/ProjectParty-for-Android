@@ -13,8 +13,6 @@ cfuns.cdef[[
 	{
 		vec3f acceleration;
 		vec3f gyroscope;
-		touchHandler onTouch;
-		tapHandler   onTap;
 	} SensorState;
 
 	typedef struct
@@ -150,15 +148,6 @@ Network = {
 Time = {}
 Time.total   = 0
 Time.elapsed = 0
-
-
-C.gGame.sensor.onTouch = function (x, y, index)
-	if onTouch then onTouch(x, y, index) end
-end
-
-C.gGame.sensor.onTap = function (x, y)
-	if onTap then onTap(x, y) end
-end
 
 Out = { }
  function Out.writeByte(byte)

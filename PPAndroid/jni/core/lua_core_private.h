@@ -21,4 +21,10 @@ void renderLuaCall();
 void runLuaGarbageCollector(int milisecs);
 void loadLuaScript(const std::string& relativeScriptPath);
 
+void luaOnTap(int x, int y);
+void luaOnTouch(int x, int y, int pointerIndex);
+void luaOnDrag(float x, float y);
+void luaOnDragBegin(float x, float y);
+void luaOnDragEnd(float x, float y);
+
 #endif /* LUA_CORE_PRIVATE_H_ */

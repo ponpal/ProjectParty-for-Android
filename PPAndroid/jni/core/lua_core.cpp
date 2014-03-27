@@ -159,7 +159,7 @@ void runLuaGarbageCollector(int milisecs)
 
 void callEmptyLuaFunction(const char* buffer)
 {
-	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "weeee");
+	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "empty");
 	error = error | lua_pcall(luaState, 0, 0, 0);
 
 	if(error) {
@@ -167,6 +167,49 @@ void callEmptyLuaFunction(const char* buffer)
 		lua_pop(luaState, 1);
 	}
 }
+
+void callIntIntLuaFunction(const char* methodName, int x, int y)
+{
+	char buffer[128];
+	sprintf(buffer, "%s(%d,%d)", methodName, x, y);
+
+	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "int int");
+	error = error | lua_pcall(luaState, 0, 0, 0);
+
+	if(error) {
+		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
+	}
+}
+
+void callIntIntLuaFunction(const char* methodName, int x, int y, int z)
+{
+	char buffer[128];
+	sprintf(buffer, "%s(%d,%d,%d)", methodName, x, y, z);
+
+	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "int int int");
+	error = error | lua_pcall(luaState, 0, 0, 0);
+
+	if(error) {
+		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
+	}
+}
+
+void callFloatFloatLuaFunction(const char* methodName, float x, float y)
+{
+	char buffer[128];
+	sprintf(buffer, "%s(%f,%f)", methodName, x, y);
+
+	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "float float");
+	error = error | lua_pcall(luaState, 0, 0, 0);
+
+	if(error) {
+		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
+	}
+}
+
 
 void initLuaCall()
 {
@@ -219,4 +262,29 @@ void renderLuaCall()
 void luaLog(const char* toLog)
 {
 	LOGI("%s" , toLog);
+}
+
+void luaOnTap(int x, int y)
+{
+	callIntIntLuaFunction("onTap", x, y);
+}
+
+void luaOnTouch(int x, int y, int pointerIndex)
+{
+	callIntIntLuaFunction("onTouch", x, y, pointerIndex);
+}
+
+void luaOnDrag(float x, float y)
+{
+	callFloatFloatLuaFunction("onDrag", x, y);
+}
+
+void luaOnDragBegin(float x, float y)
+{
+	callFloatFloatLuaFunction("onDragBegin", x, y);
+}
+
+void luaOnDragEnd(float x, float y)
+{
+	callFloatFloatLuaFunction("onDragEnd", x, y);
 }
