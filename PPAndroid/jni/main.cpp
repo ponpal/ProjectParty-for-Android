@@ -129,7 +129,7 @@ void resumeSensors() {
 
 	ASensorEventQueue_enableSensor(gSensorEventQueue, gAccelerometerSensor);
 	ASensorEventQueue_setEventRate(gSensorEventQueue, gAccelerometerSensor,
-			(1000L / 60) * 1000);
+			(1000L) * 1000);
 }
 
 void pauseSensors() {
@@ -139,7 +139,7 @@ void pauseSensors() {
 void processSensors(int32_t id) {
 	if (id == LOOPER_ID_USER) {
 		ASensorEvent event;
-		while (ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1)) {
+		while (ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1) <= 0) {
 			switch (event.type) {
 			case ASENSOR_TYPE_ACCELEROMETER:
 				vec3 v;
@@ -332,20 +332,33 @@ void android_main(android_app* state) {
 		int ident, fdesc, events;
 		android_poll_source* source;
 
-		while ((ident = ALooper_pollOnce(0, &fdesc, &events, (void**) &source))
-				>= 0) {
+		while (true)
+		{
+			LOGE("going to poll");
+			ident = ALooper_pollOnce(1, &fdesc, &events, (void**) &source);
+			LOGE("HEJHÅ android_main while");
+			if(ident <= 0)
+				break;
 			if (source)
+			{
+				LOGE("android_main ifnr1 enter");
 				source->process(state, source);
+				LOGE("android_main ifnr1 exit");
+			}
 
+			LOGE("about to process sensors");
 			processSensors(ident);
+			LOGE("processing sensors is hard work, work");
 
 			if (state->destroyRequested) {
 				LOGI("Native Activity Was Fully Destroyed!");
 				return;
 			}
 		}
+		LOGE("android_main after loop");
 
 		if (gAppState.fullyActive()) {
+			LOGE("android_main ifnr3");
 			gGame->screen->width = context->GetScreenWidth();
 			gGame->screen->height = context->GetScreenHeight();
 			gameStep(context);

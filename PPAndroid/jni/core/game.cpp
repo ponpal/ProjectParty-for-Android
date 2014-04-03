@@ -34,7 +34,7 @@ void gameInitialize(android_app* app)
 	gGame->content   = new Content(128);
 
 	loadingScreen = LoadingScreen();
-
+	LOGI("Herpa Derp");
 	LOGI("Initializing Game!");
 	initializeLuaCore();
 }
@@ -149,7 +149,6 @@ void handleAllResourcesLoaded(Buffer* buffer)
 	loadingScreen.unload();
 
 	bufferReadUTF8(buffer, &gGame->name);
-	LOGI("Game %s", gGame->name);
 	initializeLuaScripts(gGame->name);
     initLuaCall();
 }
@@ -195,7 +194,7 @@ bool readMessage(Buffer* buffer)
         handleFileTransfer(buffer);
     } else if (id == NETWORK_ALLFILES) {
         handleAllResourcesLoaded(buffer);
-    } else if (id == NETWORK_FILERELOAD) {
+     } else if (id == NETWORK_FILERELOAD) {
     	LOGI("Reload");
         handleFileReload(buffer, size);
     } else {
@@ -210,11 +209,11 @@ void gameHandleReceive()
 {
 	while(true) {
         auto count = networkReceive(gGame->network, tempBuffer, tempBufferLength);
-        if (count == -1)
+        if (count == -1)        {
         	return;
+
         tempBufferLength = 0;
         auto buffer = gGame->network->in_;
-
         while (readMessage(buffer)) {
             auto remaining = bufferBytesRemaining(buffer);
             if(remaining == 0)
@@ -277,7 +276,8 @@ void gameHandleReceive()
 void gameStep(ndk_helper::GLContext* context)
 {
 	clockStep(gGame->clock);
-	if(hasLoadedResources) {
+	if(hasLoadedResources)
+	{
 		gameHandleReceive();
 		runLuaGarbageCollector(1);
 		updateLuaCall();
