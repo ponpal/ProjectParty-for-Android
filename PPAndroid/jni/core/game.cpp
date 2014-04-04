@@ -23,15 +23,14 @@ LoadingScreen loadingScreen;
 uint8_t tempBuffer[0xffff];
 uint32_t tempBufferLength = 0;
 
-void gameInitialize(android_app* app)
-{
+void gameInitialize(android_app* app) {
 	gGame = new Game();
-	gGame->clock	 = new Clock();
-	gGame->sensor 	 = new SensorState();
-	gGame->screen    = new Screen();
-	gGame->network	 = networkInitialize(app);
-	gGame->renderer  = rendererInitialize(1024);
-	gGame->content   = new Content(128);
+	gGame->clock = new Clock();
+	gGame->sensor = new SensorState();
+	gGame->screen = new Screen();
+	gGame->network = networkInitialize(app);
+	gGame->renderer = rendererInitialize(1024);
+	gGame->content = new Content(128);
 
 	loadingScreen = LoadingScreen();
 	LOGI("Herpa Derp");
@@ -39,8 +38,7 @@ void gameInitialize(android_app* app)
 	initializeLuaCore();
 }
 
-void gameTerminate()
-{
+void gameTerminate() {
 	delete gGame->clock;
 	delete gGame->sensor;
 
@@ -50,45 +48,38 @@ void gameTerminate()
 	delete gGame;
 }
 
-void gameStart()
-{
+void gameStart() {
 	hasLoadedResources = false;
 	LOGI("Starting game!");
 	clockStart(gGame->clock);
-	if(networkConnect(gGame->network) == -1)
+	if (networkConnect(gGame->network) == -1)
 		gameFinish(); //To be replaced by reconnect screen eventually.
 }
 
-void gameRestart()
-{
+void gameRestart() {
 	LOGI("Restarting game!");
 	clockStart(gGame->clock);
 	networkReconnect(gGame->network);
 }
 
-void gameResume()
-{
+void gameResume() {
 	gGame->paused = false;
 }
 
-void gamePause()
-{
+void gamePause() {
 	gGame->paused = true;
 }
 
-void gameSurfaceCreated()
-{
+void gameSurfaceCreated() {
 	rendererActivate(gGame->renderer);
 	if (!hasLoadedResources)
 		loadingScreen.load();
 }
 
-void gameSurfaceDestroyed()
-{
+void gameSurfaceDestroyed() {
 }
 
-void gameStop()
-{
+void gameStop() {
 	networkDisconnect(gGame->network);
 	gGame->content->unloadAll();
 	termLuaCall();
@@ -105,17 +96,17 @@ void handleFileTransfer(Buffer* buffer) {
 	auto externalsDir = gApp->activity->externalDataPath;
 	std::string filePath(externalsDir);
 	filePath += "/";
-	for(int i = 0; i < stringSize; i++) {
-		if(path.ptr[i] == '/') {
+	for (int i = 0; i < stringSize; i++) {
+		if (path.ptr[i] == '/') {
 			int err = mkdir(filePath.c_str(), 0770);
-			if(err != 0 && errno != 17)
+			if (err != 0 && errno != 17)
 				LOGI("Failed to make directory: %d %s", errno, strerror(errno));
 		}
 		filePath += path.ptr[i];
 	}
 
 	auto file = fopen(filePath.c_str(), "w+");
-	if(file == NULL) {
+	if (file == NULL) {
 		LOGE("Unable to write/create file: %s", filePath.c_str());
 	} else {
 		LOGI("Created file %s", filePath.c_str());
@@ -143,22 +134,20 @@ void handleFileTransfer(Buffer* buffer) {
 	LOGI("Remaining: %d", bufferBytesRemaining(buffer));
 }
 
-void handleAllResourcesLoaded(Buffer* buffer)
-{
+void handleAllResourcesLoaded(Buffer* buffer) {
 	hasLoadedResources = true;
 	loadingScreen.unload();
 
 	bufferReadUTF8(buffer, &gGame->name);
 	initializeLuaScripts(gGame->name);
-    initLuaCall();
+	initLuaCall();
 }
 
-void handleFileReload(Buffer* buf, size_t size)
-{
+void handleFileReload(Buffer* buf, size_t size) {
 	AutoPtr<char> path;
 	auto stringSize = bufferReadUTF8(buf, &path.ptr);
 	std::string str(path.ptr);
-	if(path::hasExtension(str, ".lua"))
+	if (path::hasExtension(str, ".lua"))
 		loadLuaScript(str);
 	else
 		gGame->content->reloadAsset(str);
@@ -166,59 +155,59 @@ void handleFileReload(Buffer* buf, size_t size)
 	LOGI("File reloaded! %s", str.c_str());
 }
 
-bool readMessage(Buffer* buffer)
-{
-    auto remaining = bufferBytesRemaining(buffer);
-    if (remaining == 0) {
-    	return true;
-    } else if (remaining == 1) {
-    	tempBufferLength = 1;
-    	tempBuffer[0] = bufferReadByte(buffer);
-    	return false;
-    }
+bool readMessage(Buffer* buffer) {
+	auto remaining = bufferBytesRemaining(buffer);
+	if (remaining == 0) {
+		return true;
+	} else if (remaining == 1) {
+		tempBufferLength = 1;
+		tempBuffer[0] = bufferReadByte(buffer);
+		return false;
+	}
 
-    auto size = bufferReadShort(buffer);
-    remaining = bufferBytesRemaining(buffer);
-    if (remaining < size) {
-        (*(uint16_t*)tempBuffer) = size;
-        bufferReadBytes(buffer, tempBuffer + 2, remaining);
-    	//LOGI("Got a temporary message. Size: %d, Remaining: %d",
-    	//		size, remaining);
-        tempBufferLength = remaining + 2;
-        return false;
-    }
+	auto size = bufferReadShort(buffer);
+	remaining = bufferBytesRemaining(buffer);
+	if (remaining < size) {
+		(*(uint16_t*) tempBuffer) = size;
+		bufferReadBytes(buffer, tempBuffer + 2, remaining);
+		//LOGI("Got a temporary message. Size: %d, Remaining: %d",
+		//		size, remaining);
+		tempBufferLength = remaining + 2;
+		return false;
+	}
 
-    auto id = bufferReadByte(buffer);
-    if(id == NETWORK_FILE) {
-    	LOGI("Transfer");
-        handleFileTransfer(buffer);
-    } else if (id == NETWORK_ALLFILES) {
-        handleAllResourcesLoaded(buffer);
-     } else if (id == NETWORK_FILERELOAD) {
-    	LOGI("Reload");
-        handleFileReload(buffer, size);
-    } else {
-        auto end = buffer->ptr + size - 1;
-        callLuaHandleMessage(id, size - 1);
-        buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
-    }
-    return true;
+	auto id = bufferReadByte(buffer);
+	if (id == NETWORK_FILE) {
+		LOGI("Transfer");
+		handleFileTransfer(buffer);
+	} else if (id == NETWORK_ALLFILES) {
+		handleAllResourcesLoaded(buffer);
+	} else if (id == NETWORK_FILERELOAD) {
+		LOGI("Reload");
+		handleFileReload(buffer, size);
+	} else {
+		auto end = buffer->ptr + size - 1;
+		callLuaHandleMessage(id, size - 1);
+		buffer->ptr = end; //In case the lua code did something wrong. It feels wrong to crash the application imho.
+	}
+	return true;
 }
 
-void gameHandleReceive()
-{
-	while(true) {
-        auto count = networkReceive(gGame->network, tempBuffer, tempBufferLength);
-        if (count == -1)        {
-        	return;
+void gameHandleReceive() {
+	while (true) {
+		auto count = networkReceive(gGame->network, tempBuffer,
+				tempBufferLength);
+		if (count == -1) {
+			return;
 
-        tempBufferLength = 0;
-        auto buffer = gGame->network->in_;
-        while (readMessage(buffer)) {
-            auto remaining = bufferBytesRemaining(buffer);
-            if(remaining == 0)
-                return;
-        }
+			tempBufferLength = 0;
+			auto buffer = gGame->network->in_;
+			while (readMessage(buffer)) {
+				auto remaining = bufferBytesRemaining(buffer);
+				if (remaining == 0)
+					return;
+			}
+		}
 	}
 }
 
@@ -272,26 +261,24 @@ void gameHandleReceive()
 //	}
 //	tempBufferLength = 0;
 
-
-void gameStep(ndk_helper::GLContext* context)
-{
-	clockStep(gGame->clock);
-	if(hasLoadedResources)
-	{
-		gameHandleReceive();
-		runLuaGarbageCollector(1);
-		updateLuaCall();
-		renderLuaCall();
-		context->Swap();
-	} else {
-		loadingScreen.draw(gGame->renderer, glm::vec2(gGame->screen->width, gGame->screen->height));
-		context->Swap();
-		gameHandleReceive();
+	void gameStep(ndk_helper::GLContext* context) {
+		clockStep(gGame->clock);
+		if (hasLoadedResources) {
+			gameHandleReceive();
+			runLuaGarbageCollector(1);
+			updateLuaCall();
+			renderLuaCall();
+			context->Swap();
+		} else {
+			loadingScreen.draw(gGame->renderer,
+					glm::vec2(gGame->screen->width, gGame->screen->height));
+			context->Swap();
+			gameHandleReceive();
+		}
 	}
-}
 
-void gameFinish()
-{
-	networkShutdown(gGame->network);
-	ANativeActivity_finish(gApp->activity);
-}
+	void gameFinish() {
+		networkShutdown(gGame->network);
+		ANativeActivity_finish(gApp->activity);
+	}
+

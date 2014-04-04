@@ -334,28 +334,19 @@ void android_main(android_app* state) {
 
 		while (true)
 		{
-			LOGE("going to poll");
 			ident = ALooper_pollOnce(1, &fdesc, &events, (void**) &source);
-			LOGE("HEJHÅ android_main while");
 			if(ident <= 0)
 				break;
 			if (source)
-			{
-				LOGE("android_main ifnr1 enter");
 				source->process(state, source);
-				LOGE("android_main ifnr1 exit");
-			}
 
-			LOGE("about to process sensors");
 			processSensors(ident);
-			LOGE("processing sensors is hard work, work");
 
 			if (state->destroyRequested) {
 				LOGI("Native Activity Was Fully Destroyed!");
 				return;
 			}
 		}
-		LOGE("android_main after loop");
 
 		if (gAppState.fullyActive()) {
 			LOGE("android_main ifnr3");
