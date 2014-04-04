@@ -129,7 +129,7 @@ void resumeSensors() {
 
 	ASensorEventQueue_enableSensor(gSensorEventQueue, gAccelerometerSensor);
 	ASensorEventQueue_setEventRate(gSensorEventQueue, gAccelerometerSensor,
-			(1000L) * 1000);
+			(1000L /60) * 1000);
 }
 
 void pauseSensors() {
@@ -349,7 +349,6 @@ void android_main(android_app* state) {
 		}
 
 		if (gAppState.fullyActive()) {
-			LOGE("android_main ifnr3");
 			gGame->screen->width = context->GetScreenWidth();
 			gGame->screen->height = context->GetScreenHeight();
 			gameStep(context);

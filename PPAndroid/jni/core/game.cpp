@@ -197,7 +197,7 @@ void gameHandleReceive() {
 	while (true) {
 		auto count = networkReceive(gGame->network, tempBuffer,
 				tempBufferLength);
-		if (count == -1) {
+		if (count == -1)
 			return;
 
 			tempBufferLength = 0;
@@ -208,7 +208,6 @@ void gameHandleReceive() {
 					return;
 			}
 		}
-	}
 }
 
 //
