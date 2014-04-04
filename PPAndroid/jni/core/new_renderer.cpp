@@ -159,7 +159,6 @@ void rendererAddFrame(Renderer* renderer, const Frame* frame,
 {
 	rendererFlushIfNeeded(renderer, frame->texture, 4);
 	using namespace glm;
-
 	vec2 bl  = vec2(inPos.x, inPos.y);
 	vec2 dim = vec2(inDim.x, inDim.y);
 

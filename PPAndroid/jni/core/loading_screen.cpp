@@ -20,6 +20,7 @@ LoadingScreen::LoadingScreen()
 
 void LoadingScreen::load()
 {
+	LOGE("LoadingScreen load");
 	Asset asset(LOADING_FRAME_PATH);
 	auto tex = loadTexture(asset.buffer, asset.length);
 	loadingFrame = Frame(tex);
@@ -32,6 +33,7 @@ void LoadingScreen::unload()
 
 void LoadingScreen::draw(Renderer* renderer, glm::vec2 dim)
 {
+	LOGE("LoadingScreen draw");
 	glClearColor(0.5,0.5,0.5,1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	glEnable(GL_BLEND);

@@ -129,7 +129,7 @@ void resumeSensors() {
 
 	ASensorEventQueue_enableSensor(gSensorEventQueue, gAccelerometerSensor);
 	ASensorEventQueue_setEventRate(gSensorEventQueue, gAccelerometerSensor,
-			(1000L / 60) * 1000);
+			(1000L /60) * 1000);
 }
 
 void pauseSensors() {
@@ -139,7 +139,7 @@ void pauseSensors() {
 void processSensors(int32_t id) {
 	if (id == LOOPER_ID_USER) {
 		ASensorEvent event;
-		while (ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1)) {
+		while (ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1) <= 0) {
 			switch (event.type) {
 			case ASENSOR_TYPE_ACCELEROMETER:
 				vec3 v;
@@ -332,8 +332,11 @@ void android_main(android_app* state) {
 		int ident, fdesc, events;
 		android_poll_source* source;
 
-		while ((ident = ALooper_pollOnce(0, &fdesc, &events, (void**) &source))
-				>= 0) {
+		while (true)
+		{
+			ident = ALooper_pollOnce(1, &fdesc, &events, (void**) &source);
+			if(ident <= 0)
+				break;
 			if (source)
 				source->process(state, source);
 
