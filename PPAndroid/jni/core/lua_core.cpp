@@ -143,7 +143,7 @@ void loadLuaScript(const std::string& pathInFiles)
 {
 	ExternalAsset script(pathInFiles);
 
-	int error = luaL_loadbuffer(luaState, (const char*)script.buffer, script.length, "CData");
+	int error = luaL_loadbuffer(luaState, (const char*)script.buffer, script.length, pathInFiles.c_str());
 	error |= lua_pcall(luaState, 0, 0, 0);
 
 	if(error)
