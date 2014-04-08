@@ -161,11 +161,8 @@ void runLuaGarbageCollector(int milisecs)
 
 void callEmptyLuaFunction(const char* buffer)
 {
-	LOGI("callEmpty entered" );
 	int error = luaL_loadbuffer(luaState, buffer, strlen(buffer), "empty");
-	LOGI("callEmpty error1 %d", error );
 	error = error | lua_pcall(luaState, 0, 0, 0);
-	LOGI("CallEmpty error2 %d", error);
 	if(error) {
 		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
 		lua_pop(luaState, 1);
