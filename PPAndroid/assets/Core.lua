@@ -222,7 +222,9 @@ In.readByteArray = function()
 end
 
 Sensors = C.gGame.sensor
-Screen  = C.gGame.screen;
+Screen  = C.gGame.screen
+
+vec2 = cfuns.metatype("vec2f", vec2_MT)
 
 local vec2_MT = 
 {
@@ -241,7 +243,6 @@ local vec2_MT =
 }
 
 vec2 = cfuns.metatype("vec2f", vec2_MT)
-
 
 local function updateTime()
 	Time.total   = C.clockTotal(C.gGame.clock)
