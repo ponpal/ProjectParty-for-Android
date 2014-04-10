@@ -3,6 +3,7 @@ package projectparty.ppandroid.services;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.SocketOptions;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
@@ -106,6 +107,8 @@ public class ControllerService extends Service {
 			socketChan.socket().connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
 					latestServer.getPort()), 1000);
 
+			socketChan.socket().setTcpNoDelay(true);
+			
 			ByteBuffer buffer = ByteBuffer.allocateDirect(8);
 			buffer.order(ByteOrder.LITTLE_ENDIAN);
 

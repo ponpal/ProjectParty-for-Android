@@ -224,7 +224,6 @@ end
 Sensors = C.gGame.sensor
 Screen  = C.gGame.screen
 
-vec2 = cfuns.metatype("vec2f", vec2_MT)
 
 local vec2_MT = 
 {
