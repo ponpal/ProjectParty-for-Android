@@ -338,7 +338,8 @@ void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec
 				cursor.x = 0;
 				continue;
 			} else if(c == '\t') {
-				cursor += spaceInfo.advance * 4;
+				cursor.x += spaceInfo.advance * 4;
+				continue;
 			}
 
 			CharInfo info = (*font)[c];
