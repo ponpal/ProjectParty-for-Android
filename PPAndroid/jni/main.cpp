@@ -20,7 +20,7 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 
 	if (type == AINPUT_EVENT_TYPE_MOTION) {
 		GESTURE_STATE tapState = tapDetect(&tap_detector, event);
-		if (tapState == MY_GESTURE_STATE_ACTION) {
+		if (tapState == ndk_helper::GESTURE_STATE_ACTION) {
 			luaOnTap(tap_detector.x,
 					context->GetScreenHeight() - tap_detector.y);
 		}
@@ -129,7 +129,7 @@ void resumeSensors() {
 
 	ASensorEventQueue_enableSensor(gSensorEventQueue, gAccelerometerSensor);
 	ASensorEventQueue_setEventRate(gSensorEventQueue, gAccelerometerSensor,
-			(1000L /60) * 1000);
+			(1000L / 60) * 1000);
 }
 
 void pauseSensors() {
@@ -139,7 +139,7 @@ void pauseSensors() {
 void processSensors(int32_t id) {
 	if (id == LOOPER_ID_USER) {
 		ASensorEvent event;
-		while (ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1) <= 0) {
+		while (ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1) > 0) {
 			switch (event.type) {
 			case ASENSOR_TYPE_ACCELEROMETER:
 				vec3 v;

@@ -224,7 +224,24 @@ end
 Sensors = C.gGame.sensor
 Screen  = C.gGame.screen;
 
-vec2 = cfuns.typeof("vec2f")
+local vec2_MT = 
+{
+	__add = function (v0, v1)
+				return vec2(v0.x + v1.x, v0.y + v1.y)
+			end,
+	__sub = function (v0, v1)
+				return vec2(v0.x - v1.x, v0.y - v1.y)
+			end,
+	__mul = function (v0, scalar)
+				return vec2(v0.x * scalar, v0.y * scalar)
+			end,
+	__div = function (v0, scalar)
+				return vec2(v0.x / scalar, v0.y / scalar)
+			end
+}
+
+vec2 = cfuns.metatype("vec2f", vec2_MT)
+
 
 local function updateTime()
 	Time.total   = C.clockTotal(C.gGame.clock)
