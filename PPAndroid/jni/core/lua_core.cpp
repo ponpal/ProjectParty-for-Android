@@ -29,6 +29,7 @@
 
 uint32_t loadFont(const char* fontName)
 {
+	LOGE("LOADING FONT: %s", fontName);
 	std::string path(gGame->name);
 	path += "/";
 	path += fontName;
@@ -266,8 +267,12 @@ void renderLuaCall()
 
 	glm::mat4 matrix = glm::ortho(0.0f, (float)gGame->screen->width,
 		  0.0f, (float)gGame->screen->height);
-	//matrix = translate(matrix, glm::vec3(800,0,0));
-	//matrix = rotate(matrix, (float)M_PI_2, glm::vec3(0,0,1));
+
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+	{
+		matrix = translate(matrix, glm::vec3(gGame->screen->width,0,0));
+		matrix = rotate(matrix, (float)M_PI_2, glm::vec3(0,0,1));
+	}
 
 	rendererSetTransform(gGame->renderer, &matrix);
 	callEmptyLuaFunction("render()");
@@ -281,37 +286,64 @@ void luaLog(const char* toLog)
 
 void luaOnTap(int x, int y)
 {
-	callInt2LuaFunction("onTap", x, y);
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+        callInt2LuaFunction("onTap", y, gGame->screen->width-x);
+	else
+        callInt2LuaFunction("onTap", x, y);
 }
 
 void luaOnTouch(int x, int y, int pointerIndex)
 {
-	callInt3LuaFunction("onTouch", x, y, pointerIndex);
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+        callInt3LuaFunction("onTouch", y,
+                gGame->screen->width-x, pointerIndex);
+	else
+        callInt3LuaFunction("onTouch", x, y, pointerIndex);
 }
 
 void luaOnDrag(float x, float y)
 {
-	callFloat2LuaFunction("onDrag", x, y);
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+        callFloat2LuaFunction("onDrag", y,
+                gGame->screen->width-x);
+	else
+        callFloat2LuaFunction("onDrag", x, y);
 }
 
 void luaOnDragBegin(float x, float y)
 {
-	callFloat2LuaFunction("onDragBegin", x, y);
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+        callFloat2LuaFunction("onDragBegin", y, gGame->screen->width-x);
+	else
+        callFloat2LuaFunction("onDragBegin", x, y);
 }
 
 void luaOnDragEnd(float x, float y)
 {
-	callFloat2LuaFunction("onDragEnd", x, y);
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+        callFloat2LuaFunction("onDragEnd", y, gGame->screen->width-x);
+	else
+        callFloat2LuaFunction("onDragEnd", x, y);
 }
 
 void luaOnPinchBegin(float x1, float y1, float x2, float y2)
 {
-	callFloat4LuaFunction("onPinchBegin", x1, y1, x2, y2);
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+		callFloat4LuaFunction("onPinchBegin",
+			y1, gGame->screen->width-x1,
+			y2, gGame->screen->width-x2);
+	else
+		callFloat4LuaFunction("onPinchBegin", x1, y1, x2, y2);
 }
 
 void luaOnPinch(float x1, float y1, float x2, float y2)
 {
-	callFloat4LuaFunction("onPinch", x1, y1, x2, y2);
+	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
+		callFloat4LuaFunction("onPinch",
+			y1, gGame->screen->width-x1,
+			y2, gGame->screen->width-x2);
+	else
+		callFloat4LuaFunction("onPinch", x1, y1, x2, y2);
 }
 
 

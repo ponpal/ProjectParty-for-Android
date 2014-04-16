@@ -15,6 +15,8 @@
 #include "content.h"
 #include "path.h"
 #include "lua_core.h"
+#include <time.h>
+#include "unistd.h"
 
 Game* gGame;
 messageHandler gMessageHandler;
@@ -74,9 +76,11 @@ void gameSurfaceCreated() {
 	rendererActivate(gGame->renderer);
 	if (!hasLoadedResources)
 		loadingScreen.load();
+
 }
 
 void gameSurfaceDestroyed() {
+	gGame->content->unloadAll();
 }
 
 void gameStop() {
@@ -138,6 +142,7 @@ void handleAllResourcesLoaded(Buffer* buffer) {
 	hasLoadedResources = true;
 	loadingScreen.unload();
 
+	LOGI("Calling luaInit handleResources");
 	bufferReadUTF8(buffer, &gGame->name);
 	initializeLuaScripts(gGame->name);
 	initLuaCall();
@@ -274,6 +279,12 @@ void gameHandleReceive() {
 			context->Swap();
 			gameHandleReceive();
 		}
+		auto time = gGame->clock->_lastTime;
+		auto target = time + 1000000000L/gGame->fps - timeNowMonoliticNsecs();
+		struct timespec time1, time2;
+		time1.tv_sec = 0;
+		time1.tv_nsec = target;
+		nanosleep(&time1, &time2);
 	}
 
 	void gameFinish() {

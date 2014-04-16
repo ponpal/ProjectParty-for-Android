@@ -8,6 +8,9 @@
 #ifndef GAME_H_
 #define GAME_H_
 
+#define ORIENTATION_LANDSCAPE ((uint8_t)0)
+#define ORIENTATION_PORTRAIT  ((uint8_t)1)
+
 #include "network.h"
 #include "time_helpers.h"
 #include "lua_core_private.h"
@@ -22,6 +25,7 @@ extern "C"
 	typedef struct
 	{
 		uint32_t width, height;
+		uint8_t orientation;
 	} Screen;
 
 	typedef struct
@@ -34,7 +38,7 @@ extern "C"
 		Content* content;
 		bool paused;
 		char* name;
-
+		uint32_t fps;
 	} Game;
 
 	typedef void (*messageHandler)(uint8_t id, uint32_t length);

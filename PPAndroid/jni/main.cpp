@@ -123,6 +123,8 @@ void initSensors() {
 			gSensorManager, ASENSOR_TYPE_ACCELEROMETER);
 	gSensorEventQueue = ASensorManager_createEventQueue(gSensorManager,
 			gApp->looper, LOOPER_ID_USER, NULL, NULL);
+	pinch_detector.SetConfiguration(gApp->config);
+	drag_detector.SetConfiguration(gApp->config);
 }
 
 void resumeSensors() {
@@ -255,6 +257,7 @@ void surfaceChanged() {
 	LOGI("Surface Changed");
 	gGame->screen->width = context->GetScreenWidth();
 	gGame->screen->height = context->GetScreenHeight();
+	LOGE("SC: W: %d, H: %d", gGame->screen->width, gGame->screen->height);
 }
 }
 

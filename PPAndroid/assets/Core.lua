@@ -37,6 +37,7 @@ cfuns.cdef[[
 	typedef struct
 	{
 		uint32_t width, height;
+		uint8_t orientation;
 	} Screen;
 
 	typedef struct Renderer Renderer;
@@ -51,7 +52,7 @@ cfuns.cdef[[
 		Content* content;
 		bool paused;
 		char* name;
-
+		uint32_t fps;
 	} Game;
 
 	extern Game* gGame;
@@ -132,6 +133,10 @@ Renderer.addText   = C.addText
 Font = {}
 Font.measure =  C.measureString;
 
+Time = {}
+Time.total   = 0
+Time.elapsed = 0
+
 Network = {
 	messages = {
 		sensor       = 1,
@@ -142,12 +147,19 @@ Network = {
 	end,
 	isAlive = function()
 		cfuns.C.networkIsAlive(C.gGame.network)
+	end,
+	update = function()
+		Network.elapsed = Network.elapsed + Time.elapsed
+		if Network.elapsed > Network.heartbeatInterval then
+			Out.writeShort(1)
+			Out.writeByte(7)
+		    Network.elapsed = 0
+			Network.send()
+		end
 	end
 }
-
-Time = {}
-Time.total   = 0
-Time.elapsed = 0
+Network.elapsed = 0
+Network.heartbeatInterval = 5
 
 Out = { }
  function Out.writeByte(byte)
@@ -221,9 +233,24 @@ In.readByteArray = function()
 	return array
 end
 
-Sensors = C.gGame.sensor
-Screen  = C.gGame.screen
+Orientation = {}
+Orientation.landscape = 0
+Orientation.portrait  = 1
 
+
+Sensors = C.gGame.sensor
+Screen  = {}
+
+function Screen.setOrientation(orientation)
+	if orientation == Orientation.portrait then
+		Screen.width  = C.gGame.screen.height
+		Screen.height = C.gGame.screen.width
+	else
+		Screen.width  = C.gGame.screen.width
+		Screen.height = C.gGame.screen.height
+	end
+	C.gGame.screen.orientation = orientation
+end
 
 local vec2_MT = 
 {
@@ -250,7 +277,16 @@ end
 
 function coreUpdate()
 	Sensors = C.gGame.sensor
-	Screen  = C.gGame.screen
 
 	updateTime();
+end
+
+do
+	Screen.setOrientation(Orientation.landscape)
+	C.gGame.fps = 30
+end
+
+Game = {}
+function Game.setFps(fps)
+	C.gGame.fps = fps
 end
