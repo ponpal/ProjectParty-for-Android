@@ -164,6 +164,7 @@ void handleFileReload(Buffer* buf, size_t size) {
 }
 
 bool readMessage(Buffer* buffer) {
+	LOGE("readMessage");
 	auto remaining = bufferBytesRemaining(buffer);
 	if (remaining == 0) {
 		return true;
@@ -185,6 +186,9 @@ bool readMessage(Buffer* buffer) {
 	}
 
 	auto id = bufferReadByte(buffer);
+
+	LOGE("id: %d", id);
+
 	if (id == NETWORK_FILE) {
 		LOGI("Transfer");
 		handleFileTransfer(buffer);
@@ -193,6 +197,10 @@ bool readMessage(Buffer* buffer) {
 	} else if (id == NETWORK_FILERELOAD) {
 		LOGI("Reload");
 		handleFileReload(buffer, size);
+	} else if (id == NETWORK_SHUTDOWN) {
+		LOGE("Shutting down");
+		gameFinish();
+		return false;
 	} else {
 		auto end = buffer->ptr + size - 1;
 		callLuaHandleMessage(id, size - 1);

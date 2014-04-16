@@ -26,7 +26,9 @@ extern "C"
 		NETWORK_ALLFILES   = 3,
 		NETWORK_FILERELOAD = 4,
 		NETWORK_LUALOG	   = 5, //unused
-		NETWORK_TRANSITION = 6
+		NETWORK_TRANSITION = 6,
+		NETWORK_HEARTBEAT  = 7,
+		NETWORK_SHUTDOWN   = 8
 	};
 
 	typedef struct
