@@ -61,7 +61,10 @@ void gameStart() {
 void gameRestart() {
 	LOGI("Restarting game!");
 	clockStart(gGame->clock);
-	networkReconnect(gGame->network);
+	auto result = networkReconnect(gGame->network);
+	LOGE("RESULT: %d", result);
+	if(result == -1 || result == SERVER_REFUSED_RECONNECT || result == COULD_NOT_RECONNECT)
+		gameFinish();
 }
 
 void gameResume() {

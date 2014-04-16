@@ -87,7 +87,7 @@ public class ControllerService extends Service {
 				int written = socketChan.write(outBuffer);
 
 				return written;
-			} catch (IOException e) {
+			} catch (Throwable e) {
 				e.printStackTrace();
 				return -1;
 			}
@@ -143,8 +143,8 @@ public class ControllerService extends Service {
 
 		try {
 			socketChan = SocketChannel.open();
-			socketChan.connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
-					latestServer.getPort()));
+			socketChan.socket().connect(new InetSocketAddress(InetAddress.getByAddress(latestServer.getIP()), 
+					latestServer.getPort()), 1000);
 
 			ByteBuffer buffer = ByteBuffer.allocateDirect(8);
 			buffer.order(ByteOrder.LITTLE_ENDIAN);
@@ -173,7 +173,7 @@ public class ControllerService extends Service {
 			socketChan.configureBlocking(false);
 		} catch (IOException e) {
 			e.printStackTrace();
-			return 0;
+			return -1;
 		}
 
 		return 1;

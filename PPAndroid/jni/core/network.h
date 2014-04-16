@@ -13,6 +13,9 @@
 #include "stdint.h"
 #include "buffer.h"
 
+#define SERVER_REFUSED_RECONNECT 250
+#define COULD_NOT_RECONNECT 500
+
 extern "C"
 {
 	enum
