@@ -164,7 +164,6 @@ void handleFileReload(Buffer* buf, size_t size) {
 }
 
 bool readMessage(Buffer* buffer) {
-	LOGE("readMessage");
 	auto remaining = bufferBytesRemaining(buffer);
 	if (remaining == 0) {
 		return true;
@@ -186,8 +185,6 @@ bool readMessage(Buffer* buffer) {
 	}
 
 	auto id = bufferReadByte(buffer);
-
-	LOGE("id: %d", id);
 
 	if (id == NETWORK_FILE) {
 		LOGI("Transfer");
