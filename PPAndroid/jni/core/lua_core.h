@@ -31,5 +31,6 @@ extern "C"
 
 	const char* testStr();
     void callLuaHandleMessage(uint32_t id, uint32_t length);
+
 }
 #endif /* LUA_CORE_H_ */

@@ -147,7 +147,9 @@ void handleAllResourcesLoaded(Buffer* buffer) {
 
 	LOGI("Calling luaInit handleResources");
 	bufferReadUTF8(buffer, &gGame->name);
-	initializeLuaScripts(gGame->name);
+	std::string path(gGame->name);
+	path += "/phone";
+	initializeLuaScripts(path.c_str());
 	initLuaCall();
 }
 

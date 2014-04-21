@@ -31,7 +31,7 @@ uint32_t loadFont(const char* fontName)
 {
 	LOGE("LOADING FONT: %s", fontName);
 	std::string path(gGame->name);
-	path += "/";
+	path += "/phone/";
 	path += fontName;
 	return gGame->content->loadFont(path);
 }
@@ -70,7 +70,7 @@ const char* testStr()
 uint32_t loadFrame(const char* name)
 {
 	std::string path(gGame->name);
-	path += "/";
+	path += "/phone/";
 	path += name;
 	return gGame->content->loadFrame(path);
 }
@@ -170,6 +170,26 @@ void callEmptyLuaFunction(const char* buffer)
 	}
 }
 
+bool callEmptyLuaFunctionBool(const char* buffer)
+{
+	lua_getglobal(luaState, buffer);
+	int error = error | lua_pcall(luaState, 0, 1, 0);
+	if(error) {
+		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
+		lua_pop(luaState, 1);
+		return false;
+	}
+	/*retrieve result */
+	if (!lua_isboolean(luaState, -1)) {
+	 	LOGW("function `f' must return a boolean");
+	 	return false;
+	}
+	auto result = lua_toboolean(luaState, -1);
+	lua_pop(luaState, 1);  /* pop returned value */
+
+	return result;
+}
+
 void callInt2LuaFunction(const char* methodName, int x, int y)
 {
 	char buffer[128];
@@ -255,6 +275,16 @@ void callLuaHandleMessage(uint32_t id, uint32_t length)
 		LOGW("LUA Execution Error %s", lua_tostring(luaState, -1));
 		lua_pop(luaState, 1);
 	}
+}
+
+bool callLuaMenu()
+{
+	return callEmptyLuaFunctionBool("onMenuButton");
+}
+
+bool callLuaBack()
+{
+	return callEmptyLuaFunctionBool("onBackButton");
 }
 
 void renderLuaCall()

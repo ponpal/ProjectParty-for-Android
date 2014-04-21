@@ -80,8 +80,18 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 		}
 		return 1;
 	} else if (type == AINPUT_EVENT_TYPE_KEY) {
-		LOGI("Received key event: %d", AKeyEvent_getKeyCode(event));
-		return 0;
+		auto code = AKeyEvent_getKeyCode(event);
+		LOGI("Received key event: %d", code);
+		switch(code) {
+            case AKEYCODE_MENU:
+            	return callLuaMenu();
+                break;
+            case AKEYCODE_BACK:
+            	return callLuaBack();
+                break;
+            default:
+            	return 0;
+		}
 	}
 
 	return 0;
