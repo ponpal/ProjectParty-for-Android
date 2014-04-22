@@ -74,6 +74,8 @@ cfuns.cdef[[
 				  vec2f origin, float rotation, int mirrored);
 	void addText(uint32_t font, const char* str, vec2f pos, unsigned int  color);
 
+	int vibrate(uint64_t milliseconds);
+
 	//buffer.h
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 
@@ -236,6 +238,10 @@ end
 Orientation = {}
 Orientation.landscape = 0
 Orientation.portrait  = 1
+
+function vibrate(milliseconds)
+	return C.vibrate(milliseconds)
+end
 
 
 Sensors = C.gGame.sensor

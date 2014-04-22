@@ -170,6 +170,7 @@ public class ControllerService extends Service {
 				socketChan.close();
 				return SERVER_REFUSED_RECONNECT;
 			}
+			sendAlias();
 			socketChan.configureBlocking(false);
 		} catch (IOException e) {
 			e.printStackTrace();
