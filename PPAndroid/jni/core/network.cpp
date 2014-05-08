@@ -15,7 +15,8 @@
 
 jclass gNetworkServiceClass;
 jobject gNetworkServiceObject;
-jmethodID sendID, receiveID, isAliveID, connectID, disconnectID, shutdownID, reconnectID;
+jmethodID sendID, unreliableSendID, receiveID, isAliveID,
+		  connectID, disconnectID, shutdownID, reconnectID;
 
 void networkServiceClass(jclass clazz)
 {
@@ -35,33 +36,39 @@ Network* networkInitialize(android_app* app)
 
 	gNetworkServiceObject = env->NewGlobalRef(obj);
 
-	sendID       = env->GetMethodID(clazz, "send", "(I)I");
-	receiveID    = env->GetMethodID(clazz, "receive", "(I)I");
-	isAliveID    = env->GetMethodID(clazz, "isAlive", "()I");
-	connectID    = env->GetMethodID(clazz, "connect", "()I");
-	reconnectID  = env->GetMethodID(clazz, "reconnect", "()I");
-	disconnectID = env->GetMethodID(clazz, "disconnect", "()I");
-	shutdownID   = env->GetMethodID(clazz, "shutdown", "()I");
+	sendID         	 = env->GetMethodID(clazz, "send", "(I)I");
+	unreliableSendID = env->GetMethodID(clazz, "unreliableSend", "(I)I");
+	receiveID    	 = env->GetMethodID(clazz, "receive", "(I)I");
+	isAliveID   	 = env->GetMethodID(clazz, "isAlive", "()I");
+	connectID    	 = env->GetMethodID(clazz, "connect", "()I");
+	reconnectID  	 = env->GetMethodID(clazz, "reconnect", "()I");
+	disconnectID 	 = env->GetMethodID(clazz, "disconnect", "()I");
+	shutdownID   	 = env->GetMethodID(clazz, "shutdown", "()I");
 
 	fi = env->GetFieldID(clazz, "inBuffer", "Ljava/nio/ByteBuffer;");
-
 	auto inBufferObj = env->GetObjectField(obj, fi);
 
 	fi = env->GetFieldID(clazz, "outBuffer", "Ljava/nio/ByteBuffer;");
-
 	auto outBufferObj = env->GetObjectField(obj, fi);
 
+	fi = env->GetFieldID(clazz, "routBuffer", "Ljava/nio/ByteBuffer;");
+	auto routBufferObj = env->GetObjectField(obj, fi);
 
 	auto network = new Network();
 	network->in_  = new Buffer();
 	network->out = new Buffer();
+	network->uout = new Buffer();
 
+	LOGE("Sigh");
 	network->in_->base  = network->in_->ptr  = (uint8_t*)env->GetDirectBufferAddress(inBufferObj);
 	network->out->base = network->out->ptr = (uint8_t*)env->GetDirectBufferAddress(outBufferObj);
+	network->uout->base = network->uout->ptr = (uint8_t*)env->GetDirectBufferAddress(routBufferObj);
 
 	network->in_->length  = env->GetDirectBufferCapacity(inBufferObj);
 	network->out->length = env->GetDirectBufferCapacity(outBufferObj);
+	network->uout->length = env->GetDirectBufferCapacity(routBufferObj);
 
+	LOGE("Sigh");
 	app->activity->vm->DetachCurrentThread();
 
 	return network;
@@ -96,6 +103,29 @@ int networkSend(Network* network)
 	out->ptr = out->base;
 	return 1;
 }
+
+int networkUnreliableSend(Network* network)
+{
+	Buffer* out = network->uout;
+	ptrdiff_t length = out->ptr - out->base;
+	if(length == 0) return 1; //Nothing to send.
+
+	auto env = gApp->activity->env;
+	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+
+	auto result = env->CallIntMethod(gNetworkServiceObject, unreliableSendID, length);
+
+	if(result != length) {
+		LOGW("Network did not send enough bytes! Sent: %d, Excpected: %d",
+				(uint32_t)result, (uint32_t)length);
+	}
+
+	gApp->activity->vm->DetachCurrentThread();
+
+	out->ptr = out->base;
+	return 1;
+}
+
 int networkReceive(Network* network, uint8_t* tempBuffer, uint32_t size)
 {
 	auto in = network->in_;

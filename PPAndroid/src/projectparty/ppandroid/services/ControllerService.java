@@ -1,6 +1,9 @@
 package projectparty.ppandroid.services;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketOptions;
@@ -22,11 +25,18 @@ public class ControllerService extends Service {
 	private boolean connected = false;
 
 	private ServerInfo latestServer;
+	private DatagramSocket udpSocket;
+	private DatagramPacket udpPacket;
 	private String playerAlias;
 
 	//Fields accessed by the native code
+	
 	public ByteBuffer inBuffer;
 	public ByteBuffer outBuffer;
+	public ByteBuffer routBuffer;
+	private ByteBuffer sessionBuffer;
+	private byte[] routJBuffer;
+	
 	public static ControllerService instance;
 	public static int toAccess;
 	public Long sessionID;
@@ -34,9 +44,11 @@ public class ControllerService extends Service {
 	@Override
 	public void onCreate() {
 		instance = this;
-		this.inBuffer  = ByteBuffer.allocateDirect(0xFFFFF);
-		this.outBuffer = ByteBuffer.allocateDirect(0xFFFFF);
-
+		this.inBuffer   = ByteBuffer.allocateDirect(0xFFFFF);
+		this.outBuffer  = ByteBuffer.allocateDirect(0xFFFFF);
+		this.routBuffer = ByteBuffer.allocateDirect(0xFFFF);
+		this.sessionBuffer = ByteBuffer.allocateDirect(8);
+		this.routJBuffer = new byte[0xFFFF];
 	}
 
 	@Override
@@ -78,6 +90,29 @@ public class ControllerService extends Service {
 			return 0;
 		}
 	}
+	
+	public int unreliableSend(int size)
+	{
+		try 
+		{
+			udpPacket.setAddress(socketChan.socket().getInetAddress());
+			udpPacket.setPort(12345);
+			
+			sessionBuffer.position(0);
+			sessionBuffer.putLong(sessionID);
+			sessionBuffer.flip();
+			sessionBuffer.get(routJBuffer, 0, 8);
+			
+			routBuffer.position(0);
+			routBuffer.limit(size);
+			routBuffer.get(routJBuffer, 8, size);
+			udpPacket.setData(routJBuffer, 0, size + 8);
+			udpSocket.send(udpPacket);
+			return size;
+		} catch(Exception e) {
+			return -1;	
+		}
+	}
 
 	public int send(int size) {
 		if(size > 0) {
@@ -85,7 +120,6 @@ public class ControllerService extends Service {
 			outBuffer.limit(size);
 			try {
 				int written = socketChan.write(outBuffer);
-
 				return written;
 			} catch (Throwable e) {
 				e.printStackTrace();
@@ -129,6 +163,10 @@ public class ControllerService extends Service {
 			socketChan.configureBlocking(false);
 
 			sendAlias();
+			udpSocket = new DatagramSocket(null);
+			udpSocket.setReuseAddress(true);
+			udpSocket.bind(new InetSocketAddress(12346));
+			
 			return 1;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -172,6 +210,11 @@ public class ControllerService extends Service {
 			}
 			sendAlias();
 			socketChan.configureBlocking(false);
+			
+			udpSocket = new DatagramSocket(null);
+			udpSocket.setReuseAddress(true);
+			udpSocket.bind(new InetSocketAddress(12346));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 			return -1;

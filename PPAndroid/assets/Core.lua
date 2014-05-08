@@ -32,6 +32,7 @@ cfuns.cdef[[
 	{
 		Buffer* in_;
 		Buffer* out;
+		Buffer* uout;
 	} Network;
 
 	typedef struct
@@ -107,6 +108,7 @@ cfuns.cdef[[
     int networkDisconnect(Network* network);
 
     int networkSend(Network* network);
+  	int networkUnreliableSend(Network* network);
     int networkReceive(Network* network);
 
     int networkIsAlive(Network* network);
@@ -145,8 +147,11 @@ Network = {
 		transition   = 6
 	},
 	send = function()
-	    cfuns.C.networkSend(C.gGame.network)
+	    C.networkSend(C.gGame.network)
 	end,
+  usend = function()
+      C.networkUnreliableSend(C.gGame.network)
+  end,
 	isAlive = function()
 		cfuns.C.networkIsAlive(C.gGame.network)
 	end,
@@ -194,6 +199,42 @@ end
 function Out.writeUTF8(s)
 	C.bufferWriteUTF8(C.gGame.network.out, s);
 end
+
+UOut = { }
+ function UOut.writeByte(byte)
+	C.bufferWriteByte(C.gGame.network.uout, byte)
+end
+function UOut.writeShort(short)
+	C.bufferWriteShort(C.gGame.network.uout, short)
+end
+function UOut.writeInt(int)
+	C.bufferWriteInt(C.gGame.network.uout, int)
+end
+function UOut.writeLong(long)
+	C.bufferWriteShort(C.gGame.network.uout, long)
+end
+function UOut.writeFloat(float)
+	C.bufferWriteFloat(C.gGame.network.uout, float)
+end
+function UOut.writeDouble(double)
+	C.bufferWriteDouble(C.gGame.network.uout, double)
+end
+
+function UOut.writeVec2(v)
+	UOut.writeFloat(v.x)
+	UOut.writeFloat(v.y)
+end
+
+function UOut.writeVec3(v)
+	UOut.writeFloat(v.x)
+	UOut.writeFloat(v.y)
+	UOut.writeFloat(v.z)
+end
+
+function UOut.writeUTF8(s)
+	C.bufferWriteUTF8(C.gGame.network.out, s);
+end
+
 
 In = { }
 In.readByte  = function()
@@ -258,7 +299,7 @@ function Screen.setOrientation(orientation)
 	C.gGame.screen.orientation = orientation
 end
 
-local vec2_MT = 
+local vec2_MT =
 {
 	__add = function (v0, v1)
 				return vec2(v0.x + v1.x, v0.y + v1.y)

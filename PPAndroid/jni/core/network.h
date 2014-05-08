@@ -35,9 +35,11 @@ extern "C"
 	{
 		Buffer* in_;
 		Buffer* out;
+		Buffer* uout;
 	} Network;
 
 	int networkSend(Network* network);
+	int networkUnreliableSend(Network* network);
 	int networkReceive(Network* network, uint8_t* buffer, uint32_t size);
 
 	int networkIsAlive(Network* network);
