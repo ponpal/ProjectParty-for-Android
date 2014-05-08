@@ -48,7 +48,11 @@ public class ControllerService extends Service {
 		this.outBuffer  = ByteBuffer.allocateDirect(0xFFFFF);
 		this.routBuffer = ByteBuffer.allocateDirect(0xFFFF);
 		this.sessionBuffer = ByteBuffer.allocateDirect(8);
+        this.sessionBuffer.order(ByteOrder.LITTLE_ENDIAN);
 		this.routJBuffer = new byte[0xFFFF];
+		
+		byte[] buf = new byte[0xFFFF];
+		this.udpPacket = new DatagramPacket(buf, 0xFFFF);
 	}
 
 	@Override
@@ -97,6 +101,7 @@ public class ControllerService extends Service {
 		{
 			udpPacket.setAddress(socketChan.socket().getInetAddress());
 			udpPacket.setPort(12345);
+			udpPacket.setLength(size + 8);
 			
 			sessionBuffer.position(0);
 			sessionBuffer.putLong(sessionID);
@@ -163,9 +168,9 @@ public class ControllerService extends Service {
 			socketChan.configureBlocking(false);
 
 			sendAlias();
-			udpSocket = new DatagramSocket(null);
-			udpSocket.setReuseAddress(true);
-			udpSocket.bind(new InetSocketAddress(12346));
+			udpSocket = new DatagramSocket();
+			//udpSocket.setReuseAddress(true);
+			//udpSocket.bind(new InetSocketAddress(12346));
 			
 			return 1;
 		} catch (IOException e) {
@@ -211,9 +216,9 @@ public class ControllerService extends Service {
 			sendAlias();
 			socketChan.configureBlocking(false);
 			
-			udpSocket = new DatagramSocket(null);
-			udpSocket.setReuseAddress(true);
-			udpSocket.bind(new InetSocketAddress(12346));
+			udpSocket = new DatagramSocket();
+			//udpSocket.setReuseAddress(true);
+			//udpSocket.bind(new InetSocketAddress(12346));
 			
 		} catch (IOException e) {
 			e.printStackTrace();
