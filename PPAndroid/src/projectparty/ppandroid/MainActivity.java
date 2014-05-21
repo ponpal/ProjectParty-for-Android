@@ -5,7 +5,6 @@ import java.util.List;
 
 import projectparty.ppandroid.services.ControllerService;
 import projectparty.ppandroid.services.ServerDiscoveryService;
-
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -22,7 +21,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,7 +39,6 @@ public class MainActivity extends Activity {
 
 	private EditText aliasField;
 	private TextView headerTextView;
-	private ProgressBar refreshingIndicator;
 	private Button refreshButton;
 	private ListView serverListView;
 
@@ -112,7 +109,6 @@ public class MainActivity extends Activity {
 		serverList.clear();
 
 		refreshButton.setEnabled(false);
-		refreshingIndicator.setVisibility(View.VISIBLE);
 		headerTextView.setText(R.string.refreshing);
 		startService(new Intent(this, ServerDiscoveryService.class));
 
@@ -143,7 +139,6 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		this.refreshingIndicator = (ProgressBar) findViewById(R.id.refreshingIndicator);
 		this.headerTextView = (TextView) findViewById(R.id.serversLabel);
 		this.refreshButton = (Button) findViewById(R.id.refreshButton);
 	}
@@ -189,7 +184,6 @@ public class MainActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			refreshButton.setEnabled(true);
-			refreshingIndicator.setVisibility(View.INVISIBLE);
 			headerTextView.setText("Servers found: " + serverList.size());
 		}
 	};

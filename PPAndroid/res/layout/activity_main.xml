@@ -47,14 +47,6 @@
             android:text="@string/availableServers"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <ProgressBar
-            android:id="@+id/refreshingIndicator"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_weight="0.5"
-            android:visibility="invisible" />
-
         <Button
             android:id="@+id/refreshButton"
             style="?android:attr/buttonStyleSmall"
