@@ -9,6 +9,10 @@
 #include <android_native_app_glue.h>
 #include <cstdlib>
 #include <cstring>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+
 #include "JNIHelper.h"
 #include "android_helper.h"
 
@@ -25,6 +29,13 @@ void networkServiceClass(jclass clazz)
 
 Network* networkInitialize(android_app* app)
 {
+	sock = socket(AF_INET, SOCK_STREAM, 0);
+	if(sock < 0) {
+		LOGI("Couldn't create socket");
+	} else {
+		LOGI("Created a socket!");
+	}
+
 	gApp = app;
 
 	auto env = app->activity->env;
@@ -94,7 +105,7 @@ int networkSend(Network* network)
 	auto result = env->CallIntMethod(gNetworkServiceObject, sendID, length);
 
 	if(result != length) {
-		LOGW("Network did not send enough bytes! Sent: %d, Excpected: %d",
+		LOGW("Network did not send enough bytes! Sent: %d, Expected: %d",
 				(uint32_t)result, (uint32_t)length);
 	}
 
