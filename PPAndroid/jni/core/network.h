@@ -15,22 +15,10 @@
 
 #define SERVER_REFUSED_RECONNECT 250
 #define COULD_NOT_RECONNECT 500
+#define MESSAGE(name) (shortHash((name), strlen((name)), 0))
 
 extern "C"
 {
-	enum
-	{
-		NETWORK_ALIAS      = 0,
-		NETWORK_SENSOR     = 1,
-		NETWORK_FILE       = 2,
-		NETWORK_ALLFILES   = 3,
-		NETWORK_FILERELOAD = 4,
-		NETWORK_LUALOG	   = 5, //unused
-		NETWORK_TRANSITION = 6,
-		NETWORK_HEARTBEAT  = 7,
-		NETWORK_SHUTDOWN   = 8
-	};
-
 	typedef struct
 	{
 		Buffer* in_;

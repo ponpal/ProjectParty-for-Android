@@ -50,7 +50,7 @@ struct ExternalAsset
 {
 	size_t 		length;
 	uint8_t* 	buffer;
-	ExternalAsset(std::string fileStr);
+	ExternalAsset(const std::string& filePath);
 	~ExternalAsset();
 };
 

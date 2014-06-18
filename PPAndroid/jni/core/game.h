@@ -35,9 +35,9 @@ extern "C"
 		SensorState* sensor;
 		Renderer* renderer;
 		Screen* screen;
-		Content* content;
 		bool paused;
 		char* name;
+		char* resourceDir;
 		uint32_t fps;
 	} Game;
 

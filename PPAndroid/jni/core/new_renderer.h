@@ -13,6 +13,7 @@
 #include <glm/vec2.hpp>
 #include <glm/mat4x4.hpp>
 
+extern "C" {
 
 typedef struct Renderer Renderer;
 
@@ -27,5 +28,7 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 		vec2f origin, float rotation, int mirrored);
 void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec2f pos, uint32_t color);
 void rendererDraw(Renderer* renderer); // Force a draw.
+
+}
 
 #endif /* NEW_RENDERER_H_ */

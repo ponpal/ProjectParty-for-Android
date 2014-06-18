@@ -1,56 +1,13 @@
-
-
-#define GLM_FORCE_RADIANS
-
 #include "lua_core.h"
 #include "lua_core_private.h"
 #include <cstring>
 #include "game.h"
-#include <cmath>
 
-#include "new_renderer.h"
 #include <vector>
-#include "font_loading.h"
-#include "image_loader.h"
-#include "types.h"
-#include "font.h"
-#include "time_helpers.h"
-
-#include "JNIHelper.h"
-#include <android_native_app_glue.h>
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/matrix_access.hpp>
 #include <lua.hpp>
-#include "android_helper.h"
-#include "asset_helper.h"
-#include "content.h"
 #include "path.h"
 
-uint32_t loadFont(const char* fontName)
-{
-	LOGE("LOADING FONT: %s", fontName);
-	std::string path(gGame->name);
-	path += "/phone/";
-	path += fontName;
-	return gGame->content->loadFont(path);
-}
-
-void unloadFont(uint32_t fontHandle)
-{
-	gGame->content->unloadFont(fontHandle);
-}
-
-vec2f measureString(uint32_t fontHandle, const char* str)
-{
-	auto f = gGame->content->getFont(fontHandle);
-	auto vec = font::measure(f, str);
-
-	vec2f v;
-	v.x = vec.x;
-	v.y = vec.y;
-	return v;
-}
+#include "asset_helper.h"
 
 const char* bufferReadLuaString(Buffer* buffer)
 {
@@ -60,43 +17,6 @@ const char* bufferReadLuaString(Buffer* buffer)
 	LOGE("OHNO WE CALL READSTR");
 	LOGE("%s", str);
 	return str;
-}
-
-const char* testStr()
-{
-	return "a";
-}
-
-uint32_t loadFrame(const char* name)
-{
-	std::string path(gGame->name);
-	path += "/phone/";
-	path += name;
-	return gGame->content->loadFrame(path);
-}
-
-void unloadFrame(uint32_t frameHandle)
-{
-	gGame->content->unloadFrame(frameHandle);
-}
-
-void addFrame(uint32_t frameHandle, vec2f pos, vec2f dim, uint32_t color)
-{
-	auto frame = gGame->content->getFrame(frameHandle);
-	rendererAddFrame(gGame->renderer, &frame, pos, dim, color);
-}
-
-void addFrame2(uint32_t frameHandle, vec2f pos, vec2f dim, uint32_t color,
-		vec2f origin, float rotation, int mirror)
-{
-	auto frame = gGame->content->getFrame(frameHandle);
-	rendererAddFrame2(gGame->renderer, &frame, pos, dim, color, origin, rotation, mirror);
-}
-
-void addText(uint32_t fontHandle, const char* str, vec2f pos, uint32_t color)
-{
-	auto font = gGame->content->getFont(fontHandle);
-	rendererAddText(gGame->renderer, &font, str, pos, color);
 }
 
 lua_State* luaState;
@@ -115,19 +35,16 @@ void initializeLuaCore()
 
 #include "dirent.h"
 
-void initializeLuaScripts(const std::string& dirName)
+void initializeLuaScripts()
 {
 	LOGI("Entered initializeLuaScript");
-	std::string scriptsDir;
-	scriptsDir += gApp->activity->externalDataPath;
-	scriptsDir += "/" + dirName + "/scripts/";
+	std::string scriptsDir(gGame->resourceDir);
 	DIR* dir;
 	struct dirent* ent;
 	if ((dir = opendir (scriptsDir.c_str())) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
 			if(path::hasExtension(ent->d_name, ".lua")) {
-				std::string scriptPath = "/" + dirName + "/scripts/";
-				scriptPath += ent->d_name;
+				std::string scriptPath = path::buildPath(scriptsDir, ent->d_name);
 				loadLuaScript(scriptPath);
 				LOGI("Loading script %s", scriptPath.c_str());
 			}
@@ -285,28 +202,6 @@ bool callLuaMenu()
 bool callLuaBack()
 {
 	return callEmptyLuaFunctionBool("onBackButton");
-}
-
-void renderLuaCall()
-{
-	glClearColor(0.5,0.5,0.5,1);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glViewport(0,0, gGame->screen->width, gGame->screen->height);
-
-	glm::mat4 matrix = glm::ortho(0.0f, (float)gGame->screen->width,
-		  0.0f, (float)gGame->screen->height);
-
-	if(gGame->screen->orientation == ORIENTATION_PORTRAIT)
-	{
-		matrix = translate(matrix, glm::vec3(gGame->screen->width,0,0));
-		matrix = rotate(matrix, (float)M_PI_2, glm::vec3(0,0,1));
-	}
-
-	rendererSetTransform(gGame->renderer, &matrix);
-	callEmptyLuaFunction("render()");
-	rendererDraw(gGame->renderer);
 }
 
 void luaLog(const char* toLog)

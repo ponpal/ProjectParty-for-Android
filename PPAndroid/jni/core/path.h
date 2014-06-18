@@ -12,5 +12,8 @@
 
 namespace path {
     bool hasExtension(const std::string& path, const std::string& extension);
+    std::string withoutExtension(const std::string& path);
+    std::string buildPath(const std::string& folder, const std::string& item);
+    std::string changeExtension(const std::string& path, const std::string& newExtension);
 }
 #endif /* PATH_H_ */

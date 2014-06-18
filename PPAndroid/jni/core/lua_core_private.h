@@ -11,7 +11,7 @@
 #include "JNIHelper.h"
 
 void initializeLuaCore();
-void initializeLuaScripts(const std::string& gameName);
+void initializeLuaScripts();
 void initializeRenderer();
 
 void initLuaCall();

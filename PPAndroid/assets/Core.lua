@@ -6,9 +6,6 @@ cfuns.cdef[[
 	typedef struct { float x; float y; } vec2f;
     typedef struct { float x; float y; float z; } vec3f;
 
-    typedef void (*touchHandler) (int x, int y, int pointerIndex);
-    typedef void (*tapHandler) (int x, int y);
-
 	typedef struct
 	{
 		vec3f acceleration;
@@ -50,30 +47,17 @@ cfuns.cdef[[
 		SensorState* sensor;
 		Renderer* renderer;
 		Screen* screen;
-		Content* content;
 		bool paused;
 		char* name;
+		char* resourceDir;
 		uint32_t fps;
 	} Game;
 
 	extern Game* gGame;
 
-	uint32_t loadFrame(const char* name);
-	uint32_t loadFont(const char* fontName);
-	void unloadFrame(uint32_t frame);
-	void unloadFont(uint32_t font);
-
 	//clock.h
 	float clockElapsed(Clock* clock);
 	float clockTotal(Clock* clock);
-
-
-	vec2f measureString(uint32_t font, const char* str);
-
-	void addFrame(uint32_t frame, vec2f pos, vec2f dim, unsigned int color);
-	void addFrame2(uint32_t frame, vec2f pos, vec2f dim, unsigned int color,
-				  vec2f origin, float rotation, int mirrored);
-	void addText(uint32_t font, const char* str, vec2f pos, unsigned int  color);
 
 	int vibrate(uint64_t milliseconds);
 
@@ -113,6 +97,26 @@ cfuns.cdef[[
 
     int networkIsAlive(Network* network);
     int networkShutdown(Network* network);
+    
+    typedef uint32_t HashID;
+        
+typedef struct
+{
+	HashID hashID;
+	HashID typeID;
+	void* item;
+}Handle;
+
+bool contentIsPathLoaded(const char* path);
+bool contentIsHashLoaded(HashID id);
+
+Handle* contentLoad(const char* path);
+Handle* contentGetHandle(HashID id);
+
+bool contentUnloadPath(const char* path);
+bool contentUnloadHandle(Handle* handle);
+
+void contentUnloadAll();
 ]]
 
 local C = cfuns.C
@@ -122,20 +126,6 @@ function log(s)
 	Out.writeByte(5);
 	Out.writeUTF8(s);
 end
-
-Loader = {}
-Loader.loadFrame   = C.loadFrame
-Loader.loadFont    = C.loadFont
-Loader.unloadFont  = C.unloadFont
-Loader.unloadFrame = C.unloadFrame
-
-Renderer = {}
-Renderer.addFrame  = C.addFrame
-Renderer.addFrame2 = C.addFrame2
-Renderer.addText   = C.addText
-
-Font = {}
-Font.measure =  C.measureString;
 
 Time = {}
 Time.total   = 0

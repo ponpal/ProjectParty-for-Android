@@ -22,12 +22,8 @@ Asset::~Asset()
 	AAsset_close(asset);
 }
 
-ExternalAsset::ExternalAsset(std::string fileStr)
+ExternalAsset::ExternalAsset(const std::string& filePath)
 {
-    auto externalsDir = gApp->activity->externalDataPath;
-    std::string dirStr(externalsDir);
-    std::string filePath = dirStr + "/" + fileStr;
-
     LOGI("Trying to load file %s", filePath.c_str());
     auto file = fopen(filePath.c_str(), "r+");
     ASSERTF(file != NULL, "Couldn't open file. %s", filePath.c_str());

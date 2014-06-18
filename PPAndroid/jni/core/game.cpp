@@ -12,11 +12,12 @@
 #include "sys/stat.h"
 #include "errno.h"
 #include "loading_screen.h"
-#include "content.h"
 #include "path.h"
 #include "lua_core.h"
 #include <time.h>
 #include "unistd.h"
+#include "resource_manager.h"
+#include "new_renderer.h"
 
 Game* gGame;
 messageHandler gMessageHandler;
@@ -32,17 +33,23 @@ void gameInitialize(android_app* app) {
 	gGame->screen = new Screen();
 	gGame->network = networkInitialize(app);
 	gGame->renderer = rendererInitialize(1024);
-	gGame->content = new Content(128);
+	gGame->fps = 60;
 
 	loadingScreen = LoadingScreen();
 	LOGI("Herpa Derp");
 	LOGI("Initializing Game!");
 	initializeLuaCore();
+	LOGI("Lua initialized!");
+
+	LOGE("GameName: %d", (uint32_t)MESSAGE("GameName"));
+	LOGE("GameName: %d", (uint32_t)shortHash("GameName", 8, 0));
 }
 
 void gameTerminate() {
 	delete gGame->clock;
 	delete gGame->sensor;
+	if (gGame->name != nullptr)
+        delete gGame->name;
 
 	networkDelete(gGame->network);
 	rendererDelete(gGame->renderer);
@@ -83,12 +90,12 @@ void gameSurfaceCreated() {
 }
 
 void gameSurfaceDestroyed() {
-	gGame->content->unloadAll();
+	contentUnloadAll();
 }
 
 void gameStop() {
 	networkDisconnect(gGame->network);
-	gGame->content->unloadAll();
+	contentUnloadAll();
 	termLuaCall();
 }
 
@@ -99,18 +106,7 @@ void handleFileTransfer(Buffer* buffer) {
 
 	LOGI("Received a file! name=%s size=%llu", path.ptr, fileSize);
 
-	//Open Asset here - or do something else that is nice.
-	auto externalsDir = gApp->activity->externalDataPath;
-	std::string filePath(externalsDir);
-	filePath += "/";
-	for (int i = 0; i < stringSize; i++) {
-		if (path.ptr[i] == '/') {
-			int err = mkdir(filePath.c_str(), 0770);
-			if (err != 0 && errno != 17)
-				LOGI("Failed to make directory: %d %s", errno, strerror(errno));
-		}
-		filePath += path.ptr[i];
-	}
+	auto filePath = path::buildPath(gGame->resourceDir, path.ptr);
 
 	auto file = fopen(filePath.c_str(), "w+");
 	if (file == NULL) {
@@ -146,23 +142,19 @@ void handleAllResourcesLoaded(Buffer* buffer) {
 	loadingScreen.unload();
 
 	LOGI("Calling luaInit handleResources");
-	bufferReadUTF8(buffer, &gGame->name);
-	std::string path(gGame->name);
-	path += "/phone";
-	initializeLuaScripts(path.c_str());
+	initializeLuaScripts();
 	initLuaCall();
 }
 
-void handleFileReload(Buffer* buf, size_t size) {
-	AutoPtr<char> path;
-	auto stringSize = bufferReadUTF8(buf, &path.ptr);
-	std::string str(path.ptr);
-	if (path::hasExtension(str, ".lua"))
-		loadLuaScript(str);
-	else
-		gGame->content->reloadAsset(str);
-
-	LOGI("File reloaded! %s", str.c_str());
+void handleGameName(Buffer* buffer)
+{
+	bufferReadUTF8(buffer, &gGame->name);
+	std::string path(gGame->name);
+	std::string externalDir(gApp->activity->externalDataPath);
+	std::string fullPath = path::buildPath(externalDir, gGame->name);
+	char* mut = new char[fullPath.size() + 1];
+	memcpy(mut, fullPath.c_str(), fullPath.size()+1);
+	gGame->resourceDir = mut;
 }
 
 bool readMessage(Buffer* buffer) {
@@ -186,20 +178,21 @@ bool readMessage(Buffer* buffer) {
 		return false;
 	}
 
-	auto id = bufferReadByte(buffer);
+	auto id = bufferReadShort(buffer);
+	LOGE("MESSAGE GOT: %d", (uint32_t)id);
 
-	if (id == NETWORK_FILE) {
+	if (id == MESSAGE("FileHeader")) {
 		LOGI("Transfer");
 		handleFileTransfer(buffer);
-	} else if (id == NETWORK_ALLFILES) {
+	} else if (id == MESSAGE("AllFilesSent")) {
 		handleAllResourcesLoaded(buffer);
-	} else if (id == NETWORK_FILERELOAD) {
-		LOGI("Reload");
-		handleFileReload(buffer, size);
-	} else if (id == NETWORK_SHUTDOWN) {
+	} else if (id == MESSAGE("Shutdown")) {
 		LOGE("Shutting down");
 		gameFinish();
 		return false;
+	} else if (id == MESSAGE("GameName")) {
+		LOGE("Game name");
+		handleGameName(buffer);
 	} else {
 		auto end = buffer->ptr + size - 1;
 		callLuaHandleMessage(id, size - 1);
@@ -281,7 +274,6 @@ void gameHandleReceive() {
 			gameHandleReceive();
 			runLuaGarbageCollector(1);
 			updateLuaCall();
-			renderLuaCall();
 			context->Swap();
 		} else {
 			loadingScreen.draw(gGame->renderer,
