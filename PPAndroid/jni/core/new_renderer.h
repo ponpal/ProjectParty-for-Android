@@ -10,8 +10,6 @@
 
 #include "types.h"
 #include "font.h"
-#include <glm/vec2.hpp>
-#include <glm/mat4x4.hpp>
 
 extern "C" {
 
@@ -20,7 +18,7 @@ typedef struct Renderer Renderer;
 Renderer* rendererInitialize(size_t batchSize);
 void rendererDelete(Renderer* renderer);
 void rendererActivate(Renderer* renderer);
-void rendererSetTransform(Renderer* renderer, const glm::mat4* transform);
+void rendererSetTransform(Renderer* renderer, matrix4 transform);
 void rendererAddFrame(Renderer* renderer, const Frame* frame,
 					 vec2f pos, vec2f dim, uint32_t color);
 void rendererAddFrame2(Renderer* renderer, const Frame* frame,

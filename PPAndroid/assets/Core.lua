@@ -1,3 +1,36 @@
+glfuns = require("ffi")
+
+glfuns.cdef[[
+
+
+    typedef void             GLvoid;
+    typedef char             GLchar;
+    typedef unsigned int     GLenum;
+    typedef unsigned char    GLboolean;
+    typedef unsigned int     GLbitfield;
+    typedef int8_t   		 GLbyte;
+    typedef short            GLshort;
+    typedef int              GLint;
+    typedef int              GLsizei;
+    typedef uint8_t          GLubyte;
+    typedef unsigned short   GLushort;
+    typedef unsigned int     GLuint;
+    typedef float		     GLfloat;
+    typedef float		     GLclampf;
+    typedef int32_t          GLfixed;
+
+    typedef signed long int	 GLintptr;
+    typedef signed long int	 GLsizeiptr;
+
+    void glClear (GLbitfield mask);
+    void glClearColor (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+	void glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
+
+]]
+
+gl = glfuns.C
+
+GL_COLOR_BUFFER_BIT = 0x00004000
 
 cfuns = require("ffi")
 
@@ -9,7 +42,6 @@ cfuns.cdef[[
 	typedef struct
 	{
 		vec3f acceleration;
-		vec3f gyroscope;
 	} SensorState;
 
 	typedef struct
@@ -23,6 +55,7 @@ cfuns.cdef[[
 		uint8_t* base;
 		uint8_t* ptr;
 		uint32_t length;
+		uint32_t capacity;
 	} Buffer;
 
 	typedef struct
@@ -39,7 +72,6 @@ cfuns.cdef[[
 	} Screen;
 
 	typedef struct Renderer Renderer;
-	typedef struct Content  Content;
 	typedef struct
 	{
 		Clock* clock;
@@ -84,7 +116,6 @@ cfuns.cdef[[
 	float  bufferReadFloat(Buffer* buffer);
 	double bufferReadDouble(Buffer* buffer);
 	const char* bufferReadLuaString(Buffer* buffer);
-	const char* testStr();
 
 	//network.h
     int networkConnect(Network* network);
@@ -100,42 +131,61 @@ cfuns.cdef[[
     
     typedef uint32_t HashID;
         
-typedef struct
-{
-	HashID hashID;
-	HashID typeID;
-	void* item;
-}Handle;
+    typedef struct
+    {
+        HashID hashID;
+        HashID typeID;
+        void* item;
+    }Handle;
 
-bool contentIsPathLoaded(const char* path);
-bool contentIsHashLoaded(HashID id);
+    bool contentIsPathLoaded(const char* path);
+    bool contentIsHashLoaded(HashID id);
 
-Handle* contentLoad(const char* path);
-Handle* contentGetHandle(HashID id);
+    Handle* contentLoad(const char* path);
+    Handle* contentGetHandle(HashID id);
 
-bool contentUnloadPath(const char* path);
-bool contentUnloadHandle(Handle* handle);
+    bool contentUnloadPath(const char* path);
+    bool contentUnloadHandle(Handle* handle);
 
-void contentUnloadAll();
+    void contentUnloadAll();
+    
+    typedef struct { float mat[16]; } matrix4;
+
+    typedef struct {
+        uint32_t glName;
+        uint32_t width, height;
+    } Texture;
+
+    typedef struct {
+        Texture texture;
+        float x, y, w, h;
+    } Frame;
+
+    matrix4 matrixRotate(matrix4 toRotate, float angle);
+    matrix4 matrixTranslate(matrix4 toTranslate, float x, float y);
+    matrix4 matrixOrthogonalProjection(float left, float right, float bottom, float top);
+
+	Renderer* rendererInitialize(size_t batchSize);
+	void rendererDelete(Renderer* renderer);
+	void rendererActivate(Renderer* renderer);
+	void rendererSetTransform(Renderer* renderer, matrix4 transform);
+	void rendererAddFrame(Renderer* renderer, const Frame* frame,
+						 vec2f pos, vec2f dim, uint32_t color);
+	void rendererAddFrame2(Renderer* renderer, const Frame* frame,
+			vec2f pos, vec2f dim, uint32_t color,
+			vec2f origin, float rotation, int mirrored);
+	void rendererDraw(Renderer* renderer); // Force a draw.
+
 ]]
 
-local C = cfuns.C
 
-function log(s)
-	Out.writeShort(#s + 3);
-	Out.writeByte(5);
-	Out.writeUTF8(s);
-end
+local C = cfuns.C
 
 Time = {}
 Time.total   = 0
 Time.elapsed = 0
 
 Network = {
-	messages = {
-		sensor       = 1,
-		transition   = 6
-	},
 	send = function()
 	    C.networkSend(C.gGame.network)
 	end,
@@ -147,16 +197,14 @@ Network = {
 	end,
 	update = function()
 		Network.elapsed = Network.elapsed + Time.elapsed
-		if Network.elapsed > Network.heartbeatInterval then
-			Out.writeShort(1)
-			Out.writeByte(7)
+		if Network.elapsed > Network.sendInterval then
 		    Network.elapsed = 0
 			Network.send()
 		end
 	end
 }
 Network.elapsed = 0
-Network.heartbeatInterval = 5
+Network.sendInterval = 0.1
 
 Out = { }
  function Out.writeByte(byte)
@@ -289,6 +337,8 @@ function Screen.setOrientation(orientation)
 	C.gGame.screen.orientation = orientation
 end
 
+Frame = cfuns.typeof("Frame")
+
 local vec2_MT =
 {
 	__add = function (v0, v1)
@@ -326,4 +376,31 @@ end
 Game = {}
 function Game.setFps(fps)
 	C.gGame.fps = fps
+end
+
+function init()
+end
+
+function step()
+	log("Step start")
+	log("Created matrix")
+    C.glClearColor(1,0,0,1)
+    C.glClear(GL_COLOR_BUFFER_BIT)
+    C.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
+
+    matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
+
+    texture = C.contentLoad("banana.png")
+
+    frame = Frame(cfuns.cast("Texture*", texture.item)[0], 0,0,1,1)
+	C.rendererAddFrame(C.gGame.renderer, cfuns.new("Frame[1]", frame), vec2(50,50), vec2(500,500), 0xFFFFFFFF)
+	C.rendererDraw(C.gGame.renderer)
+	C.rendererSetTransform(C.gGame.renderer, matrix)
+end
+
+function log(str)
+	Out.writeShort(2+2+#str)
+	Out.writeShort(10)
+	Out.writeUTF8(str)
+	Network.send()
 end

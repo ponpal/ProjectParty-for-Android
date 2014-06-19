@@ -7,7 +7,13 @@
 
 #include "asset_helper.h"
 #include "android/asset_manager.h"
+#include "unistd.h"
 
+bool assetExists(const char* filePath)
+{
+	auto res = access(filePath, F_OK);
+	return res == 0;
+}
 
 Asset::Asset(const char* fileName)
 {
@@ -32,12 +38,11 @@ ExternalAsset::ExternalAsset(const std::string& filePath)
     fseek( file, 0L, SEEK_END);
     length = ftell(file);
     rewind(file);
-    LOGI("ftell: %d", length);
-
     buffer = new uint8_t[length];
 
     fread(buffer, length, 1, file);
     fclose(file);
+    LOGI("Successfully loaded!");
 }
 
 ExternalAsset::~ExternalAsset()

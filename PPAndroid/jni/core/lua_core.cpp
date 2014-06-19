@@ -25,7 +25,7 @@ void initializeLuaCore()
 	luaState = luaL_newstate();
 	luaL_openlibs(luaState);
 
-	Asset coreScript("Core.lua");
+	Asset coreScript("core.lua");
 	int error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "Cheader");
 	error = error | lua_pcall(luaState, 0,0,0);
 
@@ -176,7 +176,7 @@ void termLuaCall()
 
 void updateLuaCall()
 {
-	callEmptyLuaFunction("coreUpdate() update()");
+	callEmptyLuaFunction("step()");
 }
 
 

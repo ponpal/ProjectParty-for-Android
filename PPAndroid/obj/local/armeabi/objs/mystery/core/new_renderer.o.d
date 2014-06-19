@@ -76,7 +76,7 @@ obj/local/armeabi/objs/mystery/core/new_renderer.o: \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
  jni/core/font.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
- jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp jni/core/shader.h \
+ jni/core/shader.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  jni/external_libs/utf8.h jni/external_libs/utf8/checked.h \
  jni/external_libs/utf8/core.h \
@@ -345,10 +345,6 @@ jni/glm/glm/detail/func_integer.inl:
 jni/core/font.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string:
-
-jni/glm/glm/vec2.hpp:
-
-jni/glm/glm/mat4x4.hpp:
 
 jni/core/shader.h:
 

@@ -111,10 +111,9 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
- jni/core/new_renderer.h jni/core/font.h jni/glm/glm/vec2.hpp \
- jni/glm/glm/mat4x4.hpp jni/lua/lua.hpp jni/lua/lua.h jni/lua/luaconf.h \
- jni/lua/lauxlib.h jni/lua/lualib.h jni/lua/luajit.h jni/core/path.h \
- jni/core/asset_helper.h jni/core/android_helper.h \
+ jni/core/new_renderer.h jni/core/font.h jni/lua/lua.hpp jni/lua/lua.h \
+ jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h jni/lua/luajit.h \
+ jni/core/path.h jni/core/asset_helper.h jni/core/android_helper.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
@@ -455,10 +454,6 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 jni/core/new_renderer.h:
 
 jni/core/font.h:
-
-jni/glm/glm/vec2.hpp:
-
-jni/glm/glm/mat4x4.hpp:
 
 jni/lua/lua.hpp:
 

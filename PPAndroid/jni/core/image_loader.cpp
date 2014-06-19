@@ -35,5 +35,5 @@ Texture loadTexture(uint8_t* buffer, uint32_t length)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	return Texture(name, width, height);
+	return (Texture){name, width, height};
 }

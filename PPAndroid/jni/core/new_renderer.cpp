@@ -138,9 +138,9 @@ void rendererActivate(Renderer* renderer) //Must be called before any attempts t
 }
 
 
-void rendererSetTransform(Renderer* renderer, const glm::mat4* matrix)
+void rendererSetTransform(Renderer* renderer, matrix4 matrix)
 {
-	renderer->transform = (*matrix);
+	renderer->transform = *((glm::mat4*) &matrix);
 }
 
 static void rendererFlushIfNeeded(Renderer* renderer, Texture tex, size_t count)
@@ -162,8 +162,8 @@ void rendererAddFrame(Renderer* renderer, const Frame* frame,
 	vec2 bl  = vec2(inPos.x, inPos.y);
 	vec2 dim = vec2(inDim.x, inDim.y);
 
-	vec2 bottomLeft = vec2(frame->coords.x, frame->coords.y);
-	vec2 topRight   = vec2(frame->coords.z, frame->coords.w);
+	vec2 bottomLeft = vec2(frame->x, frame->y);
+	vec2 topRight   = vec2(frame->z , frame->w);
 
 	auto ptr = &(renderer->vertices[renderer->elements]);
 
@@ -195,6 +195,11 @@ static inline glm::vec2 rotated(glm::vec2 pos, glm::vec2 offset, float sinus, fl
 	return pos;
 }
 
+void rendererSetOrientation(uint32_t orientation)
+{
+
+}
+
 void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 					   vec2f inPos, vec2f inDim, uint32_t color,
 					   vec2f inOrigin, float rotation, int mirrored)
@@ -208,9 +213,8 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 		 origin = vec2(inOrigin.x, inOrigin.y);
 
 
-	vec2 botLeft  = vec2(frame->coords.x, frame->coords.y);
-	vec2 topRight = vec2(frame->coords.z + frame->coords.x,
-								   frame->coords.w + frame->coords.y);
+	vec2 botLeft  = vec2(frame->x, frame->y);
+	vec2 topRight = vec2(frame->z, frame->w);
 
 	if(mirrored)
 	{

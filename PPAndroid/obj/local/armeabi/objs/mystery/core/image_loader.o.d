@@ -99,8 +99,7 @@ obj/local/armeabi/objs/mystery/core/image_loader.o: \
  jni/glm/glm/detail/../geometric.hpp jni/glm/glm/vector_relational.hpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
- jni/core/font.h jni/glm/glm/vec2.hpp jni/glm/glm/mat4x4.hpp \
- jni/core/android_helper.h \
+ jni/core/font.h jni/core/android_helper.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
@@ -416,10 +415,6 @@ jni/glm/glm/detail/func_integer.hpp:
 jni/glm/glm/detail/func_integer.inl:
 
 jni/core/font.h:
-
-jni/glm/glm/vec2.hpp:
-
-jni/glm/glm/mat4x4.hpp:
 
 jni/core/android_helper.h:
 

@@ -15,7 +15,11 @@
 
 #define SERVER_REFUSED_RECONNECT 250
 #define COULD_NOT_RECONNECT 500
-#define MESSAGE(name) (shortHash((name), strlen((name)), 0))
+
+enum {
+	NETWORK_SETUP_FILE_TRANSFER = 0,
+	NETWORK_SHUTDOWN = 1
+};
 
 extern "C"
 {

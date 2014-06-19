@@ -11,6 +11,8 @@
 #include "image_loader.h"
 #include <cstdio>
 #include "resource_manager.h"
+#include <GLES2/gl2.h>
+#include "asset_helper.h"
 
 template<typename T> const HashID GetHash();
 
@@ -18,7 +20,7 @@ template<typename T> const HashID GetHash();
     template<>const HashID GetHash<type>(){return bytesHash((name), strlen(name), 0);}
 
 REGISTER_TYPE_HASH(Font, "Font");
-REGISTER_TYPE_HASH(Frame, "Frame");
+REGISTER_TYPE_HASH(Texture, "Texture");
 
 #define NULL_HANDLE ((Handle){ 0, 0, nullptr })
 
@@ -81,25 +83,6 @@ static Handle* contentAddItem(HashID id, HashID type, void* item)
     return nullptr;
 }
 
-static void contentLoadFile(const char* path, uint8_t** buffer, size_t* size)
-{
-	LOGI("Trying to load file %s", path);
-    auto file = fopen(path, "r+");
-    ASSERTF(file != NULL, "Couldn't open file. %s", path);
-
-
-    fseek( file, 0L, SEEK_END);
-    size_t length = ftell(file);
-    rewind(file);
-    LOGI("ftell: %d", length);
-
-    *buffer = new uint8_t[length];
-    *size = length;
-
-    fread(buffer, length, 1, file);
-    fclose(file);
-}
-
 static Handle* contentLoadFont(const char* path, HashID id)
 {
 	ASSERT(false, "Font loading is not yet implemented.");
@@ -110,18 +93,29 @@ static Handle* contentLoadTexture(const char* path, HashID id)
 {
 	uint8_t* buffer;
 	size_t size;
-	contentLoadFile(path, &buffer, &size);
-    auto texture = loadTexture(buffer, size);
+	ExternalAsset asset(path);
+    auto texture = loadTexture(asset.buffer, asset.length);
     delete buffer;
-    auto texPtr = new Frame(texture);
-    return contentAddItem(id, GetHash<Frame>(), (void*) texPtr);
+    auto texPtr = new Texture();
+    *texPtr = texture;
+    return contentAddItem(id, GetHash<Texture>(), (void*) texPtr);
 }
 
 static std::string toString(uint32_t value)
 {
 	char buf[16];
-	sprintf(buf, "%d", value);
+	sprintf(buf, "%u", value);
 	return std::string(buf);
+}
+
+Handle* contentGetHandle(HashID id)
+{
+    for(int i = 0; i < handlesLength; i++)
+	{
+		if(handles[i].hashID == id)
+			return &handles[i];
+	}
+    return nullptr;
 }
 
 Handle* contentLoad(const char* path)
@@ -130,6 +124,10 @@ Handle* contentLoad(const char* path)
 	HashID id = bytesHash(hashPath.c_str(), hashPath.size(), 0);
 	std::string hashString = toString(id);
 	std::string absPath = path::buildPath(resourcePath, hashString);
+
+	auto handle = contentGetHandle(id);
+	if(handle != nullptr)
+		return handle;
 
 	if (path::hasExtension(path, ".png"))
 	{
@@ -143,14 +141,9 @@ Handle* contentLoad(const char* path)
 	return nullptr;
 }
 
-Handle* contentGetHandle(HashID id)
+void obliterateTexture(Texture* texture)
 {
-    for(int i = 0; i < handlesLength; i++)
-	{
-		if(handles[i].hashID == id)
-			return &handles[i];
-	}
-    return nullptr;
+	glDeleteTextures(1, &texture->glName);
 }
 
 bool contentUnloadPath(const char* path)
@@ -163,8 +156,8 @@ bool contentUnloadPath(const char* path)
 		{
 			if(path::hasExtension(path, ".png"))
 			{
-				((Frame*)handles[i].item)->obliterate();
-                delete (Frame*)handles[i].item;
+				obliterateTexture(((Texture*)handles[i].item));
+                delete (Texture*)handles[i].item;
 			}
 			else if(path::hasExtension(path, ".fnt"))
 			{
@@ -182,10 +175,10 @@ bool contentUnloadHandle(Handle* handle)
 {
 	if(handle->item == nullptr)
 		return false;
-	if(handle->typeID == GetHash<Frame>())
+	if(handle->typeID == GetHash<Texture>())
 	{
-		((Frame*)handle->item)->obliterate();
-        delete (Frame*)handle->item;
+		obliterateTexture(((Texture*)handle->item));
+        delete (Texture*)handle->item;
 	}
 	else if(handle->typeID == GetHash<Font>())
 	{

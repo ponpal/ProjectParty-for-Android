@@ -15,43 +15,16 @@
 typedef struct { float x; float y; } vec2f;
 typedef struct { float x; float y; float z; } vec3f;
 
-struct Texture
-{
-	GLuint glName;
-	uint16_t width, height;
+typedef struct { float mat[16]; } matrix4;
 
-	Texture()
-	: glName(0xFFFFFFFF),
-	  width(0), height(0)
-	{ }
+typedef struct {
+	uint32_t glName;
+	uint32_t width, height;
+} Texture;
 
-	Texture(GLuint name, uint16_t w, uint16_t h)
-	: glName(name), width(w), height(h)
-	{ }
-};
-
-struct Frame
-{
+typedef struct {
 	Texture texture;
-	glm::vec4 coords;
-
-	Frame() { }
-	Frame(Texture tex)
-	: texture(tex),
-	  coords(glm::vec4(0,1,1,-1))
-	{
-	}
-	Frame(Texture tex,
-		  glm::vec4 _coords)
-	: texture(tex),
-	  coords(_coords)
-	{
-	}
-
-	void obliterate()
-	{
-		glDeleteTextures(1, &texture.glName);
-	}
-};
+	float x, y, z, w;
+} Frame;
 
 #endif /* TYPES_H_ */

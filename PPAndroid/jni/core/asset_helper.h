@@ -54,4 +54,6 @@ struct ExternalAsset
 	~ExternalAsset();
 };
 
+bool assetExists(const char* filePath);
+
 #endif /* ASSET_HELPER_H_ */

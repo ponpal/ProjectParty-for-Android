@@ -17,6 +17,7 @@ extern "C"
 		uint8_t* base;
 		uint8_t* ptr;
 		uint32_t length;
+		uint32_t capacity;
 	} Buffer;
 
 	uint32_t bufferBytesRemaining(Buffer* buffer);
