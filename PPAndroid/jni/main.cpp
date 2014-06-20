@@ -8,71 +8,13 @@
 #include "main.h"
 #include "sys/stat.h"
 #include "errno.h"
-#include "core/sensor.h"
 
 ndk_helper::GLContext* context;
-ndk_helper::DragDetector drag_detector;
-ndk_helper::PinchDetector pinch_detector;
-TapDetector tap_detector;
 
 static int32_t handle_input(android_app* app, AInputEvent* event) {
 	auto type = AInputEvent_getType(event);
 
 	if (type == AINPUT_EVENT_TYPE_MOTION) {
-		GESTURE_STATE tapState = tapDetect(&tap_detector, event);
-		if (tapState == ndk_helper::GESTURE_STATE_ACTION) {
-			luaOnTap(tap_detector.x,
-					context->GetScreenHeight() - tap_detector.y);
-		}
-		GESTURE_STATE dragState = drag_detector.Detect(event);
-		//Handle drag state
-		if (dragState & ndk_helper::GESTURE_STATE_START) {
-			//Otherwise, start dragging
-			ndk_helper::Vec2 v;
-			drag_detector.GetPointer(v);
-			float x, y;
-			v.Value(x, y);
-			luaOnDragBegin(x, context->GetScreenHeight() - y);
-		} else if (dragState & ndk_helper::GESTURE_STATE_MOVE) {
-			ndk_helper::Vec2 v;
-			drag_detector.GetPointer(v);
-			float x, y;
-			v.Value(x, y);
-			luaOnDrag(x, context->GetScreenHeight() - y);
-		} else if (dragState & ndk_helper::GESTURE_STATE_END) {
-			ndk_helper::Vec2 v;
-			drag_detector.GetPointer(v);
-			float x, y;
-			v.Value(x, y);
-			luaOnDragEnd(x, context->GetScreenHeight() - y);
-		}
-
-		ndk_helper::GESTURE_STATE pinchState = pinch_detector.Detect(
-				event);
-
-		if (pinchState & ndk_helper::GESTURE_STATE_START) {
-			//Start new pinch
-			LOGI("Pinch start");
-			ndk_helper::Vec2 v1;
-			ndk_helper::Vec2 v2;
-			float x1, y1, x2, y2;
-			pinch_detector.GetPointers(v1, v2);
-			v1.Value(x1, y1);
-			v2.Value(x2, y2);
-			luaOnPinchBegin(x1, y1, x2, y2);
-		} else if (pinchState & ndk_helper::GESTURE_STATE_MOVE) {
-			//Multi touch
-			//Start new pinch
-			LOGI("Pinch");
-			ndk_helper::Vec2 v1;
-			ndk_helper::Vec2 v2;
-			float x1, y1, x2, y2;
-			pinch_detector.GetPointers(v1, v2);
-			v1.Value(x1, y1);
-			v2.Value(x2, y2);
-			luaOnPinch(x1, y1, x2, y2);
-		}
-
 		size_t pointerCount = AMotionEvent_getPointerCount(event);
 		for (size_t i = 0; i < pointerCount; i++) {
 			luaOnTouch(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i),
@@ -97,23 +39,6 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 	return 0;
 }
 
-extern "C" jint JNI_OnLoad(JavaVM* vm, void* reserved) {
-	JNIEnv* env;
-	if (vm->GetEnv(reinterpret_cast<void**>(&env), JNI_VERSION_1_6) != JNI_OK) {
-		return -1;
-	}
-	LOGI("JNI_OnLoad was called!");
-
-	auto tmp = env->FindClass(
-			"projectparty/ppandroid/services/ControllerService");
-	LOGI("Loaded class! %d ", (size_t) tmp);
-	auto clazz = (jclass) env->NewGlobalRef(tmp);
-
-	networkServiceClass(clazz);
-
-	return JNI_VERSION_1_6;
-}
-
 struct AppState {
 	bool isStarted, isResumed, isFocused, hasSurface, wasStopped;
 
@@ -133,8 +58,6 @@ void initSensors() {
 			gSensorManager, ASENSOR_TYPE_ACCELEROMETER);
 	gSensorEventQueue = ASensorManager_createEventQueue(gSensorManager,
 			gApp->looper, LOOPER_ID_USER, NULL, NULL);
-	pinch_detector.SetConfiguration(gApp->config);
-	drag_detector.SetConfiguration(gApp->config);
 }
 
 void resumeSensors() {
@@ -154,13 +77,14 @@ void processSensors(int32_t id) {
 		while (ASensorEventQueue_getEvents(gSensorEventQueue, &event, 1) > 0) {
 			switch (event.type) {
 			case ASENSOR_TYPE_ACCELEROMETER:
-				vec3 v;
+				vec3f v;
 				v.x = event.acceleration.x;
 				v.y = event.acceleration.y;
 				v.z = event.acceleration.z;
 
-				gGame->sensor->acceleration = v;
-				break;
+                if (gameInitialized())
+                    gGame->sensor->acceleration = v;
+                break;
 			}
 		}
 	}
@@ -175,8 +99,6 @@ void create() {
 	gAppState.isFocused = false;
 	gAppState.hasSurface = false;
 	gAppState.wasStopped = false;
-
-	gameInitialize(gApp);
 }
 
 void start() {
@@ -189,30 +111,22 @@ void start() {
 void restart() {
 	LOGI("App was restarted!");
 	gAppState.isStarted = true;
-
-	gameRestart();
 }
 
 void freshStart() {
 	LOGI("App was started!");
 	gAppState.isStarted = true;
-
-	gameStart();
 }
 
 void resume() {
 	LOGI("App was resumed!");
 	gAppState.isResumed = true;
-
-	gameResume();
 }
 
 void pause() {
 	LOGI("App was paused!");
 	gAppState.isResumed = false;
 	gAppState.isFocused = false;
-
-	gamePause();
 }
 
 void stop() {
@@ -226,7 +140,6 @@ void stop() {
 
 void destroy() {
 	LOGI("App was destroyed!");
-	gameTerminate();
 }
 
 //Focus Events
@@ -248,10 +161,10 @@ void surfaceCreated() {
 	gAppState.hasSurface = true;
 
 	context->Init(gApp->window);
-	gGame->screen->width = context->GetScreenWidth();
-	gGame->screen->height = context->GetScreenHeight();
-	gameSurfaceCreated();
-
+	if (gameInitialized()) {
+        gGame->screen->width = context->GetScreenWidth();
+        gGame->screen->height = context->GetScreenHeight();
+	}
 }
 
 void surfaceDestroyed() {
@@ -259,15 +172,16 @@ void surfaceDestroyed() {
 	gAppState.hasSurface = false;
 
 	context->Invalidate();
-
-	gameSurfaceDestroyed();
+	gameStop();
 }
 
 void surfaceChanged() {
 	LOGI("Surface Changed");
-	gGame->screen->width = context->GetScreenWidth();
-	gGame->screen->height = context->GetScreenHeight();
-	LOGE("SC: W: %d, H: %d", gGame->screen->width, gGame->screen->height);
+	if (gameInitialized()) {
+        gGame->screen->width = context->GetScreenWidth();
+        gGame->screen->height = context->GetScreenHeight();
+        LOGE("SC: W: %d, H: %d", gGame->screen->width, gGame->screen->height);
+	}
 }
 }
 
@@ -341,6 +255,7 @@ void android_main(android_app* state) {
 	initSensors();
 	lifecycle::create();
 
+	bool fullyActive = false;
 	while (1) {
 		int ident, fdesc, events;
 		android_poll_source* source;
@@ -361,11 +276,15 @@ void android_main(android_app* state) {
 			}
 		}
 
+		if (!fullyActive && gAppState.fullyActive())
+			gameInitialize();
+
 		if (gAppState.fullyActive()) {
 			gGame->screen->width = context->GetScreenWidth();
 			gGame->screen->height = context->GetScreenHeight();
 			gameStep(context);
 		}
+		fullyActive = gAppState.fullyActive();
 	}
 
 }

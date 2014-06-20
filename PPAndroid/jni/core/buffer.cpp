@@ -8,9 +8,34 @@
 #include "buffer.h"
 #include "assert.h"
 
+#define __STDC_FORMAT_MACROS
+
+#include <inttypes.h>
+
+
 #define BOUNDS_CHECK(buffer, len) \
-	ASSERTF(bufferBytesRemaining(buffer) >= len, "Buffer Overflow! Buf: %d, Len: %d",\
-			bufferBytesRemaining(buffer), len);
+if(!(bufferBytesRemaining(buffer) >= len)) \
+{ \
+	auto message___Buffer = new char[1024]; \
+	sprintf(message___Buffer, "Buffer Overflow! Buf: %d, Len: %d", bufferBytesRemaining(buffer), len); \
+	LOGE("%s", message___Buffer); \
+	delete message___Buffer; \
+}
+
+Buffer* bufferCreate(size_t bufferSize)
+{
+	auto buffer = new Buffer();
+	buffer->base = buffer->ptr = new uint8_t[bufferSize];
+	buffer->length = 0;
+	buffer->capacity = bufferSize;
+	return buffer;
+}
+
+void bufferDestroy(Buffer* buffer)
+{
+	delete buffer->base;
+	delete buffer;
+}
 
 
 uint32_t bufferBytesRemaining(Buffer* buffer)
@@ -158,15 +183,8 @@ uint64_t bufferReadLong(Buffer* buffer)
 	BOUNDS_CHECK(buffer, sizeof(uint64_t));
 
 	auto ptr = buffer->ptr;
-	uint64_t result = *(ptr++);
-	result = result | (*(ptr++) << 8);
-	result = result | (*(ptr++) << 16);
-	result = result | (*(ptr++) << 24);
-	result = result | (((uint64_t)*(ptr++)) << 32);
-	result = result | (((uint64_t)*(ptr++)) << 40);
-	result = result | (((uint64_t)*(ptr++)) << 48);
-	result = result | (((uint64_t)*(ptr++)) << 56);
-	buffer->ptr = ptr;
+	uint64_t result = bufferReadInt(buffer);
+	result |= static_cast<uint64_t>(bufferReadInt(buffer)) << 32;
 	return result;
 }
 

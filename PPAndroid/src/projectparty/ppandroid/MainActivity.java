@@ -156,12 +156,10 @@ public class MainActivity extends Activity {
 	 * @param server ServerInfo containing IP and port from the list.
 	 */
 	public void startController(ServerInfo server) {
-		Intent serviceIntent = new Intent(this, ControllerService.class);
-		serviceIntent.putExtra("server", server);
-		serviceIntent.putExtra("playerAlias", playerAlias);
-		startService(serviceIntent);
 		
 		Intent activityIntent = new Intent(this, MyNativeActivity.class);
+		activityIntent.putExtra("server", server);
+		activityIntent.putExtra("playerAlias", playerAlias);
 		startActivity(activityIntent);
 	}
 

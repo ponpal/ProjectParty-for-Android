@@ -143,6 +143,7 @@ static void* fileTask(void* ptr)
 
 void receiveFiles(ReceiveFileConfig serverConfig)
 {
+		LOG("Receiving files...");
 		auto config = new ReceiveFileConfig();
 		*config = serverConfig;
         pthread_t t;

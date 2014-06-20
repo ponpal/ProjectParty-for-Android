@@ -14,6 +14,8 @@ void initializeLuaCore();
 void initializeLuaScripts();
 void initializeRenderer();
 
+void resourcesLoadedLuaCall();
+
 void initLuaCall();
 void termLuaCall();
 void updateLuaCall();

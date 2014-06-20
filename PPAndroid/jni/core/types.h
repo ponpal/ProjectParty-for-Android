@@ -14,6 +14,7 @@
 
 typedef struct { float x; float y; } vec2f;
 typedef struct { float x; float y; float z; } vec3f;
+typedef struct { float x; float y; float z; float w; } vec4f;
 
 typedef struct { float mat[16]; } matrix4;
 

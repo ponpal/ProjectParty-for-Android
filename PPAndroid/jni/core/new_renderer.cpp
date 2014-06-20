@@ -250,7 +250,7 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 	renderer->elements += 4;
 }
 
-static inline void rendererDrawChar(Renderer* renderer, Texture texture, const CharInfo& info,
+static inline void rendererDrawChar(Renderer* renderer, Texture texture, const CharInfo* info,
 									glm::vec2 pos, glm::vec2 offset, uint32_t color)
 {
 	rendererFlushIfNeeded(renderer, texture, 4);
@@ -258,9 +258,9 @@ static inline void rendererDrawChar(Renderer* renderer, Texture texture, const C
 
 
 	glm::vec2 location   = pos + offset;
-	glm::vec2 bottomLeft = glm::vec2(info.textureCoords.x, info.textureCoords.y);
-	glm::vec2 topRight   = glm::vec2(info.textureCoords.z, info.textureCoords.w);
-	glm::vec2 dim        = glm::vec2(info.srcRect.z, info.srcRect.w);
+	glm::vec2 bottomLeft = glm::vec2(info->textureCoords.x, info->textureCoords.y);
+	glm::vec2 topRight   = glm::vec2(info->textureCoords.z, info->textureCoords.w);
+	glm::vec2 dim        = glm::vec2(info->srcRect.z, info->srcRect.w);
 
 	Vertex vert;
 	vert.position = location;
@@ -283,11 +283,11 @@ static inline void rendererDrawChar(Renderer* renderer, Texture texture, const C
 	renderer->elements += 4;
 }
 
-inline static glm::vec2 measureFont(const Font& font, const char* text)
+inline static glm::vec2 measureFont(const Font* font, const char* text)
 {
 	float width = 0, height = 0, cursor = 0;
 
-	auto spaceInfo = font[' '];
+	auto spaceInfo = fontCharInfo(font, ' ');
 	auto itr   = &text[0];
 	auto end   = &text[strlen(text)];
 
@@ -297,33 +297,33 @@ inline static glm::vec2 measureFont(const Font& font, const char* text)
 		if(c == '\r') continue;
 
 		if(c == ' ') {
-			cursor += spaceInfo.advance;
+			cursor += spaceInfo->advance;
 			continue;
 		} else if(c == '\n') {
-			height += font.lineHeight;
+			height += font->lineHeight;
 			width  = fmaxf(cursor, width);
 			cursor = 0;
 			continue;
 		} else if(c == '\t') {
-			cursor += spaceInfo.advance * 4;
+			cursor += spaceInfo->advance * 4;
 		}
 
-		CharInfo info = font.chars[c];
-		cursor += info.advance;
+		auto info = fontCharInfo(font, c);
+		cursor += info->advance;
 	}
 
 	width = fmaxf(width, cursor);
-	height += font.base;
+	height += font->base;
 	return glm::vec2(width, height);
 }
 
 void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec2f inPos, uint32_t color)
 {
 	using namespace glm;
-	vec2 pos = vec2(inPos.x, inPos.y);
-	vec2 size = measureFont(*font, text);
-	vec2 cursor = vec2(0, size.y - font->base);
-	CharInfo spaceInfo = (*font)[' '];
+	auto pos = glm::vec2(inPos.x, inPos.y);
+	glm::vec2 size = measureFont(font, text);
+	auto cursor = glm::vec2(0, size.y - font->base);
+	auto spaceInfo = fontCharInfo(font, ' ');
 
 	auto itr   = &text[0];
 	auto end   = &text[strlen(text)];
@@ -334,22 +334,22 @@ void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec
 		if(c == '\r') continue;
 
 			if(c == ' ') {
-				rendererDrawChar(renderer, font->page.texture, spaceInfo, pos, cursor, color);
-				cursor.x += spaceInfo.advance;
+				cursor.x += spaceInfo->advance;
 				continue;
 			} else if(c == '\n') {
 				cursor.y -= font->lineHeight;
 				cursor.x = 0;
 				continue;
 			} else if(c == '\t') {
-				cursor.x += spaceInfo.advance * 4;
+				cursor.x += spaceInfo->advance * 4;
 				continue;
 			}
 
-			CharInfo info = (*font)[c];
-			rendererDrawChar(renderer, font->page.texture, info, pos, cursor + info.offset, color);
+			auto info = fontCharInfo(font, c);
+			glm::vec2 offset(info->offset.x, info->offset.y);
+			rendererDrawChar(renderer, font->page, info, pos, cursor + offset, color);
 
-			cursor.x += info.advance;
+			cursor.x += info->advance;
 	}
 }
 

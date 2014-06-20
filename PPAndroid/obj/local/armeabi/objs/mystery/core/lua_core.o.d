@@ -106,8 +106,36 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
- jni/core/game.h jni/core/network.h jni/core/time_helpers.h \
- jni/core/sensor.h jni/glm/glm/vec3.hpp \
+ jni/core/game.h jni/core/network.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/socket.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/socket.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/socket.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/sockios.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/sockios.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/uio.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/byteorder.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/little_endian.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/swab.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/generic.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in6.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/ipv6.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in6.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/unistd.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/select.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/sysconf.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/capability.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/pathconf.h \
+ jni/core/time_helpers.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
@@ -120,11 +148,6 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h \
  jni/core/assert.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/dirent.h
 
 jni/core/lua_core.h:
@@ -439,11 +462,63 @@ jni/core/game.h:
 
 jni/core/network.h:
 
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/socket.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/socket.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/socket.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/sockios.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/sockios.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/uio.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/endian.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/endian.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/machine/endian.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/byteorder.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/little_endian.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/swab.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/byteorder/generic.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/in6.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/ipv6.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/in6.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/unistd.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/select.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/sysconf.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/capability.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/pathconf.h:
+
 jni/core/time_helpers.h:
-
-jni/core/sensor.h:
-
-jni/glm/glm/vec3.hpp:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h:
 
@@ -484,15 +559,5 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 jni/core/assert.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/errno.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/errno.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm/errno.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/dirent.h:

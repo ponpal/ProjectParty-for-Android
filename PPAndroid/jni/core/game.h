@@ -11,17 +11,20 @@
 #define ORIENTATION_LANDSCAPE ((uint8_t)0)
 #define ORIENTATION_PORTRAIT  ((uint8_t)1)
 
+#include "types.h"
 #include "network.h"
 #include "time_helpers.h"
 #include "lua_core_private.h"
-#include "sensor.h"
 #include "GLContext.h"
 #include "new_renderer.h"
 
-typedef struct Content Content;
-
 extern "C"
 {
+    typedef struct
+    {
+        vec3f acceleration;
+    } SensorState;
+
 	typedef struct
 	{
 		uint32_t width, height;
@@ -41,21 +44,15 @@ extern "C"
 		uint32_t fps;
 	} Game;
 
-	typedef void (*messageHandler)(uint8_t id, uint32_t length);
-	extern messageHandler gMessageHandler;
 	extern Game* gGame;
 }
 
-void gameInitialize(android_app* app);
-void gameStart();
-void gameRestart();
-void gameResume();
-void gamePause();
-void gameSurfaceCreated();
-void gameSurfaceDestroyed();
+bool gameInitialized();
+
+void gameInitialize();
+void gameTerminate();
 void gameStop();
 
-void gameTerminate();
 void gameStep(ndk_helper::GLContext* context);
 void gameFinish();
 

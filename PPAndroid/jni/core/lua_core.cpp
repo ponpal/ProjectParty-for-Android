@@ -25,12 +25,20 @@ void initializeLuaCore()
 	luaState = luaL_newstate();
 	luaL_openlibs(luaState);
 
+	Asset glScript("gl.lua");
+	int error = luaL_loadbuffer(luaState, (const char*)glScript.buffer, glScript.length, "Cheader");
+	error = error | lua_pcall(luaState, 0,0,0);
+	if(error)
+		LOGE("LUA GL ERROR %s", lua_tostring(luaState, -1));
+
+
 	Asset coreScript("core.lua");
-	int error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "Cheader");
+	error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "Cheader");
 	error = error | lua_pcall(luaState, 0,0,0);
 
 	if(error)
 		LOGE("LUA CORE ERROR %s", lua_tostring(luaState, -1));
+
 }
 
 #include "dirent.h"
@@ -164,9 +172,9 @@ void callFloat4LuaFunction(const char* methodName, float x1, float y1, float x2,
 }
 
 
-void initLuaCall()
+void resourcesLoadedLuaCall()
 {
-	callEmptyLuaFunction("init()");
+	callEmptyLuaFunction("resourcesLoaded()");
 }
 
 void termLuaCall()

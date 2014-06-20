@@ -9,9 +9,9 @@
 #define VIBRATOR_H_
 
 extern "C" {
-
-int vibrate(uint64_t milliseconds);
-
+int platformVibrate(uint64_t milliseconds);
+uint16_t platformGetPort();
+uint32_t platformGetIP();
+uint32_t platformGetBroadcastAddress();
 }
-
 #endif /* VIBRATOR_H_ */

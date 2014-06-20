@@ -20,6 +20,9 @@ extern "C"
 		uint32_t capacity;
 	} Buffer;
 
+	Buffer* bufferCreate(size_t size);
+	void bufferDestroy(Buffer* buffer);
+
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 
 	void bufferWriteBytes(Buffer* buffer, uint8_t* data, size_t length);

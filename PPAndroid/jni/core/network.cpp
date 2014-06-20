@@ -5,6 +5,7 @@
  *      Author: Lukas_2
  */
 
+#include "assert.h"
 #include "network.h"
 #include <android_native_app_glue.h>
 #include <cstdlib>
@@ -14,202 +15,182 @@
 
 #include "JNIHelper.h"
 #include "android_helper.h"
+#include <netinet/tcp.h>
+#include <fcntl.h>
+#include "socket_stream.h"
 
+#define __STDC_FORMAT_MACROS
 
-jclass gNetworkServiceClass;
-jobject gNetworkServiceObject;
-jmethodID sendID, unreliableSendID, receiveID, isAliveID,
-		  connectID, disconnectID, shutdownID, reconnectID;
+#include <inttypes.h>
 
-void networkServiceClass(jclass clazz)
+Network* networkCreate(size_t bufferSize)
 {
-	gNetworkServiceClass = clazz;
-}
-
-Network* networkInitialize(android_app* app)
-{
-	gApp = app;
-
-	auto env = app->activity->env;
-	app->activity->vm->AttachCurrentThread( &env, NULL );
-	auto clazz = gNetworkServiceClass;
-	auto dummy = env->GetStaticFieldID(clazz, "toAccess", "I");
-	auto fi = env->GetStaticFieldID(clazz, "instance", "Lprojectparty/ppandroid/services/ControllerService;");
-	auto obj = env->GetStaticObjectField(clazz, fi);
-
-	gNetworkServiceObject = env->NewGlobalRef(obj);
-
-	sendID         	 = env->GetMethodID(clazz, "send", "(I)I");
-	unreliableSendID = env->GetMethodID(clazz, "unreliableSend", "(I)I");
-	receiveID    	 = env->GetMethodID(clazz, "receive", "(I)I");
-	isAliveID   	 = env->GetMethodID(clazz, "isAlive", "()I");
-	connectID    	 = env->GetMethodID(clazz, "connect", "()I");
-	reconnectID  	 = env->GetMethodID(clazz, "reconnect", "()I");
-	disconnectID 	 = env->GetMethodID(clazz, "disconnect", "()I");
-	shutdownID   	 = env->GetMethodID(clazz, "shutdown", "()I");
-
-	fi = env->GetFieldID(clazz, "inBuffer", "Ljava/nio/ByteBuffer;");
-	auto inBufferObj = env->GetObjectField(obj, fi);
-
-	fi = env->GetFieldID(clazz, "outBuffer", "Ljava/nio/ByteBuffer;");
-	auto outBufferObj = env->GetObjectField(obj, fi);
-
-	fi = env->GetFieldID(clazz, "routBuffer", "Ljava/nio/ByteBuffer;");
-	auto routBufferObj = env->GetObjectField(obj, fi);
-
 	auto network = new Network();
-	network->in_  = new Buffer();
-	network->out = new Buffer();
-	network->uout = new Buffer();
-
-	LOGE("Sigh");
-	network->in_->base  = network->in_->ptr  = (uint8_t*)env->GetDirectBufferAddress(inBufferObj);
-	network->out->base = network->out->ptr = (uint8_t*)env->GetDirectBufferAddress(outBufferObj);
-	network->uout->base = network->uout->ptr = (uint8_t*)env->GetDirectBufferAddress(routBufferObj);
-
-	network->in_->length  = env->GetDirectBufferCapacity(inBufferObj);
-	network->out->length = env->GetDirectBufferCapacity(outBufferObj);
-	network->uout->length = env->GetDirectBufferCapacity(routBufferObj);
-
-	LOGE("Sigh");
-	app->activity->vm->DetachCurrentThread();
+	network->in_ = bufferCreate(bufferSize);
+	network->uin = bufferCreate(bufferSize);
+	network->out = bufferCreate(bufferSize);
+	network->uout = bufferCreate(bufferSize);
+	network->out->length = network->out->capacity;
+	network->uout->length = network->uout->capacity;
+	network->udpSocket = 0;
+	network->tcpSocket = 0;
+	network->remoteIP = 0;
+	network->remoteUdpPort = 0;
+	network->sessionID = 0;
 
 	return network;
 }
 
-void networkDelete(Network* network)
+void networkDestroy(Network* network)
 {
-	delete network->in_;
-	delete network->out;
+	bufferDestroy(network->in_);
+	bufferDestroy(network->out);
+	bufferDestroy(network->uout);
 	delete network;
 }
 
-int networkSend(Network* network)
+static void setNonBlocking(int socket)
 {
-	Buffer* out = network->out;
+	int flags = fcntl(socket, F_GETFL, 0);
+	flags |= O_NONBLOCK;
+	auto err = fcntl(socket, F_SETFL, flags);
+	if(err < 0)
+		LOGE("Could not set nonblocking, %d %s", errno, strerror(err));
 
-	ptrdiff_t length = out->ptr - out->base;
-	if(length == 0) return 1; //Nothing to send.
+}
 
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+int networkConnect(Network* network, uint32_t ip, uint16_t udpPort, uint16_t tcpPort)
+{
+	int udpSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	struct sockaddr_in myaddr;
+	bzero(&myaddr, sizeof(myaddr));
+	myaddr.sin_family = AF_INET;
+	myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	myaddr.sin_port = htons(0);
 
-	auto result = env->CallIntMethod(gNetworkServiceObject, sendID, length);
+	int err = bind(udpSocket, (struct sockaddr *)&myaddr, sizeof(myaddr));
+	if(err < 0)
+		LOGE("Could not bind socket, %d %s", errno, strerror(err));
 
-	if(result != length) {
-		LOGW("Network did not send enough bytes! Sent: %d, Expected: %d",
-				(uint32_t)result, (uint32_t)length);
+	int tcpSocket;
+	struct sockaddr_in servaddr;
+	tcpSocket = socket(AF_INET, SOCK_STREAM, 0);
+	bzero(&servaddr, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htonl(ip);
+	servaddr.sin_port = htons(tcpPort);
+	auto tcperr = connect(tcpSocket, (struct sockaddr *)&servaddr, sizeof(servaddr));
+	if (tcperr)
+	{
+		LOGE("Could not connect, error is: %d %s", errno, strerror(errno));
+		return tcperr;
 	}
 
-	gApp->activity->vm->DetachCurrentThread();
+	int i = 1;
+	setsockopt(tcpSocket, IPPROTO_TCP, TCP_NODELAY, (void *)&i, sizeof(i));
+	SocketStream* stream = streamCreate(tcpSocket, 8);
+	auto sessionID = streamReadLong(stream);
+	send(tcpSocket, &sessionID, sizeof(sessionID), 0);
 
-	out->ptr = out->base;
-	return 1;
-}
+	network->sessionID = sessionID;
+	LOGI("SessionID: %" PRIu64, sessionID);
+	network->tcpSocket = tcpSocket;
+	network->remoteIP = ip;
+	network->udpSocket = udpSocket;
+	network->remoteUdpPort = udpPort;
 
-int networkUnreliableSend(Network* network)
-{
-	Buffer* out = network->uout;
-	ptrdiff_t length = out->ptr - out->base;
-	if(length == 0) return 1; //Nothing to send.
+	streamDestroy(stream);
 
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
+	setNonBlocking(tcpSocket);
+	setNonBlocking(udpSocket);
 
-	auto result = env->CallIntMethod(gNetworkServiceObject, unreliableSendID, length);
-
-	if(result != length) {
-		LOGW("Network did not send enough bytes! Sent: %d, Excpected: %d",
-				(uint32_t)result, (uint32_t)length);
-	}
-
-	gApp->activity->vm->DetachCurrentThread();
-
-	out->ptr = out->base;
-	return 1;
-}
-
-int networkReceive(Network* network, uint8_t* tempBuffer, uint32_t size)
-{
-	auto in = network->in_;
-	in->ptr = in->base;
-	memcpy(in->ptr, tempBuffer, (unsigned int)size);
-
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
-
-	auto result = env->CallIntMethod(gNetworkServiceObject, receiveID, size);
-	in->length = size + result;
-
-	gApp->activity->vm->DetachCurrentThread();
-
-	if (result == -1) {
-		LOGI("network error");
-		return -1;
-	}
-
-	return size + result;
-}
-
-int networkIsAlive(Network* network)
-{
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
-	auto result = env->CallIntMethod(gNetworkServiceObject, isAliveID);
-	gApp->activity->vm->DetachCurrentThread();
-	return result;
-}
-
-int networkConnect(Network* network)
-{
-	LOGI("Connecting to network.");
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
-	auto result = env->CallIntMethod(gNetworkServiceObject, connectID);
-	gApp->activity->vm->DetachCurrentThread();
-	if (result == 1)
-        LOGI("Connected to network.");
-	else if (result == 0) {
-		LOGE("NETWORK FAILURE");
-		return -1;
-	}
-	return result;
-}
-
-int networkDisconnect(Network* network)
-{
-	LOGI("Disconnecting from network.");
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
-	auto result = env->CallIntMethod(gNetworkServiceObject, disconnectID);
-	gApp->activity->vm->DetachCurrentThread();
-	if (result == 1)
-        LOGI("Disconnected from network.");
-	return result;
+	return 0;
 }
 
 int networkReconnect(Network* network)
 {
-    LOGI("Reconnecting to network.");
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
-	auto result = env->CallIntMethod(gNetworkServiceObject, reconnectID);
-	gApp->activity->vm->DetachCurrentThread();
-	if (result == 1)
-        LOGI("Reconnected to network.");
-	return result;
+	ASSERT(false, "not yet implemented");
+	return 0;
 }
 
-int networkShutdown(Network* network)
+void networkDisconnect(Network* network)
 {
-	LOGI("Shutting down network.");
-	auto env = gApp->activity->env;
-	gApp->activity->vm->AttachCurrentThread( &env, NULL );
-	auto result = env->CallIntMethod(gNetworkServiceObject, shutdownID);
-	gApp->activity->vm->DetachCurrentThread();
-	if (result == 1)
-        LOGI("Shut down network.");
-	return result;
+	LOGI("Disconnecting...");
+	if(network->tcpSocket == 0)
+		return;
+	close(network->tcpSocket);
+	close(network->udpSocket);
+	network->tcpSocket = 0;
+	network->udpSocket = 0;
+	LOGI("Disconnected.");
 }
 
+int bufferReceive(int socket, Buffer* buffer)
+{
+	size_t length = bufferBytesRemaining(buffer);
+	memmove(buffer->base, buffer->ptr, length);
+	buffer->ptr = buffer->base;
+	auto r = recv(socket, buffer->ptr + length, buffer->capacity - length, 0);
+	if(r<0) {
+		ASSERT(errno == EWOULDBLOCK || errno == EAGAIN, "Error in receiving logic");
+		buffer->length = length;
+	} else {
+		buffer->length = r + length;
+	}
+	return r;
+}
 
+int networkReceive(Network* network)
+{
+	return bufferReceive(network->tcpSocket, network->in_);
+}
+
+int networkUnreliableReceive(Network* network)
+{
+	return bufferReceive(network->udpSocket, network->uin);
+}
+
+int networkSend(Network* network)
+{
+	auto toSend = (uint32_t)(network->out->ptr - network->out->base);
+	auto r = send(network->tcpSocket, network->out->base, toSend, 0);
+	network->out->ptr = network->out->base;
+	network->out->length = network->out->capacity;
+	return r;
+}
+
+int networkUnreliableSend(Network* network)
+{
+
+	struct sockaddr_in servaddr;
+	bzero(&servaddr, sizeof(servaddr));
+	servaddr.sin_family = AF_INET;
+	servaddr.sin_addr.s_addr = htonl(network->remoteIP);
+	servaddr.sin_port = htons(network->remoteUdpPort);
+
+	auto r = sendto(network->udpSocket, network->uout->base, network->uout->length, 0,
+			(struct sockaddr*) &servaddr, sizeof(servaddr));
+	network->uout->ptr = network->uout->base;
+	network->uout->length = 0;
+	return r;
+}
+
+bool networkIsAlive(Network* network)
+{
+	int error_code;
+	socklen_t len = sizeof(error_code);
+	auto r = getsockopt(network->tcpSocket, SOL_SOCKET, SO_ERROR, &error_code, &len);
+	r |= getsockopt(network->udpSocket, SOL_SOCKET, SO_ERROR, &error_code, &len);
+	if(r) {
+		LOGE("Network is not alive! Error: %d %s", errno, strerror(errno));
+	}
+	return r == 0;
+}
+
+void networkSendLogMessage(Network* network, const char* message)
+{
+	bufferWriteShort(network->out, sizeof(uint16_t) + strlen(message));
+	bufferWriteShort(network->out, NETWORK_OUT_LOG);
+	bufferWriteUTF8(network->out, message);
+	networkSend(network);
+}

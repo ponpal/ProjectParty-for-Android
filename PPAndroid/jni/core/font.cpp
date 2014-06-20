@@ -11,39 +11,51 @@
 #include "font.h"
 #include "external_libs/utf8.h"
 
-namespace font
+const CharInfo* fontCharInfo(const Font* font, size_t index)
 {
-	glm::vec2 measure(const Font& font, const char* text)
-	{
-		float width = 0, height = 0, cursor = 0;
+	if(index > font->charsLength)
+			return &font->chars[font->defaultChar];
+    else
+    {
+        CharInfo* info = &font->chars[index];
 
-		auto spaceInfo = font[' '];
-		auto itr   = &text[0];
-		auto end   = &text[strlen(text)];
+        if(isnanf(info->advance))
+            return &font->chars[font->defaultChar];
+        else
+            return info;
+    }
+}
 
-		while(itr != end)
-		{
-			auto c = utf8::next(itr, end);
-			if(c == '\r') continue;
+vec2f fontMeasure(const Font* font, const char* text)
+{
+    float width = 0, height = 0, cursor = 0;
 
-			if(c == ' ') {
-				cursor += spaceInfo.advance;
-				continue;
-			} else if(c == '\n') {
-				height += font.lineHeight;
-				width  = fmaxf(cursor, width);
-				cursor = 0;
-				continue;
-			} else if(c == '\t') {
-				cursor += spaceInfo.advance * 4;
-			}
+    auto spaceInfo = fontCharInfo(font, ' ');
+    auto itr   = &text[0];
+    auto end   = &text[strlen(text)];
 
-			CharInfo info = font.chars[c];
-			cursor += info.advance;
-			height = fmax(height, -info.srcRect.w);
-		}
+    while(itr != end)
+    {
+        auto c = utf8::next(itr, end);
+        if(c == '\r') continue;
 
-		width = fmaxf(width, cursor);
-		return glm::vec2(width, height);
-	}
+        if(c == ' ') {
+            cursor += spaceInfo->advance;
+            continue;
+        } else if(c == '\n') {
+            height += font->lineHeight;
+            width  = fmaxf(cursor, width);
+            cursor = 0;
+            continue;
+        } else if(c == '\t') {
+            cursor += spaceInfo->advance * 4;
+        }
+
+        CharInfo info = font->chars[c];
+        cursor += info.advance;
+        height = fmax(height, -info.srcRect.w);
+    }
+
+    width = fmaxf(width, cursor);
+    return (vec2f){width, height};
 }
