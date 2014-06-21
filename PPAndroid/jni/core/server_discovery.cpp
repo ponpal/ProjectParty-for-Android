@@ -17,8 +17,33 @@
 #include "strings.h"
 #include "assert.h"
 #include "platform.h"
+#include <sys/time.h>
+#include "socket_stream.h"
 
 #define INVALID_SERVER_INFO (ServerInfo){0,0,0,0,0,0}
+
+static void readServerInfo(ServerDiscovery* discovery, Buffer* buffer)
+{
+    auto hostNameLength = bufferReadShort(buffer);
+    auto serverInfo = &discovery->serverInfo[discovery->end];
+    bufferReadBytes(buffer, (uint8_t*)serverInfo->serverName, (uint32_t)hostNameLength);
+    serverInfo->serverName[hostNameLength] = '\0';
+    auto gameNameLength = bufferReadShort(buffer);
+    bufferReadBytes(buffer, (uint8_t*)serverInfo->gameName, (uint32_t)gameNameLength);
+    serverInfo->gameName[gameNameLength] = '\0';
+    serverInfo->contentPort = bufferReadShort(buffer);
+    serverInfo->serverTCPPort = bufferReadShort(buffer);
+    serverInfo->serverUDPPort = bufferReadShort(buffer);
+
+    discovery->end = (discovery->end + 1) % discovery->capacity;
+    if(discovery->end == discovery->start)
+            discovery->start = (discovery->start + 1) % discovery->capacity;
+    //LOGI("Server name: %s", serverInfo->serverName);
+    //LOGI("Game name: %s", serverInfo->gameName);
+    //LOGI("TCP port: %d", (uint32_t)serverInfo->serverTCPPort);
+    //LOGI("UDP port: %d", (uint32_t)serverInfo->serverUDPPort);
+    //LOGI("Content port: %d", (uint32_t)serverInfo->contentPort);
+}
 
 void* serverDiscoveryTask(void* args)
 {
@@ -46,6 +71,14 @@ void* serverDiscoveryTask(void* args)
 	if(err < 0)
 		LOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
 
+	struct timeval tv;
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
+	err = setsockopt(udpSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+	if(err < 0)
+		LOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
+	struct sockaddr_in recvAddr;
+	auto buffer = bufferCreate(1024);
 	while(true)
 	{
         pthread_mutex_lock(&discovery->mutex);
@@ -58,10 +91,23 @@ void* serverDiscoveryTask(void* args)
 				 (struct sockaddr*) &broadcastaddr, sizeof(broadcastaddr));
         if(err < 0)
             LOGE("Could not send, %d %s", errno, strerror(err));
-        struct timespec time1, time2;
-        time1.tv_sec = 1;
-        time1.tv_nsec = 0;
-        nanosleep(&time1, &time2);
+
+        bzero(&recvAddr, sizeof(recvAddr));
+        socklen_t len = sizeof(recvAddr);
+        err = recvfrom(udpSocket, buffer->ptr, buffer->capacity, 0,
+        		(struct sockaddr*) &recvAddr, &len);
+        if(err == -1) {
+        	ASSERTF(errno == EAGAIN || errno == EWOULDBLOCK,
+        		"Error in server discovery. errno: %d, error: %s", errno, strerror(err));
+        	continue;
+        }
+
+        buffer->length = err;
+
+        pthread_mutex_lock(&discovery->mutex);
+        readServerInfo(discovery, buffer);
+        pthread_mutex_unlock(&discovery->mutex);
+        buffer->ptr = buffer->base;
 	}
 
     pthread_mutex_lock(&discovery->mutex);
@@ -76,7 +122,7 @@ ServerDiscovery* serverDiscoveryStart()
 {
     auto discovery = new ServerDiscovery();
     discovery->serverInfo = new ServerInfo[10];
-    discovery->length = 0;
+    discovery->start = discovery->end = 0;
     discovery->capacity = 10;
     discovery->broadcastIP = platformGetBroadcastAddress();
     discovery->shouldClose = false;
@@ -93,15 +139,11 @@ ServerInfo serverNextInfo(ServerDiscovery* discovery)
 {
 	ASSERT(discovery->serverInfo, "Serverdiscovery has been deleted, yet nextinfo was called.");
 	pthread_mutex_lock(&discovery->mutex);
-	auto info = discovery->serverInfo[discovery->length ? discovery->length - 1:0];
-	if(discovery->length > 0)
-	{
-		discovery->length--;
-	}
-	else
-	{
+	auto info = discovery->serverInfo[discovery->start];
+	if(discovery->start == discovery->end)
 		info = INVALID_SERVER_INFO;
-	}
+	else
+        discovery->start = (discovery->start + 1) % discovery->capacity;
 	pthread_mutex_unlock(&discovery->mutex);
 	return info;
 }

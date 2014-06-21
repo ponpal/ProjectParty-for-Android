@@ -15,6 +15,7 @@ using namespace glm;
 
 extern "C"
 {
+    void luaLog(const char* toLog);
     void initializeLuaScripts(const char* scriptsDir);
 }
 #endif /* LUA_CORE_H_ */

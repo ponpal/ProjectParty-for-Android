@@ -10,27 +10,40 @@
 #include "dirent.h"
 #include "lua.hpp"
 
+void luaLog(const char* toLog)
+{
+	LOGI("LuaLog: %s", toLog);
+}
+
 lua_State* luaCoreCreate()
 {
 	auto luaState = luaL_newstate();
 	luaL_openlibs(luaState);
 
 	Resource glScript = platformLoadInternalResource("gl.lua");
-	int error = luaL_loadbuffer(luaState, (const char*)glScript.buffer, glScript.length, "Cheader");
+	int error = luaL_loadbuffer(luaState, (const char*)glScript.buffer, glScript.length, "gl.lua");
 	error = error | lua_pcall(luaState, 0,0,0);
 	if(error)
 		LOGE("LUA GL ERROR %s", lua_tostring(luaState, -1));
 
 
 	Resource coreScript = platformLoadInternalResource("core.lua");
-	error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "Cheader");
+	error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "core.lua");
 	error = error | lua_pcall(luaState, 0,0,0);
 
 	if(error)
 		LOGE("LUA CORE ERROR %s", lua_tostring(luaState, -1));
 
+	Resource lobbyScript = platformLoadInternalResource("lobby.lua");
+	error = luaL_loadbuffer(luaState, (const char*)lobbyScript.buffer, lobbyScript.length, "lobby.lua");
+	error = error | lua_pcall(luaState, 0,0,0);
+
+	if(error)
+		LOGE("LUA LOBBY ERROR %s", lua_tostring(luaState, -1));
+
 	delete glScript.buffer;
 	delete coreScript.buffer;
+	delete lobbyScript.buffer;
 
 	return luaState;
 }
@@ -89,7 +102,7 @@ static void callEmptyLuaFunction(lua_State* L, const char* buffer)
 	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "empty");
 	error = error | lua_pcall(L, 0, 0, 0);
 	if(error) {
-		LOGW("LUA Execution Error %s", lua_tostring(L, -1));
+		LOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -99,7 +112,7 @@ static bool callEmptyLuaFunctionBool(lua_State* L, const char* buffer)
 	lua_getglobal(L, buffer);
 	int error = error | lua_pcall(L, 0, 1, 0);
 	if(error) {
-		LOGW("LUA Execution Error %s", lua_tostring(L, -1));
+		LOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
 		lua_pop(L, 1);
 		return false;
 	}
@@ -123,7 +136,7 @@ static void callInt2LuaFunction(lua_State* L, const char* methodName, int x, int
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error %s", lua_tostring(L, -1));
+		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -137,7 +150,7 @@ static void callInt3LuaFunction(lua_State* L, const char* methodName, int x, int
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error %s", lua_tostring(L, -1));
+		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -151,7 +164,21 @@ static void callFloat2LuaFunction(lua_State* L, const char* methodName, float x,
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error %s", lua_tostring(L, -1));
+		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
+}
+
+static void callIntFloat2LuaFunction(lua_State* L, const char* methodName, uint32_t i, float x, float y)
+{
+	char buffer[128];
+	sprintf(buffer, "%s(%d,%f,%f)", methodName, i, x, y);
+
+	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "int float float");
+	error = error | lua_pcall(L, 0, 0, 0);
+
+	if(error) {
+		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -172,22 +199,22 @@ static void callFloat4LuaFunction(lua_State* L, const char* methodName, float x1
 
 void luaStopCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "stop()");
+	callEmptyLuaFunction(L, "Game.stop()");
 }
 
 void luaStepCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "step()");
+	callEmptyLuaFunction(L, "Game.step()");
 }
 
 void luaStartCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "start()");
+	callEmptyLuaFunction(L, "Game.start()");
 }
 
 void luaRestartCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "restart()");
+	callEmptyLuaFunction(L, "Game.restart()");
 }
 
 void luaHandleMessageCall(lua_State* L, Buffer* buffer, uint32_t id)
@@ -210,3 +237,24 @@ bool luaBackCall(lua_State* L)
 {
 	return callEmptyLuaFunctionBool(L, "onBackButton");
 }
+
+void luaOnUpCall(lua_State* L, uint32_t pointerID, float x, float y)
+{
+	callIntFloat2LuaFunction(L, "RawInput.onUp", pointerID, x, y);
+}
+
+void luaOnDownCall(lua_State* L, uint32_t pointerID, float x, float y)
+{
+	callIntFloat2LuaFunction(L, "RawInput.onDown", pointerID, x, y);
+}
+
+void luaOnMoveCall(lua_State* L, uint32_t pointerID, float x, float y)
+{
+	callIntFloat2LuaFunction(L, "RawInput.onMove", pointerID, x, y);
+}
+
+void luaOnCancelCall(lua_State* L, uint32_t pointerID, float x, float y)
+{
+	callIntFloat2LuaFunction(L, "RawInput.onCancel", pointerID, x, y);
+}
+

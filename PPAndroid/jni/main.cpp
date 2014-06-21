@@ -18,11 +18,65 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 	auto type = AInputEvent_getType(event);
 
 	if (type == AINPUT_EVENT_TYPE_MOTION) {
-		size_t pointerCount = AMotionEvent_getPointerCount(event);
-		for (size_t i = 0; i < pointerCount; i++) {
-			//TODO: CALL LUA
-		}
-		return 1;
+	    int32_t action = AMotionEvent_getAction( event );
+	    LOGI("Action %x", action);
+	    uint32_t flags = action & AMOTION_EVENT_ACTION_MASK;
+	    auto event_ = event;
+
+	    int32_t count = AMotionEvent_getPointerCount( event );
+	    int32_t index = (action & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK)
+	                >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
+	    uint32_t pointerID;
+	    float x, y;
+	    switch( flags )
+	    {
+	    case AMOTION_EVENT_ACTION_DOWN:
+            pointerID = AMotionEvent_getPointerId( event, 0);
+            x = AMotionEvent_getX(event, 0);
+            y = AMotionEvent_getY(event, 0);
+            luaOnDownCall(gGame->L, pointerID, x, y);
+	        break;
+	    case AMOTION_EVENT_ACTION_POINTER_DOWN:
+	    {
+            pointerID = AMotionEvent_getPointerId( event, index);
+            x = AMotionEvent_getX(event, index);
+            y = AMotionEvent_getY(event, index);
+            luaOnDownCall(gGame->L, pointerID, x, y);
+	    }
+	        break;
+	    case AMOTION_EVENT_ACTION_UP:
+            pointerID = AMotionEvent_getPointerId( event, index);
+            x = AMotionEvent_getX(event, index);
+            y = AMotionEvent_getY(event, index);
+            luaOnUpCall(gGame->L, pointerID, x, y);
+	        break;
+	    case AMOTION_EVENT_ACTION_POINTER_UP:
+	    {
+	        LOGI("Pointer action up: index! %d", index);
+	        LOGI("Pointer up! %d", AMotionEvent_getPointerId( event, index));
+            pointerID = AMotionEvent_getPointerId( event, index);
+            x = AMotionEvent_getX(event, index);
+            y = AMotionEvent_getY(event, index);
+            luaOnUpCall(gGame->L, pointerID, x, y);
+	    }
+	        break;
+	    case AMOTION_EVENT_ACTION_MOVE:
+	        for(int i = 0; i < count; i++) {
+	        	pointerID = AMotionEvent_getPointerId( event, i);
+	        	x = AMotionEvent_getX(event, i);
+	        	y = AMotionEvent_getY(event, i);
+                luaOnMoveCall(gGame->L, pointerID, x, y);
+	        }
+	        break;
+	    case AMOTION_EVENT_ACTION_CANCEL:
+	        for(int i = 0; i < count; i++) {
+	        	pointerID = AMotionEvent_getPointerId( event, i);
+	        	x = AMotionEvent_getX(event, i);
+	        	y = AMotionEvent_getY(event, i);
+                luaOnCancelCall(gGame->L, pointerID, x, y);
+	        }
+	        break;
+	    }
 	} else if (type == AINPUT_EVENT_TYPE_KEY) {
 		auto code = AKeyEvent_getKeyCode(event);
 		LOGI("Received key event: %d", code);
@@ -236,7 +290,6 @@ void initializeFileSystem() {
 	std::string d(externalsDir);
 	LOGI("EXTERNALSDIR: %s", d.c_str());
 	d.erase(d.size() - 6, 6);
-	LOGI("ERASED: %s", d.c_str());
 
 	int err = mkdir(d.c_str(), 0770);
 	if (err != 0 && errno != 17)
@@ -279,7 +332,7 @@ void android_main(android_app* state) {
 		}
 
 		if (!fullyActive && gAppState.fullyActive())
-			gameInitialize();
+			gameInitialize(context->GetScreenWidth(), context->GetScreenHeight());
 
 		if (gAppState.fullyActive()) {
 			gGame->screen->width = context->GetScreenWidth();

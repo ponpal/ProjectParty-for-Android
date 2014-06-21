@@ -15,6 +15,7 @@
 #include "font.h"
 #include "external_libs/utf8.h"
 #include "JNIHelper.h"
+#include "assert.h"
 
 
 static const char gVertexShader[] =
@@ -104,6 +105,7 @@ struct Renderer
 
 Renderer* rendererInitialize(size_t maxBatchSize) //This is not yet usable.
 {
+	ASSERT(maxBatchSize*4 < 0xFFFF, "Batchsize cannot fit in Glushort, please use a value that is less than 16k");
 	Renderer* renderer = new Renderer();
 	size_t actualSize = maxBatchSize * 4;
 
@@ -124,9 +126,12 @@ void rendererActivate(Renderer* renderer) //Must be called before any attempts t
 {
 	size_t actualSize = renderer->capacity;
 	size_t maxBatchSize = actualSize / 4;
+	LOGI("Before VBO creation");
 
 	renderer->vbo = createVBO(actualSize, sizeof(Vertex));
+	LOGI("After VBO creation");
 	renderer->ibo = createIBO(maxBatchSize);
+	LOGI("After IBO creation");
 
 	renderer->program = shader::createProgram(gVertexShader, gFragmentShader);
 	renderer->samplerUniform 	= glGetUniformLocation(renderer->program, "sampler");

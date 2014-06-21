@@ -29,7 +29,6 @@ extern "C"
 	typedef struct
 	{
 		uint32_t width, height;
-		uint8_t orientation;
 	} Screen;
 
 	typedef struct
@@ -46,7 +45,7 @@ extern "C"
 
 bool gameInitialized();
 
-void gameInitialize();
+void gameInitialize(uint32_t screenWidth, uint32_t screenHeight);
 void gameTerminate();
 void gameStop();
 

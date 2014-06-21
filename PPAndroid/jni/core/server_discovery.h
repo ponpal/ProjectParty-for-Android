@@ -12,19 +12,21 @@
 
 #include "pthread.h"
 
+extern "C" {
+
 typedef struct {
 	char serverName[58];
 	char gameName[58];
-	uint32_t contentIP;
 	uint32_t serverIP;
 	uint16_t contentPort;
-	uint16_t serverPort;
+	uint16_t serverTCPPort;
+	uint16_t serverUDPPort;
 } ServerInfo;
 
 typedef struct {
 	pthread_mutex_t mutex;
 	ServerInfo* serverInfo;
-	size_t capacity, length;
+	size_t capacity, start, end;
 	int socket;
 	bool shouldClose;
 	uint32_t broadcastIP;
@@ -33,6 +35,6 @@ typedef struct {
 ServerDiscovery* serverDiscoveryStart();
 ServerInfo serverNextInfo(ServerDiscovery* discovery);
 void serverDiscoveryStop(ServerDiscovery* discovery);
-
+}
 
 #endif /* SERVER_DISCOVERY_H_ */

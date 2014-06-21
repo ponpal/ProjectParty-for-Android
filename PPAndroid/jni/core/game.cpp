@@ -14,6 +14,10 @@
 #include <time.h>
 #include "platform.h"
 
+#define __STDC_FORMAT_MACROS
+
+#include <inttypes.h>
+
 Game* gGame;
 
 bool hasStarted = false;
@@ -35,7 +39,7 @@ static void gameRestart() {
 	luaRestartCall(gGame->L);
 }
 
-void gameInitialize() {
+void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 	if (gGame)
 		return;
 
@@ -44,6 +48,9 @@ void gameInitialize() {
 	clockStart(gGame->clock);
 	gGame->sensor = new SensorState();
 	gGame->screen = new Screen();
+	gGame->screen->width = screenWidth;
+	gGame->screen->height = screenHeight;
+
 	gGame->fps = 60;
 
 	resourcesChangedCallback = nullptr;
@@ -60,6 +67,8 @@ void gameStop() {
 	if(!gGame)
 		return;
 
+	luaStopCall(gGame->L);
+	luaCoreDestroy(gGame->L);
 	delete gGame->clock;
 	delete gGame->sensor;
 	delete gGame;
@@ -77,7 +86,10 @@ void gameStep(ndk_helper::GLContext* context) {
     context->Swap();
     auto time = gGame->clock->_lastTime;
     auto target = time + 1000000000L/gGame->fps - timeNowMonoliticNsecs();
-    luaRunGarbageCollector(gGame->L, target/1000000);
+    auto now = timeNowMonoliticNsecs();
+    luaRunGarbageCollector(gGame->L, 3);
+    auto after = timeNowMonoliticNsecs();
+	LOGI("GC for: %" PRIu64, (after - now)/1000000L);
     target = time + 1000000000L/gGame->fps - timeNowMonoliticNsecs();
     struct timespec time1, time2;
     time1.tv_sec = 0;

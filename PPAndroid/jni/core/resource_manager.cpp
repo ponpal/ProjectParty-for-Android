@@ -34,6 +34,7 @@ static Resource loadLocal(ResourceManager* resources, const char* path)
 
 static Resource loadExternal(ResourceManager* resources, const char* path)
 {
+	LOGI("%s", path);
 	return platformLoadExternalResource(path::buildPath(resources->resourceDir, path).c_str());
 }
 
@@ -190,7 +191,7 @@ Handle* resourceLoad(ResourceManager* resources, const char* path)
 	std::string hashPath = path::withoutExtension(path);
 	HashID id = bytesHash(hashPath.c_str(), hashPath.size(), 0);
 	std::string hashString = toString(id);
-	std::string absPath = path::buildPath(resources->resourceDir, hashString);
+	std::string absPath = hashString;
 
 	auto handle = resourceGetHandle(resources, id);
 	if(handle != nullptr)

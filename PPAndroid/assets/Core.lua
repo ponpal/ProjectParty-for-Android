@@ -1,7 +1,7 @@
 
-cfuns = require("ffi")
+ffi = require("ffi")
 
-cfuns.cdef[[
+ffi.cdef[[
 
 	// ----------------------------
 	//  	types.h
@@ -202,6 +202,8 @@ cfuns.cdef[[
 	// ----------------------------
 
     void initializeLuaScripts(const char* scriptsDir);
+    void luaLog(const char* toLog);
+
 
 	// ----------------------------
 	//  	time_helpers.h
@@ -258,6 +260,27 @@ cfuns.cdef[[
 
 
 	// ----------------------------
+	//  	server_discovery.h
+	// ----------------------------
+
+	typedef struct ServerDiscovery ServerDiscovery;
+
+
+	typedef struct {
+		char serverName[58];
+		char gameName[58];
+		uint32_t contentIP;
+		uint32_t serverIP;
+		uint16_t contentPort;
+		uint16_t serverPort;
+	} ServerInfo;
+
+	ServerDiscovery* serverDiscoveryStart();
+	ServerInfo serverNextInfo(ServerDiscovery* discovery);
+	void serverDiscoveryStop(ServerDiscovery* discovery);
+
+
+	// ----------------------------
 	//  	game.h
 	// ----------------------------
 
@@ -269,7 +292,6 @@ cfuns.cdef[[
 	typedef struct
 	{
 		uint32_t width, height;
-		uint8_t orientation;
 	} Screen;
 
 	typedef struct lua_State lua_State;
@@ -288,7 +310,7 @@ cfuns.cdef[[
 ]]
 
 
-local C = cfuns.C
+C = ffi.C
 
 Time = {}
 Time.total   = 0
@@ -302,7 +324,7 @@ Network = {
       C.networkUnreliableSend(C.gGame.network)
   end,
 	isAlive = function()
-		cfuns.C.networkIsAlive(C.gGame.network)
+		ffi.C.networkIsAlive(C.gGame.network)
 	end,
 	update = function()
 		Network.elapsed = Network.elapsed + Time.elapsed
@@ -409,10 +431,8 @@ In.readVec3 = function()
 	return vec3(In.readFloat(), In.readFloat(), In.readFloat())
 end
 In.readUTF8 = function()
-	return cfuns.string(C.bufferReadLuaString(C.gGame.network.in_))
+	return ffi.string(C.bufferReadLuaString(C.gGame.network.in_))
 end
-
-
 
 In.readByteArray = function()
 	local len = In.readShort()
@@ -423,17 +443,21 @@ In.readByteArray = function()
 	return array
 end
 
-Orientation = {}
-Orientation.landscape = 0
-Orientation.portrait  = 1
-
 function vibrate(milliseconds)
 	return C.vibrate(milliseconds)
 end
 
+Orientation = {}
+Orientation.landscape = 0
+Orientation.portrait  = 1
 
 Sensors = C.gGame.sensor
-Screen  = {}
+Screen  = { 
+	orientation = Orientation.landscape,
+	width  = C.gGame.screen.width,
+	height = C.gGame.screen.height
+}
+
 
 function Screen.setOrientation(orientation)
 	if orientation == Orientation.portrait then
@@ -443,14 +467,40 @@ function Screen.setOrientation(orientation)
 		Screen.width  = C.gGame.screen.width
 		Screen.height = C.gGame.screen.height
 	end
-	C.gGame.screen.orientation = orientation
+	Screen.orientation = orientation
 end
 
-Font = cfuns.typeof("Font")
-FontRef = cfuns.typeof("Font[0]")
+RawInput = { }
 
-Frame = cfuns.typeof("Frame")
-FrameRef = cfuns.typeof("Frame[0]")
+local function transformInput(x,y)
+	if Screen.orientation == Orientation.portrait then
+		return Screen.width - y, Screen.height - x
+	else
+		return x, Screen.height-y
+	end
+end
+
+function RawInput.onMove(pointerID, x, y)
+	Input.onMove(pointerID, transformInput(x,y))
+end
+
+function RawInput.onUp(pointerID, x, y)
+	Input.onUp(pointerID, transformInput(x,y))
+end
+
+function RawInput.onDown(pointerID, x, y)
+	Input.onDown(pointerID, transformInput(x,y))
+end
+
+function RawInput.onDown(pointerID, x, y)
+	Input.onCancel(pointerID, transformInput(x,y))
+end
+
+Font = ffi.typeof("Font")
+FontRef = ffi.typeof("Font[0]")
+
+Frame = ffi.typeof("Frame")
+FrameRef = ffi.typeof("Frame[0]")
 
 local vec2_MT =
 {
@@ -468,61 +518,25 @@ local vec2_MT =
 			end
 }
 
-vec2 = cfuns.metatype("vec2f", vec2_MT)
+vec2 = ffi.metatype("vec2f", vec2_MT)
 
-Game = {}
-function Game.setFps(fps)
-	C.gGame.fps = fps
-end
-
-function init()
-end
-
-function Game.step()
-	log("Step start")
-	log("Created matrix")
-    gl.glClearColor(1,0,0,1)
-    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-    gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
-    gl.glEnable(gl.GL_BLEND)
-    gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-
-    matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
-
-    texture = C.contentLoad("banana.png")
-    font = C.contentLoad("ComicSans32.fnt")
-
-    frame = Frame(cfuns.cast("Texture*", texture.item)[0], 0,0,1,1)
-	C.rendererAddFrame(C.gGame.renderer, cfuns.new("Frame[1]", frame), vec2(400,400), vec2(50,50), 0xFFFFFFFF)
-	C.rendererAddText(C.gGame.renderer, cfuns.cast("Font*", font.item), "Hero worrdu", vec2(100,100), 0xFFFFFFFF)
-	C.rendererDraw(C.gGame.renderer)
-	C.rendererSetTransform(C.gGame.renderer, matrix)
-end
-
-function log(str)
---	Out.writeShort(2+2+#str)
---	Out.writeShort(10)
---	Out.writeUTF8(str)
---	Network.send()
-end
-
-start = init
-restart = init
-stop = init
-step = init
-
-function resourcesLoaded()
-	start = Game.start
-	restart = Game.restart
-	stop = Game.stop
-	step = Game.step
-end
-
-function Game.start()
-end
-
-function Game.restart()
-end
-
-function Game.stop()
-end
+--function Game.step()
+--	log("Step start")
+--	log("Created matrix")
+--    gl.glClearColor(1,0,0,1)
+--    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+--    gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
+--    gl.glEnable(gl.GL_BLEND)
+--    gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+--
+--    matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
+--
+--    texture = C.contentLoad("banana.png")
+--    font = C.contentLoad("ComicSans32.fnt")
+--
+--    frame = Frame(ffi.cast("Texture*", texture.item)[0], 0,0,1,1)
+--	C.rendererAddFrame(C.gGame.renderer, ffi.new("Frame[1]", frame), vec2(400,400), vec2(50,50), 0xFFFFFFFF)
+--	C.rendererAddText(C.gGame.renderer, ffi.cast("Font*", font.item), "Hero worrdu", vec2(100,100), 0xFFFFFFFF)
+--	C.rendererDraw(C.gGame.renderer)
+--	C.rendererSetTransform(C.gGame.renderer, matrix)
+--end

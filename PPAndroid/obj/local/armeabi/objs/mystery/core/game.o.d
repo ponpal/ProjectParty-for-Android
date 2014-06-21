@@ -145,7 +145,8 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  jni/core/lua_core.h jni/core/platform.h jni/core/resource_manager.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
- jni/core/hash.h
+ jni/core/hash.h \
+ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/inttypes.h
 
 jni/core/game.h:
 
@@ -552,3 +553,5 @@ jni/core/resource_manager.h:
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring:
 
 jni/core/hash.h:
+
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/inttypes.h:

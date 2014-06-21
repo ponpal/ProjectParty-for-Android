@@ -12,10 +12,11 @@
 #include "lua.hpp"
 #include "buffer.h"
 
+
 void luaHandleMessageCall(lua_State* L, Buffer* buffer, uint16_t id);
 
 lua_State* luaCoreCreate();
-void luaCoreCreate(lua_State* L);
+void luaCoreDestroy(lua_State* L);
 
 void luaStartCall(lua_State* L);
 void luaRestartCall(lua_State* L);
@@ -27,6 +28,11 @@ void luaOnTouch(lua_State* L, int x, int y, int pointerIndex);
 
 bool luaMenuCall(lua_State* L);
 bool luaBackCall(lua_State* L);
+
+void luaOnUpCall(lua_State* L, uint32_t pointerID, float x, float y);
+void luaOnDownCall(lua_State* L, uint32_t pointerID, float x, float y);
+void luaOnMoveCall(lua_State* L, uint32_t pointerID, float x, float y);
+void luaOnCancelCall(lua_State* L, uint32_t pointerID, float x, float y);
 
 #endif /* LUA_CORE_PRIVATE_H_ */
 

@@ -5,6 +5,8 @@
  *      Author: Gustav
  */
 
+#define GLM_FORCE_RADIANS
+
 #include "types.h"
 #include "glm/glm.hpp"
 #include "glm/gtx/transform.hpp"
