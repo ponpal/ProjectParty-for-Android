@@ -10,14 +10,18 @@
 
 #include "stdint.h"
 
+extern "C" {
+
 typedef struct
 {
-	uint32_t ip;
-	uint16_t port;
-	char*	 fileDirectory;
-	void (*callback)();
+	uint32_t 	ip;
+	uint16_t 	port;
+	const char*	fileDirectory;
+	bool	 	isDone;
 } ReceiveFileConfig;
 
 void receiveFiles(ReceiveFileConfig);
+bool isDone(ReceiveFileConfig);
+}
 
 #endif /* FILE_MANAGER_H_ */

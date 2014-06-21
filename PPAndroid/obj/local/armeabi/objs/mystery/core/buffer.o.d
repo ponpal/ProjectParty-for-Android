@@ -119,11 +119,13 @@ obj/local/armeabi/objs/mystery/core/buffer.o: jni/core/buffer.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/sysconf.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/capability.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/pathconf.h \
- jni/core/time_helpers.h jni/core/lua_core_private.h \
+ jni/core/time_helpers.h jni/core/lua_core_private.h jni/lua/lua.hpp \
+ jni/lua/lua.h jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h \
+ jni/lua/luajit.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
- jni/core/new_renderer.h jni/core/font.h \
+ jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/inttypes.h
 
 jni/core/buffer.h:
@@ -462,6 +464,18 @@ jni/core/time_helpers.h:
 
 jni/core/lua_core_private.h:
 
+jni/lua/lua.hpp:
+
+jni/lua/lua.h:
+
+jni/lua/luaconf.h:
+
+jni/lua/lauxlib.h:
+
+jni/lua/lualib.h:
+
+jni/lua/luajit.h:
+
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h:
@@ -471,5 +485,7 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 jni/core/new_renderer.h:
 
 jni/core/font.h:
+
+jni/lua/luajit.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/inttypes.h:

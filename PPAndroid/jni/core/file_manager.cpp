@@ -14,10 +14,10 @@
 #include "errno.h"
 #include "unistd.h"
 #include "strings.h"
-#include "asset_helper.h"
 #include "path.h"
 #include "socket_stream.h"
 #include "android/log.h"
+#include "platform.h"
 
 #define MAP_FILE_NAME "Map.sdl"
 #define MAP_FILE_FOUND 1
@@ -31,16 +31,17 @@ enum {
 	FILE_ALL_SENT_MESSAGE = 2
 };
 
-static void sendMapFile(const char* fileDirectory, int socket)
+static void sendMapFile(const char* dirName, int socket)
 {
-	std::string filePath = path::buildPath(fileDirectory, MAP_FILE_NAME);
+	std::string filePath = path::buildPath(dirName, MAP_FILE_NAME);
     uint8_t result;
-	if(assetExists(filePath.c_str()))
+	if(path::assetExists(filePath.c_str()))
 	{
 		result = MAP_FILE_FOUND;
 		send(socket, &result, sizeof(result), 0);
-		ExternalAsset map(filePath);
+		Resource map = platformLoadExternalResource(filePath.c_str());
         send(socket, map.buffer, map.length, 0);
+        delete map.buffer;
 	}
 	else
 	{
@@ -137,17 +138,14 @@ static void* fileTask(void* ptr)
 	receiveFiles(config->fileDirectory, sockfd);
 	LOG("All files received!");
 	close(sockfd);
-	config->callback();
-	delete config;
+	config->isDone = true;
 }
 
-void receiveFiles(ReceiveFileConfig serverConfig)
+void receiveFiles(ReceiveFileConfig* serverConfig)
 {
 		LOG("Receiving files...");
-		auto config = new ReceiveFileConfig();
-		*config = serverConfig;
         pthread_t t;
-        pthread_create(&t, nullptr, &fileTask, config);
+        pthread_create(&t, nullptr, &fileTask, serverConfig);
 }
 
 

@@ -12,13 +12,15 @@
 ndk_helper::GLContext* context;
 
 static int32_t handle_input(android_app* app, AInputEvent* event) {
+	if(!gGame)
+		return 0;
+
 	auto type = AInputEvent_getType(event);
 
 	if (type == AINPUT_EVENT_TYPE_MOTION) {
 		size_t pointerCount = AMotionEvent_getPointerCount(event);
 		for (size_t i = 0; i < pointerCount; i++) {
-			luaOnTouch(AMotionEvent_getX(event, i), AMotionEvent_getY(event, i),
-					i);
+			//TODO: CALL LUA
 		}
 		return 1;
 	} else if (type == AINPUT_EVENT_TYPE_KEY) {
@@ -26,10 +28,10 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 		LOGI("Received key event: %d", code);
 		switch(code) {
             case AKEYCODE_MENU:
-            	return callLuaMenu();
+            	return luaMenuCall(gGame->L);
                 break;
             case AKEYCODE_BACK:
-            	return callLuaBack();
+            	return luaBackCall(gGame->L);
                 break;
             default:
             	return 0;

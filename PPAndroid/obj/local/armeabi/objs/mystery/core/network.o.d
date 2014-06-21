@@ -116,12 +116,13 @@ obj/local/armeabi/objs/mystery/core/network.o: jni/core/network.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/capability.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/pathconf.h \
  jni/core/buffer.h jni/core/time_helpers.h jni/core/lua_core_private.h \
+ jni/lua/lua.hpp jni/lua/lua.h jni/lua/luaconf.h jni/lua/lauxlib.h \
+ jni/lua/lualib.h jni/lua/luajit.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
- jni/core/new_renderer.h jni/core/font.h \
+ jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
- jni/core/android_helper.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/tcp.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/tcp.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/fcntl.h \
@@ -461,6 +462,18 @@ jni/core/time_helpers.h:
 
 jni/core/lua_core_private.h:
 
+jni/lua/lua.hpp:
+
+jni/lua/lua.h:
+
+jni/lua/luaconf.h:
+
+jni/lua/lauxlib.h:
+
+jni/lua/lualib.h:
+
+jni/lua/luajit.h:
+
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h:
@@ -471,9 +484,9 @@ jni/core/new_renderer.h:
 
 jni/core/font.h:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring:
+jni/lua/luajit.h:
 
-jni/core/android_helper.h:
+C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/netinet/tcp.h:
 

@@ -23,8 +23,6 @@ if(!(b)) \
 	auto message___Buffer = new char[1024]; \
 	sprintf(message___Buffer, "Assertion Failure: File: %s Line: %d Msg: %s", __FILE__, __LINE__, msg); \
 	LOGE("%s", message___Buffer); \
-	if(gGame) \
-        networkSendLogMessage(gGame->network, message___Buffer); \
 	delete message___Buffer; \
 }
 #define ASSERTF(b, fmt, ...) \
@@ -33,8 +31,6 @@ if(!(b)) \
 	auto message___Buffer = new char[1024]; \
 	sprintf(message___Buffer, "Assertion Failure: File: %s Line: %d \n" fmt, __FILE__, __LINE__, __VA_ARGS__); \
 	LOGE("%s", message___Buffer); \
-	if(gGame) \
-        networkSendLogMessage(gGame->network, message___Buffer); \
 	delete message___Buffer; \
 }
 

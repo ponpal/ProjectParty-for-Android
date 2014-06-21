@@ -45,6 +45,7 @@ extern "C"
 		int udpSocket;
 		int tcpSocket;
 		uint64_t sessionID;
+		void (*handleMessage)(Buffer* buffer, uint16_t messageID);
 	} Network;
 
     Network* networkCreate(size_t bufferSize);

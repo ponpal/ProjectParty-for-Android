@@ -135,23 +135,17 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/vector \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h \
+ jni/lua/lua.hpp jni/lua/lua.h jni/lua/luaconf.h jni/lua/lauxlib.h \
+ jni/lua/lualib.h jni/lua/luajit.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
- jni/core/new_renderer.h jni/core/font.h jni/core/asset_helper.h \
- jni/core/android_helper.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h \
+ jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
  jni/core/assert.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/stat.h \
- C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/stat.h \
- jni/core/path.h jni/core/lua_core.h jni/core/file_manager.h \
- jni/core/resource_manager.h \
+ jni/core/lua_core.h jni/core/platform.h jni/core/resource_manager.h \
  C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
- jni/core/hash.h jni/core/android_platform.h jni/core/server_discovery.h
+ jni/core/hash.h
 
 jni/core/game.h:
 
@@ -521,6 +515,18 @@ C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/android/log.h:
 
+jni/lua/lua.hpp:
+
+jni/lua/lua.h:
+
+jni/lua/luaconf.h:
+
+jni/lua/lauxlib.h:
+
+jni/lua/lualib.h:
+
+jni/lua/luajit.h:
+
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/android/ndk_helper/GLContext.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h:
@@ -531,38 +537,18 @@ jni/core/new_renderer.h:
 
 jni/core/font.h:
 
-jni/core/asset_helper.h:
-
-jni/core/android_helper.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/stdlib.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/alloca.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/strings.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/memory.h:
+jni/lua/luajit.h:
 
 jni/core/assert.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
 
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/stat.h:
-
-C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/stat.h:
-
-jni/core/path.h:
-
 jni/core/lua_core.h:
 
-jni/core/file_manager.h:
+jni/core/platform.h:
 
 jni/core/resource_manager.h:
 
 C:/Users/Gustav/Documents/Programming/android-ndk-r9c-windows-x86_64/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring:
 
 jni/core/hash.h:
-
-jni/core/android_platform.h:
-
-jni/core/server_discovery.h:

@@ -17,6 +17,7 @@
 #include "lua_core_private.h"
 #include "GLContext.h"
 #include "new_renderer.h"
+#include "luajit.h"
 
 extern "C"
 {
@@ -34,14 +35,10 @@ extern "C"
 	typedef struct
 	{
 		Clock* clock;
-		Network* network;
 		SensorState* sensor;
-		Renderer* renderer;
 		Screen* screen;
-		bool paused;
-		char* name;
-		char* resourceDir;
 		uint32_t fps;
+		lua_State* L;
 	} Game;
 
 	extern Game* gGame;

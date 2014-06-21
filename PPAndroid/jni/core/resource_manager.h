@@ -23,18 +23,35 @@ typedef struct
 	void* item;
 }Handle;
 
-void contentInitialize(size_t numResources, std::string resourceFolder);
-void contentTerminate();
+typedef struct
+{
+	uint8_t* buffer;
+	uint32_t length;
+} Resource;
 
-bool contentIsPathLoaded(const char* path);
-bool contentIsHashLoaded(HashID id);
+struct ResourceManager;
 
-Handle* contentLoad(const char* path);
-Handle* contentGetHandle(HashID id);
+typedef struct ResourceManager
+{
+	const char* resourceDir;
+	Resource (*loadResource)(struct ResourceManager* resources, const char* name);
+    Handle* handles;
+    size_t handlesLength;
+} ResourceManager;
 
-bool contentUnloadPath(const char* path);
-bool contentUnloadHandle(Handle* handle);
+ResourceManager* resourceCreateLocal(size_t numResources);
+ResourceManager* resourceCreateNetwork(size_t numResources, const char* resourceFolder);
+void resourceTerminate(ResourceManager* resources);
 
-void contentUnloadAll();
+bool resourceIsPathLoaded(ResourceManager* resources, const char* path);
+bool resourceIsHashLoaded(ResourceManager* resources, HashID id);
+
+Handle* resourceLoad(ResourceManager* resources, const char* path);
+Handle* resourceGetHandle(ResourceManager* resources, HashID id);
+
+bool resourceUnloadPath(ResourceManager* resources, const char* path);
+bool resourceUnloadHandle(ResourceManager* resources, Handle* handle);
+
+void resourceUnloadAll(ResourceManager* resources);
 }
 #endif /* RESOURCE_MANAGER_H_ */

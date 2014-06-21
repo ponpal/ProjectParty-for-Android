@@ -9,30 +9,24 @@
 #define LUA_CORE_PRIVATE_H_
 #include <android_native_app_glue.h>
 #include "JNIHelper.h"
+#include "lua.hpp"
+#include "buffer.h"
 
-void initializeLuaCore();
-void initializeLuaScripts();
-void initializeRenderer();
+void luaHandleMessageCall(lua_State* L, Buffer* buffer, uint16_t id);
 
-void resourcesLoadedLuaCall();
+lua_State* luaCoreCreate();
+void luaCoreCreate(lua_State* L);
 
-void initLuaCall();
-void termLuaCall();
-void updateLuaCall();
-void renderLuaCall();
-void runLuaGarbageCollector(int milisecs);
-void loadLuaScript(const std::string& relativeScriptPath);
+void luaStartCall(lua_State* L);
+void luaRestartCall(lua_State* L);
+void luaStopCall(lua_State* L);
+void luaStepCall(lua_State* L);
+void luaRunGarbageCollector(lua_State* L, int milisecs);
 
-void luaOnTap(int x, int y);
-void luaOnTouch(int x, int y, int pointerIndex);
-void luaOnDrag(float x, float y);
-void luaOnDragBegin(float x, float y);
-void luaOnDragEnd(float x, float y);
-void luaOnPinchBegin(float x1, float y1, float x2, float y2);
-void luaOnPinch(float x1, float y1, float x2, float y2);
+void luaOnTouch(lua_State* L, int x, int y, int pointerIndex);
 
-bool callLuaMenu();
-bool callLuaBack();
+bool luaMenuCall(lua_State* L);
+bool luaBackCall(lua_State* L);
 
 #endif /* LUA_CORE_PRIVATE_H_ */
 

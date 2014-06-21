@@ -13,27 +13,10 @@ import android.view.WindowManager;
 
 public class MyNativeActivity extends android.app.NativeActivity 
 {	
-	ServerInfo info;
-	String playerAlias;
 	@Override
 	protected void onCreate(Bundle savedInstance) {
 		super.onCreate(savedInstance);
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-		Intent intent = getIntent();
-		info = (ServerInfo) intent.getSerializableExtra("server");
-		this.playerAlias = intent.getStringExtra("playerAlias");
-	}
-	
-	public int getIP()
-	{
-		byte[] i = info.getIP();
-		int ip = i[0] << 24 | (i[1] & 0xFF) << 16 | (i[2] & 0xFF) << 8 | (i[3] & 0xFF);
-		return ip;
-	}
-	
-	public int getPort()
-	{
-		return info.getPort();
 	}
 	
 	public int getBroadcastAddress()

@@ -13,9 +13,12 @@
 #include "JNIHelper.h"
 #include "errno.h"
 #include "pthread.h"
-#include "android_platform.h"
 #include "server_discovery.h"
 #include "strings.h"
+#include "assert.h"
+#include "platform.h"
+
+#define INVALID_SERVER_INFO (ServerInfo){0,0,0,0,0,0}
 
 void* serverDiscoveryTask(void* args)
 {
@@ -43,8 +46,13 @@ void* serverDiscoveryTask(void* args)
 	if(err < 0)
 		LOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
 
-	for(int i = 0; i < 20; i++)
+	while(true)
 	{
+        pthread_mutex_lock(&discovery->mutex);
+        auto shouldClose = discovery->shouldClose;
+        pthread_mutex_unlock(&discovery->mutex);
+        if (shouldClose)
+        	break;
 		uint32_t broadcastAddress = 21400;
 		err = sendto(udpSocket, (void*)&broadcastAddress, sizeof(broadcastAddress), 0,
 				 (struct sockaddr*) &broadcastaddr, sizeof(broadcastaddr));
@@ -54,9 +62,14 @@ void* serverDiscoveryTask(void* args)
         time1.tv_sec = 1;
         time1.tv_nsec = 0;
         nanosleep(&time1, &time2);
-        LOGI("Sent ping %d", i);
 	}
 
+    pthread_mutex_lock(&discovery->mutex);
+	delete discovery->serverInfo;
+	discovery->serverInfo = nullptr;
+    pthread_mutex_unlock(&discovery->mutex);
+	pthread_mutex_destroy(&discovery->mutex);
+	delete discovery;
 }
 
 ServerDiscovery* serverDiscoveryStart()
@@ -66,6 +79,7 @@ ServerDiscovery* serverDiscoveryStart()
     discovery->length = 0;
     discovery->capacity = 10;
     discovery->broadcastIP = platformGetBroadcastAddress();
+    discovery->shouldClose = false;
     LOGI("Broadcast Address: %X", discovery->broadcastIP);
     pthread_mutex_init(&discovery->mutex, nullptr);
 
@@ -75,19 +89,28 @@ ServerDiscovery* serverDiscoveryStart()
     return discovery;
 }
 
-ServerInfo* serverQueryInfos(ServerDiscovery* discovery, int* length)
+ServerInfo serverNextInfo(ServerDiscovery* discovery)
 {
+	ASSERT(discovery->serverInfo, "Serverdiscovery has been deleted, yet nextinfo was called.");
 	pthread_mutex_lock(&discovery->mutex);
-
-	*length = discovery->length;
-
+	auto info = discovery->serverInfo[discovery->length ? discovery->length - 1:0];
+	if(discovery->length > 0)
+	{
+		discovery->length--;
+	}
+	else
+	{
+		info = INVALID_SERVER_INFO;
+	}
 	pthread_mutex_unlock(&discovery->mutex);
-	return discovery->serverInfo;
+	return info;
 }
 
 void serverDiscoveryStop(ServerDiscovery* discovery)
 {
-
+	pthread_mutex_lock(&discovery->mutex);
+	discovery->shouldClose = true;
+	pthread_mutex_unlock(&discovery->mutex);
 }
 
 

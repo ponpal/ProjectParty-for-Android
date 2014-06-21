@@ -91,6 +91,21 @@ cfuns.cdef[[
 
 
 	// ----------------------------
+	//  	file_manager.h
+	// ----------------------------
+
+	typedef struct
+	{
+		uint32_t ip;
+		uint16_t port;
+		char*	 fileDirectory;
+		void (*callback)();
+	} ReceiveFileConfig;
+
+	void receiveFiles(ReceiveFileConfig);
+
+
+	// ----------------------------
 	//  	hash.h
 	// ----------------------------
 
@@ -102,9 +117,57 @@ cfuns.cdef[[
 
 
 	// ----------------------------
-	//  	android_platform.h
+	//  	resource_manager.h
 	// ----------------------------
+
+	typedef struct
+	{
+		HashID hashID;
+		HashID typeID;
+		void* item;
+	}Handle;
+
+	typedef struct
+	{
+		uint8_t* buffer;
+		uint32_t length;
+	} Resource;
+
+	struct ResourceManager;
+
+	typedef struct ResourceManager
+	{
+		const char* resourceDir;
+		Resource (*loadResource)(struct ResourceManager* resources, const char* name);
+	    Handle* handles;
+	    size_t handlesLength;
+	} ResourceManager;
+
+	ResourceManager* resourceCreateLocal(size_t numResources);
+	ResourceManager* resourceCreateNetwork(size_t numResources, const char* resourceFolder);
+	void resourceTerminate(ResourceManager* resources);
+
+	bool resourceIsPathLoaded(ResourceManager* resources, const char* path);
+	bool resourceIsHashLoaded(ResourceManager* resources, HashID id);
+
+	Handle* resourceLoad(ResourceManager* resources, const char* path);
+	Handle* resourceGetHandle(ResourceManager* resources, HashID id);
+
+	bool resourceUnloadPath(ResourceManager* resources, const char* path);
+	bool resourceUnloadHandle(ResourceManager* resources, Handle* handle);
+
+	void resourceUnloadAll(ResourceManager* resources);
+
+
+	// ----------------------------
+	//  	platform.h
+	// ----------------------------
+
 	int platformVibrate(uint64_t milliseconds);
+	uint32_t platformGetBroadcastAddress();
+	Resource platformLoadInternalResource(const char* path);
+	Resource platformLoadExternalResource(const char* path);
+	void platformExit();
 
 	// ----------------------------
 	//  	linalg.h
@@ -133,35 +196,12 @@ cfuns.cdef[[
 	void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec2f pos, uint32_t color);
 	void rendererDraw(Renderer* renderer); // Force a draw.
 
-	// ----------------------------
-	//  	resource_manager.h
-	// ----------------------------
-
-	typedef struct
-	{
-		HashID hashID;
-		HashID typeID;
-		void* item;
-	} Handle;
-
-	bool contentIsPathLoaded(const char* path);
-	bool contentIsHashLoaded(HashID id);
-
-	Handle* contentLoad(const char* path);
-	Handle* contentGetHandle(HashID id);
-
-	bool contentUnloadPath(const char* path);
-	bool contentUnloadHandle(Handle* handle);
-
-	void contentUnloadAll();
 
 	// ----------------------------
 	//  	lua_core.h
 	// ----------------------------
 
-	void luaLog(const char* toLog);
-	const char* bufferReadLuaString(Buffer* buffer);
-
+    void initializeLuaScripts(const char* scriptsDir);
 
 	// ----------------------------
 	//  	time_helpers.h
@@ -198,6 +238,7 @@ cfuns.cdef[[
 		int udpSocket;
 		int tcpSocket;
 		uint64_t sessionID;
+		void (*handleMessage)(Buffer* buffer, uint16_t messageID);
 	} Network;
 
     Network* networkCreate(size_t bufferSize);
@@ -231,21 +272,18 @@ cfuns.cdef[[
 		uint8_t orientation;
 	} Screen;
 
+	typedef struct lua_State lua_State;
+
 	typedef struct
 	{
 		Clock* clock;
-		Network* network;
 		SensorState* sensor;
-		Renderer* renderer;
 		Screen* screen;
-		bool paused;
-		char* name;
-		char* resourceDir;
 		uint32_t fps;
+		lua_State* L;
 	} Game;
 
 	extern Game* gGame;
-
 
 ]]
 
@@ -436,6 +474,7 @@ Game = {}
 function Game.setFps(fps)
 	C.gGame.fps = fps
 end
+
 function init()
 end
 
@@ -469,8 +508,8 @@ end
 
 start = init
 restart = init
-stop = nil
-step = nil
+stop = init
+step = init
 
 function resourcesLoaded()
 	start = Game.start
@@ -487,4 +526,3 @@ end
 
 function Game.stop()
 end
-

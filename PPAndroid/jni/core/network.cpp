@@ -14,7 +14,6 @@
 #include <sys/types.h>
 
 #include "JNIHelper.h"
-#include "android_helper.h"
 #include <netinet/tcp.h>
 #include <fcntl.h>
 #include "socket_stream.h"
@@ -23,7 +22,7 @@
 
 #include <inttypes.h>
 
-Network* networkCreate(size_t bufferSize)
+Network* networkCreate(size_t bufferSize, void (*handleMessage)(Buffer* buffer, uint16_t messageID))
 {
 	auto network = new Network();
 	network->in_ = bufferCreate(bufferSize);
@@ -37,6 +36,7 @@ Network* networkCreate(size_t bufferSize)
 	network->remoteIP = 0;
 	network->remoteUdpPort = 0;
 	network->sessionID = 0;
+	network->handleMessage = handleMessage;
 
 	return network;
 }
@@ -140,17 +140,17 @@ int bufferReceive(int socket, Buffer* buffer)
 	return r;
 }
 
-int networkReceive(Network* network)
+static int networkTCPReceive(Network* network)
 {
 	return bufferReceive(network->tcpSocket, network->in_);
 }
 
-int networkUnreliableReceive(Network* network)
+static int networkUDPReceive(Network* network)
 {
 	return bufferReceive(network->udpSocket, network->uin);
 }
 
-int networkSend(Network* network)
+int networkTCPSend(Network* network)
 {
 	auto toSend = (uint32_t)(network->out->ptr - network->out->base);
 	auto r = send(network->tcpSocket, network->out->base, toSend, 0);
@@ -159,7 +159,7 @@ int networkSend(Network* network)
 	return r;
 }
 
-int networkUnreliableSend(Network* network)
+int networkUDPSend(Network* network)
 {
 
 	struct sockaddr_in servaddr;
@@ -173,6 +173,23 @@ int networkUnreliableSend(Network* network)
 	network->uout->ptr = network->uout->base;
 	network->uout->length = 0;
 	return r;
+}
+
+int networkSend(Network* network)
+{
+	auto result = networkUDPSend(network);
+	if(result == -1)
+	{
+		LOGE("Could not send UDP, error is: %d %s", errno, strerror(errno));
+		return result;
+	}
+	result = networkTCPSend(network);
+	if(result == -1)
+	{
+		LOGE("Could not send TCP, error is: %d %s", errno, strerror(errno));
+		return result;
+	}
+	return 0;
 }
 
 bool networkIsAlive(Network* network)
@@ -193,4 +210,53 @@ void networkSendLogMessage(Network* network, const char* message)
 	bufferWriteShort(network->out, NETWORK_OUT_LOG);
 	bufferWriteUTF8(network->out, message);
 	networkSend(network);
+}
+
+static void handleSystemMessage(Buffer* buffer)
+{
+	auto id = bufferReadByte(buffer);
+    LOGI("system messageID: %d", id);
+    if (id == NETWORK_IN_SHUTDOWN) {
+        LOGE("Shutting down");
+        gameFinish();
+    }
+}
+
+static bool readMessage(Network* network, Buffer* buffer) {
+	auto remaining = bufferBytesRemaining(buffer);
+	LOGI("Remaining: %d", remaining);
+	if (remaining < 4)
+		return false;
+	auto messageSize = bufferReadShort(buffer);
+	LOGI("MessageSize: %d", (uint32_t)messageSize);
+
+	if (remaining - 2 < messageSize) {
+		buffer->ptr -= 2;
+		return false;
+    }
+	auto messageID = bufferReadShort(buffer);
+	LOGI("messageID: %d", (uint32_t)messageID);
+
+	if (messageID == 0) {
+        handleSystemMessage(buffer);
+	} else {
+		network->handleMessage(buffer, messageID);
+	}
+
+	uint32_t expected = remaining - (messageSize + 2);
+	uint32_t actual = bufferBytesRemaining(buffer);
+
+	ASSERTF(expected == actual,"Faulty message. Expected: %d, Actual: %d", expected, actual);
+	return true;
+}
+
+int networkReceive(Network* network) {
+    auto count = networkTCPReceive(network);
+    if (count == -1) return -1;
+    while (readMessage(network, network->in_)) { }
+
+    count = networkUDPReceive(network);
+    if (count == -1) return -1;
+    while (readMessage(network, network->uin)) { }
+    return 0;
 }

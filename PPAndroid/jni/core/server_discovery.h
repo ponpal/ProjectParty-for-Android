@@ -13,8 +13,12 @@
 #include "pthread.h"
 
 typedef struct {
-	uint32_t ip;
-	uint16_t port;
+	char serverName[58];
+	char gameName[58];
+	uint32_t contentIP;
+	uint32_t serverIP;
+	uint16_t contentPort;
+	uint16_t serverPort;
 } ServerInfo;
 
 typedef struct {
@@ -27,7 +31,7 @@ typedef struct {
 } ServerDiscovery;
 
 ServerDiscovery* serverDiscoveryStart();
-ServerInfo* serverQueryInfos(ServerDiscovery* discovery, int* length);
+ServerInfo serverNextInfo(ServerDiscovery* discovery);
 void serverDiscoveryStop(ServerDiscovery* discovery);
 
 
