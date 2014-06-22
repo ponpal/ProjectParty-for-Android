@@ -63,12 +63,22 @@ Resource platformLoadInternalResource(const char* path)
 	return (Resource){ buffer,length };
 }
 
+const char* platformExternalResourceDirectory()
+{
+	return gApp->activity->externalDataPath;
+}
+
 Resource platformLoadExternalResource(const char* path)
 {
     LOGI("Trying to load file %s", path);
 	auto resourcePath = path::buildPath(gApp->activity->externalDataPath, path);
-    auto file = fopen(resourcePath.c_str(), "r+");
-    ASSERTF(file != NULL, "Couldn't open file. %s", path);
+	return platformLoadAbsolutePath(resourcePath.c_str());
+}
+
+Resource platformLoadAbsolutePath(const char* resourcePath)
+{
+    auto file = fopen(resourcePath, "r+");
+    ASSERTF(file != NULL, "Couldn't open file. %s", resourcePath);
     fseek( file, 0L, SEEK_END);
     auto length = ftell(file);
     rewind(file);
@@ -77,6 +87,11 @@ Resource platformLoadExternalResource(const char* path)
     fclose(file);
     LOGI("Successfully loaded!");
     return (Resource){ buffer, length };
+}
+
+void platformUnloadResource(Resource resource)
+{
+	delete [] resource.buffer;
 }
 
 void platformExit()

@@ -41,7 +41,7 @@ typedef struct ResourceManager
 
 ResourceManager* resourceCreateLocal(size_t numResources);
 ResourceManager* resourceCreateNetwork(size_t numResources, const char* resourceFolder);
-void resourceTerminate(ResourceManager* resources);
+void resourceDestroy(ResourceManager* resources);
 
 bool resourceIsPathLoaded(ResourceManager* resources, const char* path);
 bool resourceIsHashLoaded(ResourceManager* resources, HashID id);

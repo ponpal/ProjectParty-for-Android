@@ -19,7 +19,6 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 
 	if (type == AINPUT_EVENT_TYPE_MOTION) {
 	    int32_t action = AMotionEvent_getAction( event );
-	    LOGI("Action %x", action);
 	    uint32_t flags = action & AMOTION_EVENT_ACTION_MASK;
 	    auto event_ = event;
 
@@ -52,8 +51,6 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 	        break;
 	    case AMOTION_EVENT_ACTION_POINTER_UP:
 	    {
-	        LOGI("Pointer action up: index! %d", index);
-	        LOGI("Pointer up! %d", AMotionEvent_getPointerId( event, index));
             pointerID = AMotionEvent_getPointerId( event, index);
             x = AMotionEvent_getX(event, index);
             y = AMotionEvent_getY(event, index);
@@ -236,7 +233,6 @@ void surfaceChanged() {
 	if (gameInitialized()) {
         gGame->screen->width = context->GetScreenWidth();
         gGame->screen->height = context->GetScreenHeight();
-        LOGE("SC: W: %d, H: %d", gGame->screen->width, gGame->screen->height);
 	}
 }
 }

@@ -94,15 +94,14 @@ ffi.cdef[[
 	//  	file_manager.h
 	// ----------------------------
 
-	typedef struct
-	{
-		uint32_t ip;
-		uint16_t port;
-		char*	 fileDirectory;
-		void (*callback)();
-	} ReceiveFileConfig;
+	enum {
+		TASK_SUCCESS = 0,
+		TASK_FAILURE = -1,
+		TASK_PROCESSING = 1
+	};
 
-	void receiveFiles(ReceiveFileConfig);
+	uint32_t receiveFiles(uint32_t ip, uint16_t port, const char* fileDirectory);
+	int32_t receiveFilesStatus(uint32_t);
 
 
 	// ----------------------------
@@ -145,7 +144,7 @@ ffi.cdef[[
 
 	ResourceManager* resourceCreateLocal(size_t numResources);
 	ResourceManager* resourceCreateNetwork(size_t numResources, const char* resourceFolder);
-	void resourceTerminate(ResourceManager* resources);
+	void resourceDestroy(ResourceManager* resources);
 
 	bool resourceIsPathLoaded(ResourceManager* resources, const char* path);
 	bool resourceIsHashLoaded(ResourceManager* resources, HashID id);
@@ -165,9 +164,13 @@ ffi.cdef[[
 
 	int platformVibrate(uint64_t milliseconds);
 	uint32_t platformGetBroadcastAddress();
+	const char* platformExternalResourceDirectory();
+	Resource platformLoadAbsolutePath(const char* name);
 	Resource platformLoadInternalResource(const char* path);
 	Resource platformLoadExternalResource(const char* path);
+	void platformUnloadResource(Resource resource);
 	void platformExit();
+
 
 	// ----------------------------
 	//  	linalg.h
@@ -184,9 +187,8 @@ ffi.cdef[[
 
 	typedef struct Renderer Renderer;
 
-	Renderer* rendererInitialize(size_t batchSize);
-	void rendererDelete(Renderer* renderer);
-	void rendererActivate(Renderer* renderer);
+	Renderer* rendererCreate(size_t batchSize);
+	void rendererDestroy(Renderer* renderer);
 	void rendererSetTransform(Renderer* renderer, matrix4 transform);
 	void rendererAddFrame(Renderer* renderer, const Frame* frame,
 						 vec2f pos, vec2f dim, uint32_t color);
@@ -201,9 +203,11 @@ ffi.cdef[[
 	//  	lua_core.h
 	// ----------------------------
 
-    void initializeLuaScripts(const char* scriptsDir);
-    void luaLog(const char* toLog);
+	typedef struct lua_State lua_State;
 
+    void luaLog(const char* toLog);
+    void initializeLuaScripts(const char* scriptsDir);
+    void loadLuaScripts(lua_State* L, const char* scriptsDirectory);
 
 	// ----------------------------
 	//  	time_helpers.h
@@ -265,20 +269,18 @@ ffi.cdef[[
 
 	typedef struct ServerDiscovery ServerDiscovery;
 
-
 	typedef struct {
 		char serverName[58];
 		char gameName[58];
-		uint32_t contentIP;
 		uint32_t serverIP;
 		uint16_t contentPort;
-		uint16_t serverPort;
+		uint16_t serverTCPPort;
+		uint16_t serverUDPPort;
 	} ServerInfo;
 
 	ServerDiscovery* serverDiscoveryStart();
 	ServerInfo serverNextInfo(ServerDiscovery* discovery);
 	void serverDiscoveryStop(ServerDiscovery* discovery);
-
 
 	// ----------------------------
 	//  	game.h
@@ -294,7 +296,6 @@ ffi.cdef[[
 		uint32_t width, height;
 	} Screen;
 
-	typedef struct lua_State lua_State;
 
 	typedef struct
 	{
@@ -492,15 +493,23 @@ function RawInput.onDown(pointerID, x, y)
 	Input.onDown(pointerID, transformInput(x,y))
 end
 
-function RawInput.onDown(pointerID, x, y)
+function RawInput.onCancel(pointerID, x, y)
 	Input.onCancel(pointerID, transformInput(x,y))
 end
 
+function RawInput.onMenuButton()
+	Input.onMenuButton()
+end
+
+function RawInput.onBackButton()
+	Input.onBackButton()
+end
+
 Font = ffi.typeof("Font")
-FontRef = ffi.typeof("Font[0]")
+FontRef = ffi.typeof("Font[1]")
 
 Frame = ffi.typeof("Frame")
-FrameRef = ffi.typeof("Frame[0]")
+FrameRef = ffi.typeof("Frame[1]")
 
 local vec2_MT =
 {
@@ -519,6 +528,39 @@ local vec2_MT =
 }
 
 vec2 = ffi.metatype("vec2f", vec2_MT)
+
+local function doNothing(...) end
+
+function unbindState()
+	Input.onDown = doNothing
+	Input.onUp = doNothing
+	Input.onCancel = doNothing
+	Input.onMove = doNothing
+
+	Game.step = doNothing
+	Game.start = doNothing
+	Game.stop = doNothing
+	Game.restart = doNothing
+end
+
+function runInternalFile(path)
+	local resource = C.platformLoadInternalResource(path)
+	local func = loadstring(ffi.string(resource.buffer, resource.length))
+	C.platformUnloadResource(resource)
+	return func()
+end
+
+function runExternalFile(path)
+	local resource = C.platformLoadExternalResource(path)
+	local func = loadstring(ffi.string(resource.buffer, resource.length))
+	C.platformUnloadResource(resource)
+	return func()
+end
+
+do
+	runInternalFile("gl.lua")
+	runInternalFile("lobby.lua")
+end
 
 --function Game.step()
 --	log("Step start")

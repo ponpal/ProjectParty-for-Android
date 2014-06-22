@@ -13,6 +13,7 @@
 #include "lua_core_private.h"
 #include <time.h>
 #include "platform.h"
+#include "unistd.h"
 
 #define __STDC_FORMAT_MACROS
 
@@ -22,8 +23,6 @@ Game* gGame;
 
 bool hasStarted = false;
 
-void (*resourcesChangedCallback)(void);
-
 bool gameInitialized() {
 	return gGame != nullptr;
 }
@@ -32,6 +31,7 @@ static void gameStart() {
 	LOGI("Starting game!");
 	hasStarted = true;
 	luaStartCall(gGame->L);
+	nice(1000000);
 }
 
 static void gameRestart() {
@@ -52,8 +52,6 @@ void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 	gGame->screen->height = screenHeight;
 
 	gGame->fps = 60;
-
-	resourcesChangedCallback = nullptr;
 
 	LOGI("Initializing Game!");
 	gGame->L = luaCoreCreate();
@@ -77,27 +75,38 @@ void gameStop() {
 
 void gameTerminate() {
 	hasStarted = false;
-
 }
 
+uint64_t target_frame = 0;
+uint32_t fps = 0;
+uint32_t frames = 0;
+uint64_t next_second = 0;
+int32_t sleep_offset = 0;
 void gameStep(ndk_helper::GLContext* context) {
     clockStep(gGame->clock);
     luaStepCall(gGame->L);
-    context->Swap();
-    auto time = gGame->clock->_lastTime;
-    auto target = time + 1000000000L/gGame->fps - timeNowMonoliticNsecs();
-    auto now = timeNowMonoliticNsecs();
     luaRunGarbageCollector(gGame->L, 3);
-    auto after = timeNowMonoliticNsecs();
-	LOGI("GC for: %" PRIu64, (after - now)/1000000L);
-    target = time + 1000000000L/gGame->fps - timeNowMonoliticNsecs();
     struct timespec time1, time2;
     time1.tv_sec = 0;
-    time1.tv_nsec = target;
+    time1.tv_nsec = target_frame - sleep_offset - timeNowMonoliticNsecs();
+    auto should_sleep = target_frame - timeNowMonoliticNsecs();
+    auto before = timeNowMonoliticNsecs();
     nanosleep(&time1, &time2);
-    if(resourcesChangedCallback != nullptr)
+    auto after = timeNowMonoliticNsecs();
+    frames++;
+    context->Swap();
+    target_frame = timeNowMonoliticNsecs() + 1000000000L/gGame->fps;
+
+    if(next_second <= timeNowMonoliticNsecs())
     {
-    	resourcesChangedCallback();
+    	if(frames + 1 < gGame->fps)
+    		sleep_offset += 250000;
+    	else if(frames - 1 > gGame->fps)
+    		sleep_offset -= 250000;
+    	if(sleep_offset < 0)
+    		sleep_offset = 0;
+    	next_second = timeNowMonoliticNsecs() + 1000000000L;
+    	frames = 0;
     }
 }
 

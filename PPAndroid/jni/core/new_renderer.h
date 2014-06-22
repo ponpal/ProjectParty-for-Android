@@ -15,9 +15,8 @@ extern "C" {
 
 typedef struct Renderer Renderer;
 
-Renderer* rendererInitialize(size_t batchSize);
-void rendererDelete(Renderer* renderer);
-void rendererActivate(Renderer* renderer);
+Renderer* rendererCreate(size_t batchSize);
+void rendererDestroy(Renderer* renderer);
 void rendererSetTransform(Renderer* renderer, matrix4 transform);
 void rendererAddFrame(Renderer* renderer, const Frame* frame,
 					 vec2f pos, vec2f dim, uint32_t color);

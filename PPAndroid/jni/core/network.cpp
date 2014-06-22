@@ -46,6 +46,7 @@ void networkDestroy(Network* network)
 	bufferDestroy(network->in_);
 	bufferDestroy(network->out);
 	bufferDestroy(network->uout);
+	bufferDestroy(network->uin);
 	delete network;
 }
 

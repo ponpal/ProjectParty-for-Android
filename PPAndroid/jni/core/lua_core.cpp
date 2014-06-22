@@ -20,30 +20,14 @@ lua_State* luaCoreCreate()
 	auto luaState = luaL_newstate();
 	luaL_openlibs(luaState);
 
-	Resource glScript = platformLoadInternalResource("gl.lua");
-	int error = luaL_loadbuffer(luaState, (const char*)glScript.buffer, glScript.length, "gl.lua");
-	error = error | lua_pcall(luaState, 0,0,0);
-	if(error)
-		LOGE("LUA GL ERROR %s", lua_tostring(luaState, -1));
-
-
 	Resource coreScript = platformLoadInternalResource("core.lua");
-	error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "core.lua");
+	auto error = luaL_loadbuffer(luaState, (const char*)coreScript.buffer, coreScript.length, "core.lua");
 	error = error | lua_pcall(luaState, 0,0,0);
 
 	if(error)
 		LOGE("LUA CORE ERROR %s", lua_tostring(luaState, -1));
 
-	Resource lobbyScript = platformLoadInternalResource("lobby.lua");
-	error = luaL_loadbuffer(luaState, (const char*)lobbyScript.buffer, lobbyScript.length, "lobby.lua");
-	error = error | lua_pcall(luaState, 0,0,0);
-
-	if(error)
-		LOGE("LUA LOBBY ERROR %s", lua_tostring(luaState, -1));
-
-	delete glScript.buffer;
-	delete coreScript.buffer;
-	delete lobbyScript.buffer;
+	platformUnloadResource(coreScript);
 
 	return luaState;
 }
@@ -63,19 +47,19 @@ static void loadLuaScript(lua_State* L, const std::string& pathInFiles)
 	if(error)
 		LOGE("LUA SCRIPT ERROR %s in file %s", lua_tostring(L, -1), pathInFiles.c_str());
 
-	delete script.buffer;
+	platformUnloadResource(script);
 }
 
 void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
 {
-	LOGI("Entered initializeLuaScript");
-	std::string scriptsDir(scriptsDirectory);
+	LOGI("Entered initializeLuaScript: %s", scriptsDirectory);
+	std::string scriptsDir = path::buildPath(platformExternalResourceDirectory(), scriptsDirectory);
 	DIR* dir;
 	struct dirent* ent;
 	if ((dir = opendir (scriptsDir.c_str())) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
 			if(path::hasExtension(ent->d_name, ".lua")) {
-				std::string scriptPath = path::buildPath(scriptsDir, ent->d_name);
+				std::string scriptPath = path::buildPath(scriptsDirectory, ent->d_name);
 				loadLuaScript(L, scriptPath);
 				LOGI("Loading script %s", scriptPath.c_str());
 			}

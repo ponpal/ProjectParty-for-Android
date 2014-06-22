@@ -103,26 +103,7 @@ struct Renderer
 	Texture activeTexture;
 };
 
-Renderer* rendererInitialize(size_t maxBatchSize) //This is not yet usable.
-{
-	ASSERT(maxBatchSize*4 < 0xFFFF, "Batchsize cannot fit in Glushort, please use a value that is less than 16k");
-	Renderer* renderer = new Renderer();
-	size_t actualSize = maxBatchSize * 4;
-
-	renderer->vertices = new Vertex[actualSize];
-	renderer->elements = 0;
-	renderer->capacity = actualSize;
-
-	return renderer;
-}
-
-void rendererDelete(Renderer* renderer)
-{
-	delete renderer->vertices;
-	delete renderer;
-}
-
-void rendererActivate(Renderer* renderer) //Must be called before any attempts to use the renderer!
+static void rendererActivate(Renderer* renderer) //Must be called before any attempts to use the renderer!
 {
 	size_t actualSize = renderer->capacity;
 	size_t maxBatchSize = actualSize / 4;
@@ -140,6 +121,25 @@ void rendererActivate(Renderer* renderer) //Must be called before any attempts t
 	renderer->posAttrib   		= glGetAttribLocation(renderer->program, "vPosition");
 	renderer->colorAttrib 		= glGetAttribLocation(renderer->program, "vColor");
 	renderer->texcoordAttrib 	= glGetAttribLocation(renderer->program, "vTexcoord");
+}
+
+Renderer* rendererCreate(size_t maxBatchSize) //This is not yet usable.
+{
+	ASSERT(maxBatchSize*4 < 0xFFFF, "Batchsize cannot fit in Glushort, please use a value that is less than 16k");
+	Renderer* renderer = new Renderer();
+	size_t actualSize = maxBatchSize * 4;
+
+	renderer->vertices = new Vertex[actualSize];
+	renderer->elements = 0;
+	renderer->capacity = actualSize;
+	rendererActivate(renderer);
+	return renderer;
+}
+
+void rendererDestroy(Renderer* renderer)
+{
+	delete [] renderer->vertices;
+	delete renderer;
 }
 
 

@@ -17,9 +17,10 @@
 if(!(bufferBytesRemaining(buffer) >= len)) \
 { \
 	auto message___Buffer = new char[1024]; \
-	sprintf(message___Buffer, "Buffer Overflow! Buf: %d, Len: %d", bufferBytesRemaining(buffer), len); \
+	sprintf(message___Buffer, "Buffer Overflow! Buf: %d, Len: %d, File: %s, Line: %d", \
+		bufferBytesRemaining(buffer), len, __FILE__, __LINE__); \
 	LOGE("%s", message___Buffer); \
-	delete message___Buffer; \
+	delete [] message___Buffer; \
 }
 
 Buffer* bufferCreate(size_t bufferSize)
@@ -33,7 +34,7 @@ Buffer* bufferCreate(size_t bufferSize)
 
 void bufferDestroy(Buffer* buffer)
 {
-	delete buffer->base;
+	delete [] buffer->base;
 	delete buffer;
 }
 

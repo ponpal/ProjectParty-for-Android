@@ -69,7 +69,7 @@ ResourceManager* resourceCreateNetwork(size_t numResources, const char* resource
 	return resources;
 }
 
-void resourceTerminate(ResourceManager* resources)
+void resourceDestroy(ResourceManager* resources)
 {
 	for(int i = 0; i < resources->handlesLength; i++)
 	{
@@ -128,8 +128,8 @@ static Handle* resourceLoadFont(ResourceManager* resources, const char* path, Ha
     font->page = texture;
     font->defaultChar = '_';
 
-    delete fontAsset.buffer;
-    delete textureAsset.buffer;
+    platformUnloadResource(fontAsset);
+    platformUnloadResource(textureAsset);
 //    LOGI("Font size: %f", font->size);
 //    LOGI("Font base: %f", font->base);
 //    LOGI("Font lineHeight: %f", font->lineHeight);
@@ -165,7 +165,7 @@ static Handle* resourceLoadTexture(ResourceManager* resources, const char* path,
     auto texture = loadTexture(asset.buffer, asset.length);
     auto texPtr = new Texture();
     *texPtr = texture;
-    delete asset.buffer;
+    platformUnloadResource(asset);
     return resourceAddItem(resources, id, GetHash<Texture>(), (void*) texPtr);
 }
 
@@ -235,7 +235,7 @@ bool resourceUnloadPath(ResourceManager* resources, const char* path)
 			else if(path::hasExtension(path, ".fnt"))
 			{
 				obliterateFont(((Font*)resources->handles[i].item));
-                delete (Font*)resources->handles[i].item;
+                delete [] (uint8_t*)resources->handles[i].item;
 			}
 			resources->handles[i] = NULL_HANDLE;
 			return true;
@@ -256,7 +256,7 @@ bool resourceUnloadHandle(ResourceManager* resources, Handle* handle)
 	else if(handle->typeID == GetHash<Font>())
 	{
         obliterateFont(((Font*)handle->item));
-        delete (Font*)handle->item;
+        delete [] (uint8_t*)handle->item;
 	}
 	*handle = NULL_HANDLE;
 	return true;

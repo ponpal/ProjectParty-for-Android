@@ -22,7 +22,7 @@
 
 #define INVALID_SERVER_INFO (ServerInfo){0,0,0,0,0,0}
 
-static void readServerInfo(ServerDiscovery* discovery, Buffer* buffer)
+static void readServerInfo(ServerDiscovery* discovery, Buffer* buffer, uint32_t ip)
 {
     auto hostNameLength = bufferReadShort(buffer);
     auto serverInfo = &discovery->serverInfo[discovery->end];
@@ -34,6 +34,7 @@ static void readServerInfo(ServerDiscovery* discovery, Buffer* buffer)
     serverInfo->contentPort = bufferReadShort(buffer);
     serverInfo->serverTCPPort = bufferReadShort(buffer);
     serverInfo->serverUDPPort = bufferReadShort(buffer);
+    serverInfo->serverIP = ip;
 
     discovery->end = (discovery->end + 1) % discovery->capacity;
     if(discovery->end == discovery->start)
@@ -43,6 +44,7 @@ static void readServerInfo(ServerDiscovery* discovery, Buffer* buffer)
     //LOGI("TCP port: %d", (uint32_t)serverInfo->serverTCPPort);
     //LOGI("UDP port: %d", (uint32_t)serverInfo->serverUDPPort);
     //LOGI("Content port: %d", (uint32_t)serverInfo->contentPort);
+    //LOGI("Server IP: %x", serverInfo->serverIP);
 }
 
 void* serverDiscoveryTask(void* args)
@@ -91,27 +93,31 @@ void* serverDiscoveryTask(void* args)
 				 (struct sockaddr*) &broadcastaddr, sizeof(broadcastaddr));
         if(err < 0)
             LOGE("Could not send, %d %s", errno, strerror(err));
+        while(true) {
 
-        bzero(&recvAddr, sizeof(recvAddr));
-        socklen_t len = sizeof(recvAddr);
-        err = recvfrom(udpSocket, buffer->ptr, buffer->capacity, 0,
-        		(struct sockaddr*) &recvAddr, &len);
-        if(err == -1) {
-        	ASSERTF(errno == EAGAIN || errno == EWOULDBLOCK,
-        		"Error in server discovery. errno: %d, error: %s", errno, strerror(err));
-        	continue;
+            bzero(&recvAddr, sizeof(recvAddr));
+            socklen_t len = sizeof(recvAddr);
+
+            err = recvfrom(udpSocket, buffer->ptr, buffer->capacity, 0,
+                    (struct sockaddr*) &recvAddr, &len);
+
+            if(err == -1) {
+                ASSERTF(errno == EAGAIN || errno == EWOULDBLOCK,
+                    "Error in server discovery. errno: %d, error: %s", errno, strerror(err));
+                break;
+            }
+
+            buffer->length = err;
+
+            pthread_mutex_lock(&discovery->mutex);
+            readServerInfo(discovery, buffer, htonl(recvAddr.sin_addr.s_addr));
+            pthread_mutex_unlock(&discovery->mutex);
+            buffer->ptr = buffer->base;
         }
-
-        buffer->length = err;
-
-        pthread_mutex_lock(&discovery->mutex);
-        readServerInfo(discovery, buffer);
-        pthread_mutex_unlock(&discovery->mutex);
-        buffer->ptr = buffer->base;
 	}
 
     pthread_mutex_lock(&discovery->mutex);
-	delete discovery->serverInfo;
+	delete [] discovery->serverInfo;
 	discovery->serverInfo = nullptr;
     pthread_mutex_unlock(&discovery->mutex);
 	pthread_mutex_destroy(&discovery->mutex);

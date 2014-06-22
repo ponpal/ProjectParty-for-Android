@@ -18,8 +18,11 @@ extern android_app* gApp;
 extern "C" {
 int platformVibrate(uint64_t milliseconds);
 uint32_t platformGetBroadcastAddress();
+const char* platformExternalResourceDirectory();
+Resource platformLoadAbsolutePath(const char* name);
 Resource platformLoadInternalResource(const char* path);
 Resource platformLoadExternalResource(const char* path);
+void platformUnloadResource(Resource resource);
 void platformExit();
 }
 #endif /* VIBRATOR_H_ */

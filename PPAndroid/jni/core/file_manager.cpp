@@ -18,6 +18,7 @@
 #include "socket_stream.h"
 #include "android/log.h"
 #include "platform.h"
+#include "assert.h"
 
 #define MAP_FILE_NAME "Map.sdl"
 #define MAP_FILE_FOUND 1
@@ -31,6 +32,15 @@ enum {
 	FILE_ALL_SENT_MESSAGE = 2
 };
 
+uint32_t taskStatus;
+
+typedef struct
+{
+	uint32_t 	ip;
+	uint16_t 	port;
+	std::string	fileDirectory;
+} ReceiveFileTask;
+
 static void sendMapFile(const char* dirName, int socket)
 {
 	std::string filePath = path::buildPath(dirName, MAP_FILE_NAME);
@@ -39,9 +49,9 @@ static void sendMapFile(const char* dirName, int socket)
 	{
 		result = MAP_FILE_FOUND;
 		send(socket, &result, sizeof(result), 0);
-		Resource map = platformLoadExternalResource(filePath.c_str());
+		Resource map = platformLoadAbsolutePath(filePath.c_str());
         send(socket, map.buffer, map.length, 0);
-        delete map.buffer;
+        platformUnloadResource(map);
 	}
 	else
 	{
@@ -52,7 +62,7 @@ static void sendMapFile(const char* dirName, int socket)
 
 static void receiveFile(SocketStream* stream, const char* fileDirectory)
 {
-	uint8_t nameBuffer[100];
+	uint8_t nameBuffer[196];
     uint16_t nameLen = streamReadShort(stream);
     streamReadBytes(stream, nameBuffer, nameLen);
     std::string name((char*)nameBuffer, nameLen);
@@ -60,6 +70,7 @@ static void receiveFile(SocketStream* stream, const char* fileDirectory)
 
     int32_t fileSize = streamReadInt(stream);
     LOG("FileSize: %d", fileSize);
+    LOG("FileDir: %s", fileDirectory);
     auto filePath = path::buildPath(fileDirectory, name.c_str()).c_str();
     LOG("FilePath: %s", filePath);
     auto file = fopen(filePath, "w");
@@ -79,7 +90,7 @@ static void receiveFile(SocketStream* stream, const char* fileDirectory)
 static void removeFiles(SocketStream* stream, const char* fileDirectory)
 {
     uint16_t messageLength = streamReadShort(stream);
-	uint8_t nameBuffer[100];
+	uint8_t nameBuffer[196];
     for(int i = 0; i < messageLength; i++)
     {
         uint16_t nameLen = streamReadShort(stream);
@@ -114,11 +125,12 @@ static void receiveFiles(const char* fileDirectory, int socket)
         }
 	}
 	streamDestroy(stream);
+	LOGI("ReceiveFiles done!");
 }
 
 static void* fileTask(void* ptr)
 {
-	auto config = (ReceiveFileConfig*) ptr;
+	auto task = (ReceiveFileTask*) ptr;
 	int sockfd;
 	struct sockaddr_in servaddr;
 
@@ -126,27 +138,78 @@ static void* fileTask(void* ptr)
 
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(config->ip);
-	servaddr.sin_port = htons(config->port);
+	servaddr.sin_addr.s_addr = htonl(task->ip);
+	servaddr.sin_port = htons(task->port);
 
-	auto err = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+	LOG("Connecting");
+
+    struct sockaddr_in myaddr;
+    bzero(&myaddr, sizeof(myaddr));
+    myaddr.sin_family = AF_INET;
+    myaddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    myaddr.sin_port = htons(0);
+
+
+	int err = bind(sockfd, (struct sockaddr *)&myaddr, sizeof(myaddr));
+	if(err < 0)
+		LOGE("Could not bind socket, %d %s", errno, strerror(err));
+	struct timeval tv;
+	tv.tv_sec = 5;
+	tv.tv_usec = 0;
+
+	err = setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
+	if (err)
+	{
+		LOG("Could not set timeout, error is: %d %s", errno, strerror(errno));
+		taskStatus = TASK_FAILURE;
+		close(sockfd);
+		return nullptr;
+	}
+	err = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
+	if (err)
+	{
+		LOG("Could not set receivetimeout, error is: %d %s", errno, strerror(errno));
+		taskStatus = TASK_FAILURE;
+		close(sockfd);
+		return nullptr;
+	}
+    LOG("Receiving files from: [PORT: %d, IP:%x] ", (uint32_t)task->port, task->ip);
+	err = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
 	if (err)
 	{
 		LOG("Could not connect to file server, error is: %d %s", errno, strerror(errno));
+		taskStatus = TASK_FAILURE;
+		close(sockfd);
+		return nullptr;
 	}
-	sendMapFile(config->fileDirectory, sockfd);
-	receiveFiles(config->fileDirectory, sockfd);
+	LOG("Connected");
+	sendMapFile(task->fileDirectory.c_str(), sockfd);
+	LOG("Sent map file");
+	LOG("FileDirectory = %s", task->fileDirectory.c_str());
+	receiveFiles(task->fileDirectory.c_str(), sockfd);
 	LOG("All files received!");
 	close(sockfd);
-	config->isDone = true;
+	taskStatus = TASK_SUCCESS;
+	return nullptr;
 }
 
-void receiveFiles(ReceiveFileConfig* serverConfig)
+uint32_t receiveFiles(uint32_t ip, uint16_t port, const char* fileDirectory)
 {
-		LOG("Receiving files...");
-        pthread_t t;
-        pthread_create(&t, nullptr, &fileTask, serverConfig);
+	ASSERT(taskStatus != TASK_PROCESSING,
+			"Already in the process of receiving files");
+	auto task = new ReceiveFileTask();
+	task->ip = ip;
+	task->port = port;
+	task->fileDirectory = fileDirectory;
+	taskStatus = TASK_PROCESSING;
+    LOG("Receiving files from: [PORT: %d, IP:%x] %s", (uint32_t)port, ip, fileDirectory);
+    pthread_t t;
+    pthread_create(&t, nullptr, &fileTask, task);
+    return taskStatus;
 }
 
-
+int32_t receiveFilesStatus(uint32_t)
+{
+	return taskStatus;
+}
 

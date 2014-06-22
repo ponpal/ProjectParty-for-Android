@@ -12,16 +12,14 @@
 
 extern "C" {
 
-typedef struct
-{
-	uint32_t 	ip;
-	uint16_t 	port;
-	const char*	fileDirectory;
-	bool	 	isDone;
-} ReceiveFileConfig;
+enum {
+	TASK_SUCCESS = 0,
+	TASK_FAILURE = -1,
+	TASK_PROCESSING = 1
+};
 
-void receiveFiles(ReceiveFileConfig);
-bool isDone(ReceiveFileConfig);
+uint32_t receiveFiles(uint32_t ip, uint16_t port, const char* fileDirectory);
+int32_t receiveFilesStatus(uint32_t);
 }
 
 #endif /* FILE_MANAGER_H_ */

@@ -11,11 +11,13 @@
 
 #include "types.h"
 #include "buffer.h"
+#include "lua.hpp"
 using namespace glm;
 
 extern "C"
 {
     void luaLog(const char* toLog);
     void initializeLuaScripts(const char* scriptsDir);
+    void loadLuaScripts(lua_State* L, const char* scriptsDirectory);
 }
 #endif /* LUA_CORE_H_ */
