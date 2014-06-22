@@ -20,7 +20,7 @@ ffi.cdef[[
 
 	typedef struct {
 		Texture texture;
-		float x, y, z, w;
+		float x, y, width, height;
 	} Frame;
 
 
@@ -543,6 +543,76 @@ function unbindState()
 	Game.restart = doNothing
 end
 
+Resources = {}
+
+Resources.gameName = ""
+
+Path = {}
+
+local function split(string, token)
+	local toReturn = { }
+	for word in string.gmatch(string, '([^'..token..']+)') do
+		table.insert(toReturn, word)
+	end
+	return toReturn
+end
+
+function Path.hasExtension(path, extension)
+	local temp = split(path, ".")
+	return temp[#temp] == extension
+end
+
+function Path.baseName(path)
+	local temp = split(path, "/")
+	local temp2 = split(temp[#temp], ".")
+	return temp2[1], temp2[2]
+end
+
+local function saveTable(file, t)
+	for k, v in pairs(t) do
+		C.luaLog(tostring(k))
+		if type(v) == "table" then
+			file:write(tostring(k).." = {")
+			saveTable(file, v)
+			file:write("}")
+		else
+			file:write(tostring(k).." = "..tostring(v))
+		end
+		file:write(",")
+	end
+end
+
+function Resources.saveTable(t, name)
+	C.luaLog(string.format("Starting saveTable with name %s", ffi.string(C.platformExternalResourceDirectory())..
+					"/"..Resources.gameName.."/"..name))
+	local file = assert(io.open(ffi.string(C.platformExternalResourceDirectory())..
+					"/"..Resources.gameName.."/"..name, "w"))
+	file:write("return {")
+	saveTable(file, t)
+	file:write("}")
+	assert(file:close())
+	C.luaLog("Exiting saveTable")
+end
+
+function Resources.loadTable(name)
+	return runExternalFile(Resources.gameName.."/"..name)
+end
+
+function Resources.loadFile(path)
+	if Path.hasExtension(path, "luac") then
+		local name, ext = Path.baseName(path)
+		local hash = C.bytesHash(name, #name, 0)
+		local toLoad = Resources.gameName.."/"..tostring(hash).."."..ext
+		return runExternalFile(toLoad)
+	else
+		return C.resourceLoad(Resources.loader, path)
+	end
+end
+
+function Resources.setCLoader(resourceLoader)
+	Resources.loader = resourceLoader
+end
+
 function runInternalFile(path)
 	local resource = C.platformLoadInternalResource(path)
 	local func = loadstring(ffi.string(resource.buffer, resource.length))
@@ -560,6 +630,7 @@ end
 do
 	runInternalFile("gl.lua")
 	runInternalFile("lobby.lua")
+	runInternalFile("renderer.lua")
 end
 
 --function Game.step()

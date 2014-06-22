@@ -25,7 +25,7 @@ typedef struct {
 
 typedef struct {
 	Texture texture;
-	float x, y, z, w;
+	float x, y, width, height;
 } Frame;
 
 #endif /* TYPES_H_ */

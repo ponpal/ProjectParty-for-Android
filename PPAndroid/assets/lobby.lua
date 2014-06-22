@@ -18,6 +18,9 @@ function Game.restart()
 	if state.shouldTransition then
 		unbindState()
 		C.loadLuaScripts(C.gGame.L, state.gameName)
+		Resources.setCLoader(C.resourceCreateNetwork(40, state.gameName))
+		Resources.gameName = state.gameName
+		Game.restart()
 	else
 		position = state.position
 	end
@@ -67,6 +70,7 @@ function Game.step()
     matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
     matrix = C.matrixTranslate(matrix, C.gGame.screen.width, 0)
     matrix = C.matrixRotate(matrix, math.pi/2)
+	C.rendererSetTransform(renderer, matrix)
 
     info = C.serverNextInfo(discovery)
     if info.serverIP ~= 0 then
@@ -125,6 +129,9 @@ function Game.step()
 				Game.stop()
 				C.loadLuaScripts(C.gGame.L, chosenServer.gameName)
 				C.luaLog("Exited loadLuaScripts")
+				Resources.setCLoader(C.resourceCreateNetwork(40, chosenServer.gameName))
+				Resources.gameName = ffi.string(chosenServer.gameName)
+				Game.start()
 				return
 		elseif fileStatus == C.TASK_FAILURE then
 			C.rendererAddText(renderer, font, "File loading failures", 
@@ -133,7 +140,6 @@ function Game.step()
 		end
 	end
 	C.rendererDraw(renderer)
-	C.rendererSetTransform(renderer, matrix)
 end
 
 function Input.onMove(pointerID, x, y)

@@ -168,7 +168,7 @@ void rendererAddFrame(Renderer* renderer, const Frame* frame,
 	vec2 dim = vec2(inDim.x, inDim.y);
 
 	vec2 bottomLeft = vec2(frame->x, frame->y);
-	vec2 topRight   = vec2(frame->z , frame->w);
+	vec2 topRight   = vec2(frame->width , frame->height);
 
 	auto ptr = &(renderer->vertices[renderer->elements]);
 
@@ -219,7 +219,7 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 
 
 	vec2 botLeft  = vec2(frame->x, frame->y);
-	vec2 topRight = vec2(frame->z, frame->w);
+	vec2 topRight = vec2(frame->width, frame->height);
 
 	if(mirrored)
 	{
