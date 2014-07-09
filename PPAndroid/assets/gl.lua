@@ -1,4 +1,4 @@
-glfuns = require("ffi")
+local glfuns = require("ffi")
 
 glfuns.cdef[[
 typedef void             GLvoid;
@@ -570,4 +570,4 @@ void         glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
 ]]
 
-gl = glfuns.C
+global.gl = glfuns.C

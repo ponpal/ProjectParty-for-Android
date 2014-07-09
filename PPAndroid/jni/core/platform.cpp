@@ -58,7 +58,7 @@ Resource platformLoadInternalResource(const char* path)
 	auto length = AAsset_getLength(asset);
 	auto buffer = new uint8_t[length];
 	auto err = AAsset_read(asset, buffer, length);
-	ASSERTF(err>=0, "Failed to load internal resource %s. Error was: %d", path, err);
+	ASSERTF(err >= 0, "Failed to load internal resource %s. Error was: %d", path, err);
 	AAsset_close(asset);
 	return (Resource){ buffer,length };
 }

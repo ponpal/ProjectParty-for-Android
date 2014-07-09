@@ -570,7 +570,6 @@ end
 
 local function saveTable(file, t)
 	for k, v in pairs(t) do
-		C.luaLog(tostring(k))
 		if type(v) == "table" then
 			file:write(tostring(k).." = {")
 			saveTable(file, v)
@@ -627,29 +626,54 @@ function runExternalFile(path)
 	return func()
 end
 
+local function unlock_new_index(t, k, v)
+  rawset(t, k, v)
+end
+
+--===================================================
+-- call GLOBAL_unlock(_G)
+-- to change things back to normal.
+--===================================================
+local function GLOBAL_unlock(t)
+  local mt = getmetatable(t) or {}
+  mt.__newindex = unlock_new_index
+  setmetatable(t, mt)
+end
+
+local function lock_new_index(t, k, v)
+    error("GLOBALS are locked -- " .. k .. " must be declared local, if a global was wanted use global.ident", 2)
+end
+
+--===================================================
+--=  Niklas Frykholm 
+-- basically if user tries to create global variable
+-- the system will not let them!!
+-- call GLOBAL_lock(_G)
+--
+--===================================================
+local function GLOBAL_lock(t)
+  local mt = getmetatable(t) or {}
+  mt.__newindex = lock_new_index
+  setmetatable(t, mt)
+end
+
+
+local GlobalMT = { }
+
+function GlobalMT.__index(t, k)
+	return _G[k]
+end
+
+function GlobalMT.__newindex(t, k, v)
+	rawset(_G, k, v)
+end
+
+global = { }
+setmetatable(global, GlobalMT)
+
 do
+	GLOBAL_lock(_G)
 	runInternalFile("gl.lua")
 	runInternalFile("lobby.lua")
 	runInternalFile("renderer.lua")
 end
-
---function Game.step()
---	log("Step start")
---	log("Created matrix")
---    gl.glClearColor(1,0,0,1)
---    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
---    gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
---    gl.glEnable(gl.GL_BLEND)
---    gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
---
---    matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
---
---    texture = C.contentLoad("banana.png")
---    font = C.contentLoad("ComicSans32.fnt")
---
---    frame = Frame(ffi.cast("Texture*", texture.item)[0], 0,0,1,1)
---	C.rendererAddFrame(C.gGame.renderer, ffi.new("Frame[1]", frame), vec2(400,400), vec2(50,50), 0xFFFFFFFF)
---	C.rendererAddText(C.gGame.renderer, ffi.cast("Font*", font.item), "Hero worrdu", vec2(100,100), 0xFFFFFFFF)
---	C.rendererDraw(C.gGame.renderer)
---	C.rendererSetTransform(C.gGame.renderer, matrix)
---end

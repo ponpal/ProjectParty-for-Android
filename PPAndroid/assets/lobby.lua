@@ -1,19 +1,25 @@
-Game = { }
-Input = { }
+global.Game = { }
+global.Input = { }
+
+local discovery
+local renderer
+local resources
+local texture
+local font 
+local position
 
 function Game.start()
 	discovery = C.serverDiscoveryStart()
-	renderer = C.rendererCreate(1024*15)
+	renderer = CRenderer(256)
 	resources = C.resourceCreateLocal(10)
-    texture = C.resourceLoad(resources, "banana.png")
     font = C.resourceLoad(resources, "arial50.fnt")
     font = ffi.cast("Font*", font.item)
-    position = vec2(500,500)
     Screen.setOrientation(Orientation.portrait)
 end
 
-local path = ffi.string(C.platformExternalResourceDirectory()).."/lobby_state.luac"
 function Game.restart()
+	local state = Resources.loadTable("lobby_save_state.luac")
+
 	local state = dofile(path)
 	if state.shouldTransition then
 		unbindState()
@@ -21,8 +27,6 @@ function Game.restart()
 		Resources.setCLoader(C.resourceCreateNetwork(40, state.gameName))
 		Resources.gameName = state.gameName
 		Game.restart()
-	else
-		position = state.position
 	end
 end
 
@@ -30,49 +34,30 @@ function Game.stop()
 	C.serverDiscoveryStop(discovery)
 	C.resourceUnloadAll(resources)
 	C.resourceDestroy(resources)
-	C.rendererDestroy(renderer)
 	unbindState()
-	local f = assert(io.open(path, "w"))
+
+	local toSave = { }
 	if chosenServer then
-		f:write(string.format([[
-			local state = { } 
-			state.position = vec2(%d,%d) 
-			state.gameName = "%s"
-			state.shouldTransition = %s
-			return state]],position.x, position.y, ffi.string(chosenServer.gameName), true))
-	else
-		f:write(string.format([[
-			local state = { } 
-			state.position = vec2(%d,%d) 
-			state.shouldTransition = %s
-			return state]],position.x, position.y, false))
-	end
-	assert(f:close())
+		toSave.gameName = ffi.string(chosenServer.gameName)
+		toSave.ip       = chosenServer.serverIP
+		toSave.shouldTransition = true
+	else 
+		toSave.shouldTransition = false
+	end 
+
+	Resources.saveTable(toSave, "lobby_save_state.luac")
 end
 
-servers = { }
-serverRects = { }
-serverTimers = { }
-serverTimeout = 5
+local servers = { }
+local serverRects = { }
+local serverTimers = { }
+local serverTimeout = 5
+local fileSendingHandle = 0
+local receiveFiles = 0
+local chosenServer = nil
 
-fileSendingHandle = 0
-receiveFiles = 0
-
-chosenServer = nil
-
-function Game.step()
-    gl.glClearColor(1,0,0,1)
-    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-    gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
-    gl.glEnable(gl.GL_BLEND)
-    gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
-
-    matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
-    matrix = C.matrixTranslate(matrix, C.gGame.screen.width, 0)
-    matrix = C.matrixRotate(matrix, math.pi/2)
-	C.rendererSetTransform(renderer, matrix)
-
-    info = C.serverNextInfo(discovery)
+local function updateServerInfo()
+    local info = C.serverNextInfo(discovery)
     if info.serverIP ~= 0 then
     	local exists = false
     	for i, v in ipairs(servers) do
@@ -82,15 +67,16 @@ function Game.step()
     			break
     		end
     	end
-    	if not exists then
-	    	table.insert(servers, info)
+
+    	if not exists then   	
 	    	local rect = { }
 	    	local dim = C.fontMeasure(font, string.format("%s %s", ffi.string(info.serverName), ffi.string(info.gameName)))
-	    	C.luaLog(string.format("Rect x: %d Rect y: %d", dim.x, dim.y))
 	    	rect.x = 100
 	    	rect.y = 100 * #servers
 	    	rect.width = dim.x
 	    	rect.height = dim.y
+
+	    	table.insert(servers, info)
 	    	table.insert(serverRects, rect)
 	    	table.insert(serverTimers, 0)
 	    end
@@ -105,41 +91,61 @@ function Game.step()
 	    	serverTimers[i] = serverTimers[i] + C.clockElapsed(C.gGame.clock)
 	    end 
     end
+end
 
-    frame = Frame(ffi.cast("Texture*", texture.item)[0], 0,0,1,1)
-	C.rendererAddFrame(renderer, ffi.new("Frame[1]", frame), position, vec2(50,50), 0xFFFFFFFF)
+local function chechForTransition()
+	if receiveFiles ~= 0 then
+		local fileStatus = C.receiveFilesStatus(fileSendingHandle)
+		if fileStatus == C.TASK_SUCCESS then
+			Game.stop()
+			C.loadLuaScripts(C.gGame.L, chosenServer.gameName)
+			Resources.setCLoader(C.resourceCreateNetwork(40, chosenServer.gameName))
+			Resources.gameName = ffi.string(chosenServer.gameName)
+			Game.start()
+			return
+		end
+	end
+end
+
+function Game.step()
+    updateServerInfo()
+    checkForTransition()
+
+    gl.glClearColor(1,0,0,1)
+    gl.glClear(gl.GL_COLOR_BUFFER_BIT)
+    gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
+    gl.glEnable(gl.GL_BLEND)
+    gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
+
 	for i, v in ipairs(servers) do 
 		local rect = serverRects[i]
 		local vec = vec2(rect.x, rect.y)
-		C.rendererAddText(renderer, font, string.format("%s %s", ffi.string(v.serverName), ffi.string(v.gameName)), 
+		renderer:addText(font, string.format("%s %s", ffi.string(v.serverName), ffi.string(v.gameName)), 
 			vec, 0xFFFFFFFF)
 	end
+	
 	local vec = vec2(100, Screen.height - 100)
 	if receiveFiles == 0 then 
-		C.rendererAddText(renderer, font, "Connect to a server!", 
-			vec, 0xFFFFFFFF)
+		renderer:addText(font, "Connect to a server!", vec, 0xFFFFFFFF)
 	else
 		local fileStatus = C.receiveFilesStatus(fileSendingHandle)
 		if fileStatus == C.TASK_PROCESSING then
-			C.rendererAddText(renderer, font, "Processing files", 
-				vec, 0xFFFFFFFF)
+			renderer:addText(renderer, font, "Processing files", vec, 0xFFFFFFFF)
 		elseif fileStatus == C.TASK_SUCCESS then
-			C.rendererAddText(renderer, font, "We are done loading files!", 
-				vec, 0xFFFFFFFF)
-				Game.stop()
-				C.loadLuaScripts(C.gGame.L, chosenServer.gameName)
-				C.luaLog("Exited loadLuaScripts")
-				Resources.setCLoader(C.resourceCreateNetwork(40, chosenServer.gameName))
-				Resources.gameName = ffi.string(chosenServer.gameName)
-				Game.start()
-				return
+			renderer:addText(renderer, font, "We are done loading files!", vec, 0xFFFFFFFF)
+			Game.stop()
+			C.loadLuaScripts(C.gGame.L, chosenServer.gameName)
+			Resources.setCLoader(C.resourceCreateNetwork(40, chosenServer.gameName))
+			Resources.gameName = ffi.string(chosenServer.gameName)
+			Game.start()
+			return
 		elseif fileStatus == C.TASK_FAILURE then
-			C.rendererAddText(renderer, font, "File loading failures", 
+			renderer:addText(renderer, font, "File loading failures", 
 				vec, 0xFFFFFFFF)
 			receivedFiles = 1
 		end
 	end
-	C.rendererDraw(renderer)
+	renderer:draw()
 end
 
 function Input.onMove(pointerID, x, y)

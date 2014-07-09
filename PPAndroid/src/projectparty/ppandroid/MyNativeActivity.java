@@ -3,6 +3,7 @@ package projectparty.ppandroid;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.net.DhcpInfo;
@@ -38,6 +39,7 @@ public class MyNativeActivity extends android.app.NativeActivity
 		System.loadLibrary("mystery");
 	}
 	
+	@SuppressLint("NewApi")
 	int vibrate(long milliseconds)
 	{
 		Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
