@@ -71,6 +71,7 @@ static void receiveFile(SocketStream* stream, const char* fileDirectory)
     int32_t fileSize = streamReadInt(stream);
     RLOGI("FileSize: %d", fileSize);
     RLOGI("FileDir: %s", fileDirectory);
+
     auto filePath = path::buildPath(fileDirectory, name.c_str()).c_str();
     RLOGI("FilePath: %s", filePath);
     auto file = fopen(filePath, "w");
