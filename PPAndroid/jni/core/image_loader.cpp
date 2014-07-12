@@ -18,11 +18,11 @@ Texture loadTexture(uint8_t* buffer, uint32_t length)
 	uint8_t* pngData;
 
 	uint32_t width, height;
-	LOGI("Loading png");
+	RLOGI("%s", "Loading png");
 	auto err = lodepng_decode32(&pngData, &width, &height, buffer, length);
 	ASSERTF(err == 0, "Failed to load png! ERROR: %s BUF: %d, LEN: %d",
 			lodepng_error_text(err), (uint32_t)buffer, length);
-	LOGI("LOADED PNG");
+	RLOGI("%s", "LOADED PNG");
 
 	GLuint name;
 	glGenTextures(1, &name);

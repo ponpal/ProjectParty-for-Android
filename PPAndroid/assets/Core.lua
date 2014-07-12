@@ -205,7 +205,6 @@ ffi.cdef[[
 
 	typedef struct lua_State lua_State;
 
-    void luaLog(const char* toLog);
     void initializeLuaScripts(const char* scriptsDir);
     void loadLuaScripts(lua_State* L, const char* scriptsDirectory);
 
@@ -281,6 +280,13 @@ ffi.cdef[[
 	ServerDiscovery* serverDiscoveryStart();
 	ServerInfo serverNextInfo(ServerDiscovery* discovery);
 	void serverDiscoveryStop(ServerDiscovery* discovery);
+
+	//-----------------------------
+	//		remote_log.h
+	//-----------------------------
+	void remoteLogInitialize(const char* loggingID, uint16_t loggingPort);
+	void remoteLogTerm();
+	void remoteLuaLog(int verbosity, const char* message);
 
 	// ----------------------------
 	//  	game.h
@@ -543,10 +549,36 @@ function unbindState()
 	Game.restart = doNothing
 end
 
+Log = {}
+
+function Log.info(msg)
+	C.remoteLuaLog(0, msg)
+end
+
+function Log.warn(msg)
+	C.remoteLuaLog(1, msg)
+end
+
+function Log.error(msg)
+	C.remoteLuaLog(2, msg)
+end
+
+function Log.infof(fmt, ...)
+	C.remoteLuaLog(0, string.format(fmt, ...))
+end
+
+function Log.warnf(fmt, ...)
+	C.remoteLuaLog(1, string.format(fmt, ...))
+end
+
+function Log.errorf(fmt, ...)
+	C.remoteLuaLog(2, string.format(fmt, ...))
+end
+
+
+
 Resources = {}
-
 Resources.gameName = ""
-
 Path = {}
 
 local function split(string, token)
@@ -574,6 +606,8 @@ local function saveTable(file, t)
 			file:write(tostring(k).." = {")
 			saveTable(file, v)
 			file:write("}")
+		elseif type(v) == "string" then
+			file:write(tostring(k) .. " = \"" .. tostring(v) .. "\"")
 		else
 			file:write(tostring(k).." = "..tostring(v))
 		end
@@ -582,15 +616,15 @@ local function saveTable(file, t)
 end
 
 function Resources.saveTable(t, name)
-	C.luaLog(string.format("Starting saveTable with name %s", ffi.string(C.platformExternalResourceDirectory())..
-					"/"..Resources.gameName.."/"..name))
-	local file = assert(io.open(ffi.string(C.platformExternalResourceDirectory())..
-					"/"..Resources.gameName.."/"..name, "w"))
+	local path = ffi.string(C.platformExternalResourceDirectory()).."/"..Resources.gameName.."/"..name
+	Log.infof("Starting saveTable with name %s", path)
+
+	local file = assert(io.open(path, "w"))
 	file:write("return {")
 	saveTable(file, t)
 	file:write("}")
 	assert(file:close())
-	C.luaLog("Exiting saveTable")
+	Log.infof("Table Saved %s", path)
 end
 
 function Resources.loadTable(name)

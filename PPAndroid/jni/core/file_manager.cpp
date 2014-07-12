@@ -16,15 +16,15 @@
 #include "strings.h"
 #include "path.h"
 #include "socket_stream.h"
-#include "android/log.h"
 #include "platform.h"
 #include "assert.h"
+#include "remote_log.h"
+#include "sys/stat.h"
 
 #define MAP_FILE_NAME "Map.sdl"
 #define MAP_FILE_FOUND 1
 #define MAP_FILE_NOT_FOUND 0
 
-#define LOG(...) ((void)__android_log_print(ANDROID_LOG_INFO, "FileIO", __VA_ARGS__))
 
 enum {
 	FILE_SENT_MESSAGE     = 0,
@@ -66,16 +66,17 @@ static void receiveFile(SocketStream* stream, const char* fileDirectory)
     uint16_t nameLen = streamReadShort(stream);
     streamReadBytes(stream, nameBuffer, nameLen);
     std::string name((char*)nameBuffer, nameLen);
-    LOG("Receiving file: %s", name.c_str());
+    RLOGI("Receiving file: %s", name.c_str());
 
     int32_t fileSize = streamReadInt(stream);
-    LOG("FileSize: %d", fileSize);
-    LOG("FileDir: %s", fileDirectory);
+    RLOGI("FileSize: %d", fileSize);
+    RLOGI("FileDir: %s", fileDirectory);
     auto filePath = path::buildPath(fileDirectory, name.c_str()).c_str();
-    LOG("FilePath: %s", filePath);
+    RLOGI("FilePath: %s", filePath);
     auto file = fopen(filePath, "w");
     if(file == NULL)
-        LOG("File is null! Name: %s", filePath);
+    	RLOGI("File is null! Name: %s", filePath);
+
     while(fileSize != 0)
     {
         auto length = std::min(0xffff, fileSize);
@@ -85,7 +86,7 @@ static void receiveFile(SocketStream* stream, const char* fileDirectory)
     }
     fflush(file);
     fclose(file);
-    LOG("Received file: %s", name.c_str());
+    RLOGI("Received file: %s", name.c_str());
 }
 static void removeFiles(SocketStream* stream, const char* fileDirectory)
 {
@@ -97,7 +98,7 @@ static void removeFiles(SocketStream* stream, const char* fileDirectory)
         streamReadBytes(stream, nameBuffer, nameLen);
         std::string name((char*)nameBuffer, nameLen);
 
-        LOG("Removing %s", name.c_str());
+        RLOGI("Removing %s", name.c_str());
         auto filePath = path::buildPath(fileDirectory, name.c_str()).c_str();
         remove(filePath);
     }
@@ -110,7 +111,7 @@ static void receiveFiles(const char* fileDirectory, int socket)
 	while(true)
 	{
         auto messageID = streamReadByte(stream);
-        LOG("MessageID: %d", messageID);
+        RLOGI("MessageID: %d", messageID);
         if(messageID == FILE_ALL_SENT_MESSAGE)
         {
         	break;
@@ -125,12 +126,21 @@ static void receiveFiles(const char* fileDirectory, int socket)
         }
 	}
 	streamDestroy(stream);
-	LOGI("ReceiveFiles done!");
+	RLOGI("%s", "ReceiveFiles done!");
+}
+
+static void createDir(const char* fileDir)
+{
+	int err = mkdir(fileDir, 0770);
+	if (err != 0 && errno != 17)
+		RLOGI("Error is: %d %s", errno, strerror(errno));
 }
 
 static void* fileTask(void* ptr)
 {
 	auto task = (ReceiveFileTask*) ptr;
+	createDir(task->fileDirectory.c_str());
+
 	int sockfd;
 	struct sockaddr_in servaddr;
 
@@ -141,7 +151,7 @@ static void* fileTask(void* ptr)
 	servaddr.sin_addr.s_addr = htonl(task->ip);
 	servaddr.sin_port = htons(task->port);
 
-	LOG("Connecting");
+	RLOGI("%s", "Connecting");
 
     struct sockaddr_in myaddr;
     bzero(&myaddr, sizeof(myaddr));
@@ -160,34 +170,36 @@ static void* fileTask(void* ptr)
 	err = setsockopt(sockfd, SOL_SOCKET, SO_SNDTIMEO, &tv, sizeof(tv));
 	if (err)
 	{
-		LOG("Could not set timeout, error is: %d %s", errno, strerror(errno));
+		RLOGI("Could not set timeout, error is: %d %s", errno, strerror(errno));
 		taskStatus = TASK_FAILURE;
 		close(sockfd);
 		return nullptr;
 	}
+
 	err = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 	if (err)
 	{
-		LOG("Could not set receivetimeout, error is: %d %s", errno, strerror(errno));
+		RLOGI("Could not set receivetimeout, error is: %d %s", errno, strerror(errno));
 		taskStatus = TASK_FAILURE;
 		close(sockfd);
 		return nullptr;
 	}
-    LOG("Receiving files from: [PORT: %d, IP:%x] ", (uint32_t)task->port, task->ip);
+
+	RLOGI("Receiving files from: [PORT: %d, IP:%x] ", (uint32_t)task->port, task->ip);
 	err = connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
 	if (err)
 	{
-		LOG("Could not connect to file server, error is: %d %s", errno, strerror(errno));
+		RLOGI("Could not connect to file server, error is: %d %s", errno, strerror(errno));
 		taskStatus = TASK_FAILURE;
 		close(sockfd);
 		return nullptr;
 	}
-	LOG("Connected");
+	RLOGI("%s", "Connected");
 	sendMapFile(task->fileDirectory.c_str(), sockfd);
-	LOG("Sent map file");
-	LOG("FileDirectory = %s", task->fileDirectory.c_str());
+	RLOGI("%s", "Sent map file");
+	RLOGI("FileDirectory = %s", task->fileDirectory.c_str());
 	receiveFiles(task->fileDirectory.c_str(), sockfd);
-	LOG("All files received!");
+	RLOGI("%s", "All files received!");
 	close(sockfd);
 	taskStatus = TASK_SUCCESS;
 	return nullptr;
@@ -202,7 +214,7 @@ uint32_t receiveFiles(uint32_t ip, uint16_t port, const char* fileDirectory)
 	task->port = port;
 	task->fileDirectory = fileDirectory;
 	taskStatus = TASK_PROCESSING;
-    LOG("Receiving files from: [PORT: %d, IP:%x] %s", (uint32_t)port, ip, fileDirectory);
+    RLOGI("Receiving files from: [PORT: %d, IP:%x] %s", (uint32_t)port, ip, fileDirectory);
     pthread_t t;
     pthread_create(&t, nullptr, &fileTask, task);
     return taskStatus;

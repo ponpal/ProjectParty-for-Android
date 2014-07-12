@@ -8,6 +8,7 @@
 #include "main.h"
 #include "sys/stat.h"
 #include "errno.h"
+#include "core/remote_log.h"
 
 ndk_helper::GLContext* context;
 
@@ -76,7 +77,7 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 	    }
 	} else if (type == AINPUT_EVENT_TYPE_KEY) {
 		auto code = AKeyEvent_getKeyCode(event);
-		LOGI("Received key event: %d", code);
+		RLOGI("Received key event: %d", code);
 		switch(code) {
             case AKEYCODE_MENU:
             	return luaMenuCall(gGame->L);
@@ -152,6 +153,7 @@ void create() {
 	gAppState.isFocused = false;
 	gAppState.hasSurface = false;
 	gAppState.wasStopped = false;
+
 }
 
 void start() {
@@ -162,28 +164,28 @@ void start() {
 }
 
 void restart() {
-	LOGI("App was restarted!");
+	RLOGI("%s", "App was restarted!");
 	gAppState.isStarted = true;
 }
 
 void freshStart() {
-	LOGI("App was started!");
+	RLOGI("%s", "App was started!");
 	gAppState.isStarted = true;
 }
 
 void resume() {
-	LOGI("App was resumed!");
+	RLOGI("%s", "App was resumed!");
 	gAppState.isResumed = true;
 }
 
 void pause() {
-	LOGI("App was paused!");
+	RLOGI("%s", "App was paused!");
 	gAppState.isResumed = false;
 	gAppState.isFocused = false;
 }
 
 void stop() {
-	LOGI("App was stopped!");
+	RLOGI("s", "App was stopped!");
 
 	gAppState.wasStopped = true;
 	gAppState.isStarted = false;
@@ -192,25 +194,25 @@ void stop() {
 }
 
 void destroy() {
-	LOGI("App was destroyed!");
+	RLOGI("%s", "App was destroyed!");
 }
 
 //Focus Events
 void gainedFocus() {
-	LOGI("App gained focus");
+	RLOGI("%s", "App gained focus");
 	gAppState.isFocused = true;
 	resumeSensors();
 }
 
 void lostFocus() {
-	LOGI("App lost focus");
+	RLOGI("%s", "App lost focus");
 	gAppState.isFocused = false;
 	pauseSensors();
 }
 
 //EGL calls
 void surfaceCreated() {
-	LOGI("Surface created graphics resources can be safely loaded.");
+	RLOGI("%s", "Surface created graphics resources can be safely loaded.");
 	gAppState.hasSurface = true;
 
 	context->Init(gApp->window);
@@ -221,7 +223,7 @@ void surfaceCreated() {
 }
 
 void surfaceDestroyed() {
-	LOGI("Surface Destroyed");
+	RLOGI("%s", "Surface Destroyed");
 	gAppState.hasSurface = false;
 
 	context->Invalidate();
@@ -229,7 +231,7 @@ void surfaceDestroyed() {
 }
 
 void surfaceChanged() {
-	LOGI("Surface Changed");
+	RLOGI("%s", "Surface Changed");
 	if (gameInitialized()) {
         gGame->screen->width = context->GetScreenWidth();
         gGame->screen->height = context->GetScreenHeight();
@@ -284,16 +286,16 @@ void initializeFileSystem() {
 	//On some phones the directory does not exist so we create it :)
 	auto externalsDir = gApp->activity->externalDataPath;
 	std::string d(externalsDir);
-	LOGI("EXTERNALSDIR: %s", d.c_str());
+	RLOGI("EXTERNALSDIR: %s", d.c_str());
 	d.erase(d.size() - 6, 6);
 
 	int err = mkdir(d.c_str(), 0770);
 	if (err != 0 && errno != 17)
-		LOGI("Error is: %d %s", errno, strerror(errno));
+		RLOGI("Error is: %d %s", errno, strerror(errno));
 
 	err = mkdir(externalsDir, 0770);
 	if (err != 0 && errno != 17)
-		LOGI("Error is: %d %s", errno, strerror(errno));
+		RLOGI("Error is: %d %s", errno, strerror(errno));
 }
 
 void android_main(android_app* state) {
@@ -322,7 +324,7 @@ void android_main(android_app* state) {
 			processSensors(ident);
 
 			if (state->destroyRequested) {
-				LOGI("Native Activity Was Fully Destroyed!");
+				RLOGI("%s", "Native Activity Was Fully Destroyed!");
 				return;
 			}
 		}
@@ -336,8 +338,4 @@ void android_main(android_app* state) {
 
 		fullyActive = gAppState.fullyActive();
 	}
-
 }
-
-
-

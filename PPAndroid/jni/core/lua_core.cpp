@@ -9,11 +9,7 @@
 #include "platform.h"
 #include "dirent.h"
 #include "lua.hpp"
-
-void luaLog(const char* toLog)
-{
-	LOGI("LuaLog: %s", toLog);
-}
+#include "remote_log.h"
 
 lua_State* luaCoreCreate()
 {
@@ -25,7 +21,7 @@ lua_State* luaCoreCreate()
 	error = error | lua_pcall(luaState, 0,0,0);
 
 	if(error)
-		LOGE("LUA CORE ERROR %s", lua_tostring(luaState, -1));
+		RLOGE("LUA CORE ERROR %s", lua_tostring(luaState, -1));
 
 	platformUnloadResource(coreScript);
 
@@ -45,14 +41,14 @@ static void loadLuaScript(lua_State* L, const std::string& pathInFiles)
 	error |= lua_pcall(L, 0, 0, 0);
 
 	if(error)
-		LOGE("LUA SCRIPT ERROR %s in file %s", lua_tostring(L, -1), pathInFiles.c_str());
+		RLOGE("LUA SCRIPT ERROR %s in file %s", lua_tostring(L, -1), pathInFiles.c_str());
 
 	platformUnloadResource(script);
 }
 
 void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
 {
-	LOGI("Entered initializeLuaScript: %s", scriptsDirectory);
+	RLOGI("Entered initializeLuaScript: %s", scriptsDirectory);
 	std::string scriptsDir = path::buildPath(platformExternalResourceDirectory(), scriptsDirectory);
 	DIR* dir;
 	struct dirent* ent;
@@ -61,15 +57,15 @@ void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
 			if(path::hasExtension(ent->d_name, ".lua")) {
 				std::string scriptPath = path::buildPath(scriptsDirectory, ent->d_name);
 				loadLuaScript(L, scriptPath);
-				LOGI("Loading script %s", scriptPath.c_str());
+				RLOGI("Loading script %s", scriptPath.c_str());
 			}
 		}
 		closedir(dir);
 	} else {
-		LOGE("Couldn't open directory %s", scriptsDir.c_str());
+		RLOGE("Couldn't open directory %s", scriptsDir.c_str());
 		platformExit();
 	}
-	LOGI("About to exit initializeLuaScript");
+	RLOGI("%s", "About to exit initializeLuaScript");
 }
 
 void luaRunGarbageCollector(lua_State* L, int milisecs)
@@ -86,7 +82,7 @@ static void callEmptyLuaFunction(lua_State* L, const char* buffer)
 	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "empty");
 	error = error | lua_pcall(L, 0, 0, 0);
 	if(error) {
-		LOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
+		RLOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -96,13 +92,13 @@ static bool callEmptyLuaFunctionBool(lua_State* L, const char* buffer)
 	lua_getglobal(L, buffer);
 	int error = error | lua_pcall(L, 0, 1, 0);
 	if(error) {
-		LOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
+		RLOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
 		lua_pop(L, 1);
 		return false;
 	}
 	/*retrieve result */
 	if (!lua_isboolean(L, -1)) {
-	 	LOGW("function `f' must return a boolean");
+	 	RLOGW("%s", "function `f' must return a boolean");
 	 	return false;
 	}
 	auto result = lua_toboolean(L, -1);
@@ -120,7 +116,7 @@ static void callInt2LuaFunction(lua_State* L, const char* methodName, int x, int
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
+		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -134,7 +130,7 @@ static void callInt3LuaFunction(lua_State* L, const char* methodName, int x, int
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
+		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -148,7 +144,7 @@ static void callFloat2LuaFunction(lua_State* L, const char* methodName, float x,
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
+		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -162,7 +158,7 @@ static void callIntFloat2LuaFunction(lua_State* L, const char* methodName, uint3
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
+		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -176,7 +172,7 @@ static void callFloat4LuaFunction(lua_State* L, const char* methodName, float x1
 	error = error | lua_pcall(L, 0, 0, 0);
 
 	if(error) {
-		LOGW("LUA Execution Error %s", lua_tostring(L, -1));
+		RLOGW("LUA Execution Error %s", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }
@@ -208,7 +204,7 @@ void luaHandleMessageCall(lua_State* L, Buffer* buffer, uint32_t id)
 	lua_pushnumber(L, id);
 	auto err = lua_pcall(L, 2, 0, 0);
 	if(err) {
-		LOGW("LUA Execution Error %s", lua_tostring(L, -1));
+		RLOGW("LUA Execution Error %s", lua_tostring(L, -1));
 	}
 }
 

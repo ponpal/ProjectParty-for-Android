@@ -146,7 +146,9 @@ obj/local/armeabi/objs/mystery/main.o: jni/main.cpp jni/main.h \
  C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
  jni/core/hash.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/stat.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/stat.h
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/stat.h \
+ jni/core/remote_log.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib
 
 jni/main.h:
 
@@ -557,3 +559,7 @@ jni/core/hash.h:
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/sys/stat.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/linux/stat.h:
+
+jni/core/remote_log.h:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:

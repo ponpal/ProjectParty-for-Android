@@ -11,7 +11,7 @@
 #define __STDC_FORMAT_MACROS
 
 #include <inttypes.h>
-
+#include "remote_log.h"
 
 #define BOUNDS_CHECK(buffer, len) \
 if(!(bufferBytesRemaining(buffer) >= len)) \
@@ -19,7 +19,7 @@ if(!(bufferBytesRemaining(buffer) >= len)) \
 	auto message___Buffer = new char[1024]; \
 	sprintf(message___Buffer, "Buffer Overflow! Buf: %d, Len: %d, File: %s, Line: %d", \
 		bufferBytesRemaining(buffer), len, __FILE__, __LINE__); \
-	LOGE("%s", message___Buffer); \
+	RLOGE("%s", message___Buffer); \
 	delete [] message___Buffer; \
 }
 

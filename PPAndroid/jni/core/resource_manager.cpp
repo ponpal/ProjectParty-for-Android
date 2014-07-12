@@ -14,6 +14,7 @@
 #include "resource_manager.h"
 #include <GLES2/gl2.h>
 #include "platform.h"
+#include "remote_log.h"
 
 template<typename T> const HashID GetHash();
 
@@ -34,7 +35,7 @@ static Resource loadLocal(ResourceManager* resources, const char* path)
 
 static Resource loadExternal(ResourceManager* resources, const char* path)
 {
-	LOGI("%s", path);
+	RLOGI("%s", path);
 	return platformLoadExternalResource(path::buildPath(resources->resourceDir, path).c_str());
 }
 
@@ -130,26 +131,26 @@ static Handle* resourceLoadFont(ResourceManager* resources, const char* path, Ha
 
     platformUnloadResource(fontAsset);
     platformUnloadResource(textureAsset);
-//    LOGI("Font size: %f", font->size);
-//    LOGI("Font base: %f", font->base);
-//    LOGI("Font lineHeight: %f", font->lineHeight);
+//    RLOGI("Font size: %f", font->size);
+//    RLOGI("Font base: %f", font->base);
+//    RLOGI("Font lineHeight: %f", font->lineHeight);
 //
-//    LOGI("Font page glName: %d", font->page.glName);
-//    LOGI("Font page width: %d", font->page.width);
-//    LOGI("Font page height: %d", font->page.height);
+//    RLOGI("Font page glName: %d", font->page.glName);
+//    RLOGI("Font page width: %d", font->page.width);
+//    RLOGI("Font page height: %d", font->page.height);
 //
-//    LOGI("Font charslength: %d", font->charsLength);
-//    LOGI("Font defaultChar: %d", font->defaultChar);
+//    RLOGI("Font charslength: %d", font->charsLength);
+//    RLOGI("Font defaultChar: %d", font->defaultChar);
 //    for(int i = 0; i < font->charsLength; i++)
 //    {
-//        LOGI("Font first char advance: %f", font->chars[i].advance);
-//        LOGI("Font first char offset: x = %f | y = %f", font->chars[i].offset.x, font->chars[i].offset.y);
-//        LOGI("Font first char srcrect: [%f,%f,%f,%f]",
+//        RLOGI("Font first char advance: %f", font->chars[i].advance);
+//        RLOGI("Font first char offset: x = %f | y = %f", font->chars[i].offset.x, font->chars[i].offset.y);
+//        RLOGI("Font first char srcrect: [%f,%f,%f,%f]",
 //                font->chars[i].srcRect.x,
 //                font->chars[i].srcRect.y,
 //                font->chars[i].srcRect.z,
 //                font->chars[i].srcRect.w);
-//        LOGI("Font first char textureCoords: [%f,%f,%f,%f]",
+//        RLOGI("Font first char textureCoords: [%f,%f,%f,%f]",
 //                font->chars[i].textureCoords.x,
 //                font->chars[i].textureCoords.y,
 //                font->chars[i].textureCoords.z,

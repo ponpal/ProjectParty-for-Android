@@ -50,9 +50,53 @@ uint32_t platformGetBroadcastAddress()
     return result;
 }
 
+uint32_t platformLanIP()
+{
+	auto env = gApp->activity->env;
+	auto vm = gApp->activity->vm;
+	auto obj = gApp->activity->clazz;
+
+	vm->AttachCurrentThread( &env, NULL );
+
+	auto clazz = env->GetObjectClass(obj);
+	jmethodID methodID = env->GetMethodID(clazz, "getLanIp", "()I");
+	auto result = env->CallIntMethod(obj, methodID);
+	vm->DetachCurrentThread();
+	return result;
+}
+
+static char deviceName[128];
+const char* platformDeviceName()
+{
+	auto env = gApp->activity->env;
+	auto vm = gApp->activity->vm;
+	auto obj = gApp->activity->clazz;
+
+	vm->AttachCurrentThread( &env, NULL );
+
+
+	auto clazz = env->GetObjectClass(obj);
+	jmethodID methodID = env->GetMethodID(clazz, "getDeviceName", "()[B");
+	LOGI("Method : %d", (uint32_t)methodID);
+
+	auto array = (jbyteArray)env->CallObjectMethod(obj, methodID);
+	auto ptr   = env->GetByteArrayElements(array, 0);
+	int len   = env->GetArrayLength(array);
+
+	LOGI("Exit");
+
+	memcpy(deviceName, ptr, len);
+	deviceName[len] = '\0';
+
+	LOGI("DName %s", deviceName);
+
+	vm->DetachCurrentThread();
+	return deviceName;
+}
+
 Resource platformLoadInternalResource(const char* path)
 {
-    LOGI("Trying to load file %s", path);
+    RLOGI("Trying to load file %s", path);
 	auto mgr  = gApp->activity->assetManager;
 	auto asset = AAssetManager_open(mgr, path, AASSET_MODE_RANDOM);
 	auto length = AAsset_getLength(asset);
@@ -70,7 +114,7 @@ const char* platformExternalResourceDirectory()
 
 Resource platformLoadExternalResource(const char* path)
 {
-    LOGI("Trying to load file %s", path);
+    RLOGI("Trying to load file %s", path);
 	auto resourcePath = path::buildPath(gApp->activity->externalDataPath, path);
 	return platformLoadAbsolutePath(resourcePath.c_str());
 }
@@ -85,7 +129,7 @@ Resource platformLoadAbsolutePath(const char* resourcePath)
     auto buffer = new uint8_t[length];
     fread(buffer, length, 1, file);
     fclose(file);
-    LOGI("Successfully loaded!");
+    RLOGI("%s", "Successfully loaded!");
     return (Resource){ buffer, length };
 }
 

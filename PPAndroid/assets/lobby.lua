@@ -6,7 +6,15 @@ local renderer
 local resources
 local texture
 local font 
-local position
+
+local servers = { }
+local serverRects = { }
+local serverTimers = { }
+local serverTimeout = 5
+local fileSendingHandle = 0
+local receiveFiles = 0
+local receivedFiles
+local chosenServer = nil
 
 function Game.start()
 	discovery = C.serverDiscoveryStart()
@@ -19,26 +27,24 @@ end
 
 function Game.restart()
 	local state = Resources.loadTable("lobby_save_state.luac")
-
-	local state = dofile(path)
 	if state.shouldTransition then
+
 		unbindState()
 		C.loadLuaScripts(C.gGame.L, state.gameName)
 		Resources.setCLoader(C.resourceCreateNetwork(40, state.gameName))
 		Resources.gameName = state.gameName
 		Game.restart()
+	else 
+		Game.start();
 	end
 end
 
 function Game.stop()
-	C.serverDiscoveryStop(discovery)
-	C.resourceUnloadAll(resources)
-	C.resourceDestroy(resources)
-	unbindState()
 
 	local toSave = { }
 	if chosenServer then
 		toSave.gameName = ffi.string(chosenServer.gameName)
+		Log.info(toSave.gameName);
 		toSave.ip       = chosenServer.serverIP
 		toSave.shouldTransition = true
 	else 
@@ -46,15 +52,14 @@ function Game.stop()
 	end 
 
 	Resources.saveTable(toSave, "lobby_save_state.luac")
+
+	C.serverDiscoveryStop(discovery)
+	C.resourceUnloadAll(resources)
+	C.resourceDestroy(resources)
+
+	unbindState()
 end
 
-local servers = { }
-local serverRects = { }
-local serverTimers = { }
-local serverTimeout = 5
-local fileSendingHandle = 0
-local receiveFiles = 0
-local chosenServer = nil
 
 local function updateServerInfo()
     local info = C.serverNextInfo(discovery)
@@ -93,25 +98,30 @@ local function updateServerInfo()
     end
 end
 
-local function chechForTransition()
+local function checkForTransition()
 	if receiveFiles ~= 0 then
 		local fileStatus = C.receiveFilesStatus(fileSendingHandle)
 		if fileStatus == C.TASK_SUCCESS then
-			Game.stop()
-			C.loadLuaScripts(C.gGame.L, chosenServer.gameName)
-			Resources.setCLoader(C.resourceCreateNetwork(40, chosenServer.gameName))
-			Resources.gameName = ffi.string(chosenServer.gameName)
-			Game.start()
-			return
+			return true
 		end
 	end
+
+	return false
 end
 
 function Game.step()
-    updateServerInfo()
-    checkForTransition()
+	updateServerInfo()
+	local shouldTransition = checkForTransition()
+    if shouldTransition then
+		Game.stop()
+		C.loadLuaScripts(C.gGame.L, chosenServer.gameName)
+		Resources.setCLoader(C.resourceCreateNetwork(40, chosenServer.gameName))
+		Resources.gameName = ffi.string(chosenServer.gameName)
+		Game.start()
+		return;
+    end
 
-    gl.glClearColor(1,0,0,1)
+	gl.glClearColor(1,0,0,1)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
     gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
     gl.glEnable(gl.GL_BLEND)
@@ -124,34 +134,25 @@ function Game.step()
 			vec, 0xFFFFFFFF)
 	end
 	
-	local vec = vec2(100, Screen.height - 100)
+	local msg = ""
 	if receiveFiles == 0 then 
-		renderer:addText(font, "Connect to a server!", vec, 0xFFFFFFFF)
+		msg = "Connect to a server!"
 	else
 		local fileStatus = C.receiveFilesStatus(fileSendingHandle)
 		if fileStatus == C.TASK_PROCESSING then
-			renderer:addText(renderer, font, "Processing files", vec, 0xFFFFFFFF)
+			msg = "Processing files"
 		elseif fileStatus == C.TASK_SUCCESS then
-			renderer:addText(renderer, font, "We are done loading files!", vec, 0xFFFFFFFF)
-			Game.stop()
-			C.loadLuaScripts(C.gGame.L, chosenServer.gameName)
-			Resources.setCLoader(C.resourceCreateNetwork(40, chosenServer.gameName))
-			Resources.gameName = ffi.string(chosenServer.gameName)
-			Game.start()
-			return
+			msg = "We are done loading files!"
 		elseif fileStatus == C.TASK_FAILURE then
-			renderer:addText(renderer, font, "File loading failures", 
-				vec, 0xFFFFFFFF)
+			msg = "File loading failures"
 			receivedFiles = 1
 		end
 	end
+
+	renderer:addText(font, msg, vec2(100, Screen.height - 100), 0xFFFFFFFF)
 	renderer:draw()
 end
 
-function Input.onMove(pointerID, x, y)
-	C.luaLog(string.format("On move: %d",pointerID))
-	position = vec2(x,y)
-end
 
 local function startReceivingFiles(serverInfo)
 	chosenServer = serverInfo
@@ -160,11 +161,8 @@ local function startReceivingFiles(serverInfo)
 end
 
 function Input.onDown(pointerID, x, y)
-	C.luaLog(string.format("On down: %d",pointerID))
-	position = vec2(x,y)
 	for i, rect in ipairs(serverRects) do
 		if x > rect.x and x < rect.x + rect.width and y > rect.y and y < rect.y + rect.height then
-			C.luaLog(string.format("Pressed server: %d", i))
 			if receiveFiles == 0 or receivedFiles == 1 then
 				startReceivingFiles(servers[i])
 				receivedFiles = 2
@@ -173,12 +171,11 @@ function Input.onDown(pointerID, x, y)
 	end
 end
 
+function Input.onMove(pointerID, x, y)
+end
+
 function Input.onUp(pointerID, x, y)
-	C.luaLog(string.format("On up: %d",pointerID))
-	position = vec2(x,y)
 end
 
 function Input.onCancel(pointerID, x, y)
-	C.luaLog(string.format("On cancel: %d",pointerID))
-	position = vec2(x,y)
 end

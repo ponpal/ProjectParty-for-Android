@@ -134,7 +134,7 @@ obj/local/armeabi/objs/mystery/core/new_renderer.o: \
  C:/Android/android-ndk-r9c/sources/android/ndk_helper/GLContext.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
- jni/lua/luajit.h
+ jni/lua/luajit.h jni/core/remote_log.h
 
 jni/core/new_renderer.h:
 
@@ -517,3 +517,5 @@ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/egl.h:
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h:
 
 jni/lua/luajit.h:
+
+jni/core/remote_log.h:

@@ -21,11 +21,11 @@ SocketStream* streamCreate(int socket, size_t bufferSize)
 
 void streamDestroy(SocketStream* toDestroy)
 {
-	LOGI("Destroying stream");
+	RLOGI("%s", "Destroying stream");
 	delete [] toDestroy->buffer.base;
-	LOGI("Destroyed buffer");
+	RLOGI("%s", "Destroyed buffer");
 	delete toDestroy;
-	LOGI("Destroyed stream");
+	RLOGI("%s", "Destroyed stream");
 }
 
 static void streamReceive(SocketStream* stream)
@@ -35,7 +35,7 @@ static void streamReceive(SocketStream* stream)
 	stream->buffer.ptr = stream->buffer.base;
 	auto r = recv(stream->socket, stream->buffer.ptr + length, stream->size - length, 0);
 	if (r < 0)
-		LOGI("Error while receiving from stream: %d %s", errno, strerror(errno));
+		RLOGI("Error while receiving from stream: %d %s", errno, strerror(errno));
 	stream->buffer.length = r + length;
 }
 

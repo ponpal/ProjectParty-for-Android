@@ -6,16 +6,15 @@
  */
 
 #include "shader.h"
-#include "JNIHelper.h"
-
 #include <stdlib.h>
+#include "remote_log.h"
 
 namespace shader
 {
 	void checkGlError(const char* op) {
 		for (GLint error = glGetError(); error; error
 				= glGetError()) {
-			LOGI("after %s() glError (0x%x)\n", op, error);
+			RLOGI("after %s() glError (0x%x)\n", op, error);
 		}
 	}
 
@@ -33,7 +32,7 @@ namespace shader
 					char* buf = (char*) malloc(infoLen);
 					if (buf) {
 						glGetShaderInfoLog(shader, infoLen, NULL, buf);
-						LOGE("Could not compile shader %d:\n%s\n",
+						RLOGE("Could not compile shader %d:\n%s\n",
 								shaderType, buf);
 						free(buf);
 					}
@@ -72,7 +71,7 @@ namespace shader
 					char* buf = (char*) malloc(bufLength);
 					if (buf) {
 						glGetProgramInfoLog(program, bufLength, NULL, buf);
-						LOGE("Could not link program:\n%s\n", buf);
+						RLOGE("Could not link program:\n%s\n", buf);
 						free(buf);
 					}
 				}

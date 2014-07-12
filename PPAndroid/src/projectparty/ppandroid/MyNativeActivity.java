@@ -2,6 +2,7 @@ package projectparty.ppandroid;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.Charset;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -31,6 +32,25 @@ public class MyNativeActivity extends android.app.NativeActivity
 		buf.putInt(broadcast);
 		buf.flip();
 		buf.order(ByteOrder.LITTLE_ENDIAN);
+		return buf.getInt();
+	}
+	
+	public byte[] getDeviceName()
+	{
+		String name = android.os.Build.MODEL;
+		byte[] array  = name.getBytes(Charset.forName("UTF-8"));
+		return array;
+	}
+	
+	public int getLanIp()
+	{
+		WifiManager wm = (WifiManager)getSystemService(Context.WIFI_SERVICE);
+		ByteBuffer buf = ByteBuffer.allocate(4);
+		buf.order(ByteOrder.BIG_ENDIAN);
+		buf.putInt(wm.getDhcpInfo().ipAddress);
+		buf.flip();
+		buf.order(ByteOrder.LITTLE_ENDIAN);
+	
 		return buf.getInt();
 	}
 	

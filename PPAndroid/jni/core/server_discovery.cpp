@@ -39,12 +39,12 @@ static void readServerInfo(ServerDiscovery* discovery, Buffer* buffer, uint32_t 
     discovery->end = (discovery->end + 1) % discovery->capacity;
     if(discovery->end == discovery->start)
             discovery->start = (discovery->start + 1) % discovery->capacity;
-    //LOGI("Server name: %s", serverInfo->serverName);
-    //LOGI("Game name: %s", serverInfo->gameName);
-    //LOGI("TCP port: %d", (uint32_t)serverInfo->serverTCPPort);
-    //LOGI("UDP port: %d", (uint32_t)serverInfo->serverUDPPort);
-    //LOGI("Content port: %d", (uint32_t)serverInfo->contentPort);
-    //LOGI("Server IP: %x", serverInfo->serverIP);
+    //RLOGW("Server name: %s", serverInfo->serverName);
+    //RLOGW("Game name: %s", serverInfo->gameName);
+    //RLOGW("TCP port: %d", (uint32_t)serverInfo->serverTCPPort);
+    //RLOGW("UDP port: %d", (uint32_t)serverInfo->serverUDPPort);
+    //RLOGW("Content port: %d", (uint32_t)serverInfo->contentPort);
+    //RLOGW("Server IP: %x", serverInfo->serverIP);
 }
 
 void* serverDiscoveryTask(void* args)
@@ -66,19 +66,19 @@ void* serverDiscoveryTask(void* args)
 
 	int err = bind(udpSocket, (struct sockaddr *)&myaddr, sizeof(myaddr));
 	if(err < 0)
-		LOGE("Could not bind socket, %d %s", errno, strerror(err));
+		RLOGE("Could not bind socket, %d %s", errno, strerror(err));
 	int broadcastEnable = 1;
 
 	err = setsockopt(udpSocket, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
 	if(err < 0)
-		LOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
+		RLOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
 
 	struct timeval tv;
 	tv.tv_sec = 1;
 	tv.tv_usec = 0;
 	err = setsockopt(udpSocket, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 	if(err < 0)
-		LOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
+		RLOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
 	struct sockaddr_in recvAddr;
 	auto buffer = bufferCreate(1024);
 	while(true)
@@ -92,7 +92,7 @@ void* serverDiscoveryTask(void* args)
 		err = sendto(udpSocket, (void*)&broadcastAddress, sizeof(broadcastAddress), 0,
 				 (struct sockaddr*) &broadcastaddr, sizeof(broadcastaddr));
         if(err < 0)
-            LOGE("Could not send, %d %s", errno, strerror(err));
+            RLOGE("Could not send, %d %s", errno, strerror(err));
         while(true) {
 
             bzero(&recvAddr, sizeof(recvAddr));
@@ -122,6 +122,8 @@ void* serverDiscoveryTask(void* args)
     pthread_mutex_unlock(&discovery->mutex);
 	pthread_mutex_destroy(&discovery->mutex);
 	delete discovery;
+
+	return 0;
 }
 
 ServerDiscovery* serverDiscoveryStart()
@@ -132,7 +134,7 @@ ServerDiscovery* serverDiscoveryStart()
     discovery->capacity = 10;
     discovery->broadcastIP = platformGetBroadcastAddress();
     discovery->shouldClose = false;
-    LOGI("Broadcast Address: %X", discovery->broadcastIP);
+    RLOGW("Broadcast Address: %X", discovery->broadcastIP);
     pthread_mutex_init(&discovery->mutex, nullptr);
 
     pthread_t t;

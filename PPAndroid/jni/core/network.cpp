@@ -56,7 +56,7 @@ static void setNonBlocking(int socket)
 	flags |= O_NONBLOCK;
 	auto err = fcntl(socket, F_SETFL, flags);
 	if(err < 0)
-		LOGE("Could not set nonblocking, %d %s", errno, strerror(err));
+		RLOGE("Could not set nonblocking, %d %s", errno, strerror(err));
 
 }
 
@@ -71,7 +71,7 @@ int networkConnect(Network* network, uint32_t ip, uint16_t udpPort, uint16_t tcp
 
 	int err = bind(udpSocket, (struct sockaddr *)&myaddr, sizeof(myaddr));
 	if(err < 0)
-		LOGE("Could not bind socket, %d %s", errno, strerror(err));
+		RLOGE("Could not bind socket, %d %s", errno, strerror(err));
 
 	int tcpSocket;
 	struct sockaddr_in servaddr;
@@ -83,7 +83,7 @@ int networkConnect(Network* network, uint32_t ip, uint16_t udpPort, uint16_t tcp
 	auto tcperr = connect(tcpSocket, (struct sockaddr *)&servaddr, sizeof(servaddr));
 	if (tcperr)
 	{
-		LOGE("Could not connect, error is: %d %s", errno, strerror(errno));
+		RLOGE("Could not connect, error is: %d %s", errno, strerror(errno));
 		return tcperr;
 	}
 
@@ -94,7 +94,7 @@ int networkConnect(Network* network, uint32_t ip, uint16_t udpPort, uint16_t tcp
 	send(tcpSocket, &sessionID, sizeof(sessionID), 0);
 
 	network->sessionID = sessionID;
-	LOGI("SessionID: %" PRIu64, sessionID);
+	RLOGI("SessionID: %" PRIu64, sessionID);
 	network->tcpSocket = tcpSocket;
 	network->remoteIP = ip;
 	network->udpSocket = udpSocket;
@@ -116,14 +116,14 @@ int networkReconnect(Network* network)
 
 void networkDisconnect(Network* network)
 {
-	LOGI("Disconnecting...");
+	RLOGI("%s", "Disconnecting...");
 	if(network->tcpSocket == 0)
 		return;
 	close(network->tcpSocket);
 	close(network->udpSocket);
 	network->tcpSocket = 0;
 	network->udpSocket = 0;
-	LOGI("Disconnected.");
+	RLOGI("%s", "Disconnected.");
 }
 
 int bufferReceive(int socket, Buffer* buffer)
@@ -181,13 +181,13 @@ int networkSend(Network* network)
 	auto result = networkUDPSend(network);
 	if(result == -1)
 	{
-		LOGE("Could not send UDP, error is: %d %s", errno, strerror(errno));
+		RLOGE("Could not send UDP, error is: %d %s", errno, strerror(errno));
 		return result;
 	}
 	result = networkTCPSend(network);
 	if(result == -1)
 	{
-		LOGE("Could not send TCP, error is: %d %s", errno, strerror(errno));
+		RLOGE("Could not send TCP, error is: %d %s", errno, strerror(errno));
 		return result;
 	}
 	return 0;
@@ -200,7 +200,7 @@ bool networkIsAlive(Network* network)
 	auto r = getsockopt(network->tcpSocket, SOL_SOCKET, SO_ERROR, &error_code, &len);
 	r |= getsockopt(network->udpSocket, SOL_SOCKET, SO_ERROR, &error_code, &len);
 	if(r) {
-		LOGE("Network is not alive! Error: %d %s", errno, strerror(errno));
+		RLOGE("Network is not alive! Error: %d %s", errno, strerror(errno));
 	}
 	return r == 0;
 }
@@ -216,27 +216,27 @@ void networkSendLogMessage(Network* network, const char* message)
 static void handleSystemMessage(Buffer* buffer)
 {
 	auto id = bufferReadByte(buffer);
-    LOGI("system messageID: %d", id);
+    RLOGI("system messageID: %d", id);
     if (id == NETWORK_IN_SHUTDOWN) {
-        LOGE("Shutting down");
+        RLOGE("%s", "Shutting down");
         gameFinish();
     }
 }
 
 static bool readMessage(Network* network, Buffer* buffer) {
 	auto remaining = bufferBytesRemaining(buffer);
-	LOGI("Remaining: %d", remaining);
+	RLOGI("Remaining: %d", remaining);
 	if (remaining < 4)
 		return false;
 	auto messageSize = bufferReadShort(buffer);
-	LOGI("MessageSize: %d", (uint32_t)messageSize);
+	RLOGI("MessageSize: %d", (uint32_t)messageSize);
 
 	if (remaining - 2 < messageSize) {
 		buffer->ptr -= 2;
 		return false;
     }
 	auto messageID = bufferReadShort(buffer);
-	LOGI("messageID: %d", (uint32_t)messageID);
+	RLOGI("messageID: %d", (uint32_t)messageID);
 
 	if (messageID == 0) {
         handleSystemMessage(buffer);

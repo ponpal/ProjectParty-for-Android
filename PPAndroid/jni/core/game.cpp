@@ -28,20 +28,22 @@ bool gameInitialized() {
 }
 
 static void gameStart() {
-	LOGI("Starting game!");
+	RLOGI("%s", "Starting game!");
 	hasStarted = true;
 	luaStartCall(gGame->L);
 	nice(1000000);
 }
 
 static void gameRestart() {
-	LOGI("Restarting game!");
+	RLOGI("%s", "Restarting game!");
 	luaRestartCall(gGame->L);
 }
 
 void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 	if (gGame)
 		return;
+	remoteLogInitialize(platformDeviceName(), 54321);
+
 
 	gGame = new Game();
 	gGame->clock = new Clock();
@@ -53,17 +55,19 @@ void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 
 	gGame->fps = 60;
 
-	LOGI("Initializing Game!");
+	RLOGI("%s", "Initializing Game!");
 	gGame->L = luaCoreCreate();
 	if(hasStarted)
 		gameRestart();
 	else
 		gameStart();
+
 }
 
 void gameStop() {
 	if(!gGame)
 		return;
+	remoteLogTerm();
 
 	luaStopCall(gGame->L);
 	luaCoreDestroy(gGame->L);

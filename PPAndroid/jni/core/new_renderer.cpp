@@ -43,7 +43,7 @@ static const char gFragmentShader[] =
 void checkGlError(const char* op) {
     for (GLint error = glGetError(); error; error
             = glGetError()) {
-        LOGI("after %s() glError (0x%x)\n", op, error);
+        RLOGI("after %s() glError (0x%x)\n", op, error);
     }
 }
 
@@ -55,7 +55,7 @@ GLuint createVBO(size_t count, size_t elementSize)
     glBufferData(GL_ARRAY_BUFFER, count * elementSize, NULL, GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    LOGI("Buffer Size: %d", count * elementSize);
+    RLOGI("Buffer Size: %d", count * elementSize);
 
     checkGlError("createVBO");
     return buffer;
@@ -107,12 +107,9 @@ static void rendererActivate(Renderer* renderer) //Must be called before any att
 {
 	size_t actualSize = renderer->capacity;
 	size_t maxBatchSize = actualSize / 4;
-	LOGI("Before VBO creation");
 
 	renderer->vbo = createVBO(actualSize, sizeof(Vertex));
-	LOGI("After VBO creation");
 	renderer->ibo = createIBO(maxBatchSize);
-	LOGI("After IBO creation");
 
 	renderer->program = shader::createProgram(gVertexShader, gFragmentShader);
 	renderer->samplerUniform 	= glGetUniformLocation(renderer->program, "sampler");

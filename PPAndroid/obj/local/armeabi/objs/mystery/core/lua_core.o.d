@@ -144,7 +144,9 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h jni/core/path.h \
  jni/core/platform.h jni/core/resource_manager.h jni/core/hash.h \
- C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/dirent.h
+ C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/dirent.h \
+ jni/core/remote_log.h \
+ C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib
 
 jni/core/lua_core.h:
 
@@ -551,3 +553,7 @@ jni/core/resource_manager.h:
 jni/core/hash.h:
 
 C:/Android/android-ndk-r9c/platforms/android-19/arch-arm/usr/include/dirent.h:
+
+jni/core/remote_log.h:
+
+C:/Android/android-ndk-r9c/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
