@@ -32,5 +32,3 @@ matrix4 matrixOrthogonalProjection(float left, float right, float bottom, float 
 	glm::mat4 mat = glm::ortho(left, right, bottom, top);
 	return *((matrix4*)&mat);
 }
-
-

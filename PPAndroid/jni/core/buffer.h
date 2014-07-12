@@ -21,9 +21,11 @@ extern "C"
 	} Buffer;
 
 	Buffer* bufferCreate(size_t size);
+	Buffer bufferWrapArray(uint8_t* array, size_t arraySize);
 	void bufferDestroy(Buffer* buffer);
 
 	uint32_t bufferBytesRemaining(Buffer* buffer);
+	uint32_t bufferBytesConsumed(Buffer* buffer);
 
 	void bufferWriteBytes(Buffer* buffer, uint8_t* data, size_t length);
 	void bufferWriteByte(Buffer* buffer, uint8_t data);
