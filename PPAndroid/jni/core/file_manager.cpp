@@ -125,7 +125,16 @@ static void receiveFiles(const char* fileDirectory, int socket)
         {
         	removeFiles(stream, fileDirectory);
         }
+        else
+        {
+        	RLOGI("Unrecognised message ID! %d", messageID);
+        	platformExit();
+        	goto end;
+        }
 	}
+
+	end:
+
 	streamDestroy(stream);
 	RLOGI("%s", "ReceiveFiles done!");
 }
@@ -180,7 +189,7 @@ static void* fileTask(void* ptr)
 	err = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 	if (err)
 	{
-		RLOGI("Could not set receivetimeout, error is: %d %s", errno, strerror(errno));
+		RLOGI("Could not set receive timeout, error is: %d %s", errno, strerror(errno));
 		taskStatus = TASK_FAILURE;
 		close(sockfd);
 		return nullptr;
@@ -197,9 +206,13 @@ static void* fileTask(void* ptr)
 	}
 	RLOGI("%s", "Connected");
 	sendMapFile(task->fileDirectory.c_str(), sockfd);
+
 	RLOGI("%s", "Sent map file");
+
 	RLOGI("FileDirectory = %s", task->fileDirectory.c_str());
+
 	receiveFiles(task->fileDirectory.c_str(), sockfd);
+
 	RLOGI("%s", "All files received!");
 	close(sockfd);
 	taskStatus = TASK_SUCCESS;

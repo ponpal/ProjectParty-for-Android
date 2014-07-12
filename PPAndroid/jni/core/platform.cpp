@@ -104,7 +104,8 @@ Resource platformLoadInternalResource(const char* path)
 	auto err = AAsset_read(asset, buffer, length);
 	ASSERTF(err >= 0, "Failed to load internal resource %s. Error was: %d", path, err);
 	AAsset_close(asset);
-	return (Resource){ buffer,length };
+
+	return (Resource){ buffer, (uint32_t)length };
 }
 
 const char* platformExternalResourceDirectory()
@@ -130,7 +131,7 @@ Resource platformLoadAbsolutePath(const char* resourcePath)
     fread(buffer, length, 1, file);
     fclose(file);
     RLOGI("%s", "Successfully loaded!");
-    return (Resource){ buffer, length };
+    return (Resource){ buffer, (uint32_t)length };
 }
 
 void platformUnloadResource(Resource resource)

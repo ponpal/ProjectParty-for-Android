@@ -107,48 +107,6 @@ static bool callEmptyLuaFunctionBool(lua_State* L, const char* buffer)
 	return result;
 }
 
-static void callInt2LuaFunction(lua_State* L, const char* methodName, int x, int y)
-{
-	char buffer[128];
-	sprintf(buffer, "%s(%d,%d)", methodName, x, y);
-
-	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "int int");
-	error = error | lua_pcall(L, 0, 0, 0);
-
-	if(error) {
-		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
-		lua_pop(L, 1);
-	}
-}
-
-static void callInt3LuaFunction(lua_State* L, const char* methodName, int x, int y, int z)
-{
-	char buffer[128];
-	sprintf(buffer, "%s(%d,%d,%d)", methodName, x, y, z);
-
-	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "int int int");
-	error = error | lua_pcall(L, 0, 0, 0);
-
-	if(error) {
-		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
-		lua_pop(L, 1);
-	}
-}
-
-static void callFloat2LuaFunction(lua_State* L, const char* methodName, float x, float y)
-{
-	char buffer[128];
-	sprintf(buffer, "%s(%f,%f)", methodName, x, y);
-
-	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "float float");
-	error = error | lua_pcall(L, 0, 0, 0);
-
-	if(error) {
-		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
-		lua_pop(L, 1);
-	}
-}
-
 static void callIntFloat2LuaFunction(lua_State* L, const char* methodName, uint32_t i, float x, float y)
 {
 	char buffer[128];
@@ -159,20 +117,6 @@ static void callIntFloat2LuaFunction(lua_State* L, const char* methodName, uint3
 
 	if(error) {
 		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
-		lua_pop(L, 1);
-	}
-}
-
-static void callFloat4LuaFunction(lua_State* L, const char* methodName, float x1, float y1, float x2, float y2)
-{
-	char buffer[256];
-	sprintf(buffer, "%s(%f,%f,%f,%f)", methodName, x1, y1, x2, y2);
-
-	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "float4");
-	error = error | lua_pcall(L, 0, 0, 0);
-
-	if(error) {
-		RLOGW("LUA Execution Error %s", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
 }

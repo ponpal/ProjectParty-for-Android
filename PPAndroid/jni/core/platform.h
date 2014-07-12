@@ -11,20 +11,22 @@
 #include "resource_manager.h"
 
 #ifdef __ANDROID__
-#include "android_native_app_glue.h"
-extern android_app* gApp;
+	#include "android_native_app_glue.h"
+	extern android_app* gApp;
 #endif
 
-extern "C" {
-int platformVibrate(uint64_t milliseconds);
-uint32_t platformGetBroadcastAddress();
-uint32_t platformLanIP();
-const char* platformDeviceName();
-const char* platformExternalResourceDirectory();
-Resource platformLoadAbsolutePath(const char* name);
-Resource platformLoadInternalResource(const char* path);
-Resource platformLoadExternalResource(const char* path);
-void platformUnloadResource(Resource resource);
-void platformExit();
+extern "C"
+{
+	int platformVibrate(uint64_t milliseconds);
+	uint32_t platformGetBroadcastAddress();
+	uint32_t platformLanIP();
+	const char* platformDeviceName();
+	const char* platformExternalResourceDirectory();
+	Resource platformLoadAbsolutePath(const char* name);
+	Resource platformLoadInternalResource(const char* path);
+	Resource platformLoadExternalResource(const char* path);
+	void platformUnloadResource(Resource resource);
+	void platformExit();
 }
+
 #endif /* VIBRATOR_H_ */

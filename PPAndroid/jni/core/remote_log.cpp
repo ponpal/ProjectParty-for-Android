@@ -21,6 +21,7 @@
 #include "remote_log.h"
 #include <fcntl.h>
 #include <cstdio>
+#include "socket_helpers.h"
 
 static std::string gLoggingID;
 static int listener = 0, tcpSocket = 0;
@@ -34,25 +35,6 @@ struct BroadcastInfo
 	uint32_t ip;
 	uint16_t port;
 };
-
-static void setNonBlocking(int socket)
-{
-	int flags = fcntl(socket, F_GETFL, 0);
-	flags |= O_NONBLOCK;
-	auto err = fcntl(socket, F_SETFL, flags);
-	if(err < 0)
-		LOGE("Could not set nonblocking, %d %s", errno, strerror(err));
-
-}
-
-static void setBlocking(int socket)
-{
-	int flags = fcntl(socket, F_GETFL, 0);
-	flags &= ~O_NONBLOCK;
-	auto err = fcntl(socket, F_SETFL, flags);
-	if(err < 0)
-		LOGE("Could not set blocking, %d %s", errno, strerror(err));
-}
 
 static void shutdownConnection()
 {
@@ -78,7 +60,7 @@ void remoteLogInitialize(const char* loggingID, uint16_t port)
 	isInitialized = true;
 
     listener = socket(AF_INET, SOCK_DGRAM, 0);
-//	setNonBlocking(listener);
+	socketSetBlocking(listener, false);
 
     struct sockaddr_in myaddr;
 	bzero(&myaddr, sizeof(myaddr));
@@ -94,41 +76,25 @@ void remoteLogInitialize(const char* loggingID, uint16_t port)
 
 static bool connectToLogServer(BroadcastInfo info)
 {
-	struct sockaddr_in servaddr;
 	tcpSocket = socket(AF_INET, SOCK_STREAM, 0);
-	setNonBlocking(tcpSocket);
-	bzero(&servaddr, sizeof(servaddr));
-	servaddr.sin_family = AF_INET;
-	servaddr.sin_addr.s_addr = htonl(info.ip);
-	servaddr.sin_port = htons(info.port);
+	if(socketConnectTimeout(tcpSocket, info.ip, info.port, 1000))
+	{
+		socketSetBlocking(tcpSocket, true);
+		socketRecvTimeout(tcpSocket, 1000);
 
-	fd_set set;
-	FD_ZERO(&set);
-	FD_SET(tcpSocket, &set);
+		uint16_t length = gLoggingID.size();
+		send(tcpSocket, &length, sizeof(length), 0);
+		send(tcpSocket, gLoggingID.c_str(), (uint32_t)length, 0);
 
-    struct timeval  timeout;
-    timeout.tv_sec = 1;
-    timeout.tv_usec = 0;
-
-	auto tcperr = connect(tcpSocket, (struct sockaddr *)&servaddr, sizeof(servaddr));
-	auto status = select(tcpSocket + 1, NULL, &set, NULL, &timeout);
-
-	if(status < 0)
+		isConnected = true;
+		return true;
+	}
+	else
 	{
 		shutdownConnection();
 		return false;
 	}
 
-	LOGE("Connected successfully!");
-
-	setBlocking(tcpSocket);
-	setsockopt(tcpSocket, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(timeout));
-	uint16_t length = gLoggingID.size();
-	send(tcpSocket, &length, sizeof(length), 0);
-	send(tcpSocket, gLoggingID.c_str(), (uint32_t)length, 0);
-
-	isConnected = true;
-	return true;
 }
 
 static void listenForLogServer()
@@ -138,7 +104,7 @@ static void listenForLogServer()
 	socklen_t len;
 
 	auto read = recvfrom(listener, &info, sizeof(info), 0, &dummy, &len);
-	LOGI("I listened for a server! %d", read);
+	LOGI("I listened for a server! %d", (int)read);
 	if(read == 6)
 	{
 		connectToLogServer(info);
@@ -163,7 +129,7 @@ static void sendLogMessage(int verbosity, const char* toLog)
 	}
 
 	//File and line information which is not present here.
-	//Maby this should be done in the other application? It should.
+	//Maybe this should be done in the other application? It should.
 	data = 0;
 	err = send(tcpSocket, &data, 2, 0);
 

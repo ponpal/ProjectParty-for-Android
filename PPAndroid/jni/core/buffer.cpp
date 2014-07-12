@@ -32,16 +32,29 @@ Buffer* bufferCreate(size_t bufferSize)
 	return buffer;
 }
 
+Buffer bufferWrapArray(uint8_t* array, size_t length)
+{
+	Buffer buffer;
+	buffer.base     = buffer.ptr = array;
+	buffer.length   = length;
+	buffer.capacity = length;
+	return buffer;
+}
+
 void bufferDestroy(Buffer* buffer)
 {
 	delete [] buffer->base;
 	delete buffer;
 }
 
-
 uint32_t bufferBytesRemaining(Buffer* buffer)
 {
 	return buffer->length - (buffer->ptr - buffer->base);
+}
+
+uint32_t bufferBytesConsumed(Buffer* buffer)
+{
+	return buffer->ptr - buffer->base;
 }
 
 void bufferWriteUTF8(Buffer* buffer, const char* data)
@@ -94,14 +107,14 @@ void bufferWriteLong(Buffer* buffer, uint64_t data)
 	BOUNDS_CHECK(buffer, sizeof(uint64_t));
 
 	auto ptr = buffer->ptr;
-	*(ptr++) = (data & 0xFF);
-	*(ptr++) = (data & 0xFF00) >> 8;
-	*(ptr++) = (data & 0xFF0000) >> 16;
-	*(ptr++) = (data & 0xFF000000) >> 24;
-	*(ptr++) = (data & 0xFF00000000) >> 32;
-	*(ptr++) = (data & 0xFF0000000000) >> 40;
-	*(ptr++) = (data & 0xFF000000000000) >> 48;
-	*(ptr++) = (data & 0xFF00000000000000) >> 56;
+	*(ptr++) = ((uint64_t)data & 0xFF) >> 0;
+	*(ptr++) = ((uint64_t)data & 0xFF00) >> 8;
+	*(ptr++) = ((uint64_t)data & 0xFF0000) >> 16;
+	*(ptr++) = ((uint64_t)data & 0xFF000000) >> 24;
+	*(ptr++) = ((uint64_t)data & 0xFF00000000) >> 32;
+	*(ptr++) = ((uint64_t)data & 0xFF0000000000) >> 40;
+	*(ptr++) = ((uint64_t)data & 0xFF000000000000) >> 48;
+	*(ptr++) = ((uint64_t)data & 0xFF00000000000000) >> 56;
 
 	buffer->ptr = ptr;
 }
