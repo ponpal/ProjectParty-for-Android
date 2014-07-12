@@ -39,6 +39,7 @@ static void readServerInfo(ServerDiscovery* discovery, Buffer* buffer, uint32_t 
     discovery->end = (discovery->end + 1) % discovery->capacity;
     if(discovery->end == discovery->start)
             discovery->start = (discovery->start + 1) % discovery->capacity;
+
     //RLOGW("Server name: %s", serverInfo->serverName);
     //RLOGW("Game name: %s", serverInfo->gameName);
     //RLOGW("TCP port: %d", (uint32_t)serverInfo->serverTCPPort);
@@ -156,7 +157,7 @@ ServerInfo serverNextInfo(ServerDiscovery* discovery)
 	return info;
 }
 
-void serverDiscoveryStop(ServerDiscovery* discovery)
+  void serverDiscoveryStop(ServerDiscovery* discovery)
 {
 	pthread_mutex_lock(&discovery->mutex);
 	discovery->shouldClose = true;
