@@ -15,7 +15,7 @@ LOCAL_SRC_FILES += $(FILE_LIST:$(LOCAL_PATH)/%=%)
 
 LOCAL_STATIC_LIBRARIES := libluajit android_native_app_glue ndk_helper
 LOCAL_C_INCLUDES += $(LOCAL_PATH)/glm
-
+LOCAL_C_INCLUDES += $(TOP)/frameworks/native/include
 LOCAL_LDLIBS :=  -llog -landroid -lEGL -lGLESv2
 
 include $(BUILD_SHARED_LIBRARY)

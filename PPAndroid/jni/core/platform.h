@@ -26,6 +26,7 @@ extern "C"
 	Resource platformLoadInternalResource(const char* path);
 	Resource platformLoadExternalResource(const char* path);
 	void platformUnloadResource(Resource resource);
+	void platformCrash();
 	void platformExit();
 }
 

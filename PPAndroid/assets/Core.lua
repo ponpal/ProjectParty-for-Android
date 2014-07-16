@@ -23,6 +23,11 @@ ffi.cdef[[
 		float x, y, width, height;
 	} Frame;
 
+	//----------------------------
+	//	image_loader.h
+	//----------------------------
+	Texture loadTexture(uint8_t* data, uint32_t length);
+
 
 	// ----------------------------
 	//  	buffer.h
@@ -53,6 +58,7 @@ ffi.cdef[[
 
 	size_t bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes);
 	size_t bufferReadUTF8(Buffer* buffer, char** dest);
+	char* bufferReadTempUTF8(Buffer* buffer);
 	uint8_t  bufferReadByte(Buffer* buffer);
 	uint16_t bufferReadShort(Buffer* buffer);
 	uint32_t bufferReadInt(Buffer* buffer);
@@ -61,11 +67,41 @@ ffi.cdef[[
 	float  bufferReadFloat(Buffer* buffer);
 	double bufferReadDouble(Buffer* buffer);
 
+	//-----------------------------
+	//	    socket_stream.h
+	//-----------------------------
+	typedef struct SocketStream SocketStream;
+
+	SocketStream* streamCreate(int socket, size_t bufferSize);
+	void streamDestroy(SocketStream* toDestroy);
+	void streamFlush(SocketStream* stream, bool untilFinished);
+
+	bool streamHasInputData(SocketStream* stream);
+	bool streamHasOutputData(SocketStream* stream);
+	bool streamCheckError(SocketStream* stream);
+
+	uint8_t streamReadByte(SocketStream* stream);
+	uint16_t streamReadShort(SocketStream* stream);
+	uint32_t streamReadInt(SocketStream* stream);
+	uint64_t streamReadLong(SocketStream* stream);
+	float streamFloat(SocketStream* stream);
+	double streamDouble(SocketStream* stream);
+	size_t streamReadBytes(SocketStream* stream, uint8_t* dest, uint32_t length);
+	const char* streamReadTempUTF8(SocketStream* stream);
+	const uint8_t* streamReadInPlace(SocketStream* stream, uint32_t length);
+
+	void streamWriteByte(SocketStream* stream, uint8_t data);
+	void streamWriteShort(SocketStream* stream, uint16_t data);
+	void streamWriteInt(SocketStream* stream, uint32_t data);
+	void streamWriteLong(SocketStream* stream, uint64_t data);
+	void streamWriteFloat(SocketStream* stream, float data);
+	void streamWriteDouble(SocketStream* stream, double data);
+	void streamWriteBytes(SocketStream* stream, uint8_t* data, uint32_t length);
+	void streamWriteUTF8(SocketStream* stream, const char* data);
 
 	// ----------------------------
 	//  	font.h
 	// ----------------------------
-
 	typedef struct
 	{
 		vec4f textureCoords;
@@ -94,12 +130,14 @@ ffi.cdef[[
 	//  	file_manager.h
 	// ----------------------------
 
-	enum {
+	enum 
+	{
 		TASK_SUCCESS = 0,
 		TASK_FAILURE = -1,
 		TASK_PROCESSING = 1
 	};
 
+	bool receiveFile(SocketStream* stream, const char* fileDirectory, const char* name);
 	uint32_t receiveFiles(uint32_t ip, uint16_t port, const char* fileDirectory);
 	int32_t receiveFilesStatus(uint32_t);
 
@@ -261,32 +299,24 @@ ffi.cdef[[
 
 	void networkSendLogMessage(Network* network, const char* message);
 
+	//------------------------------
+	//		service_finder.h
+	//------------------------------
+	static const uint16_t servicePort = 34299;
+	typedef void (*serviceFound)(const char*, Buffer*);
+	typedef struct ServiceFinder ServiceFinder;
 
-	// ----------------------------
-	//  	server_discovery.h
-	// ----------------------------
-
-	typedef struct ServerDiscovery ServerDiscovery;
-
-	typedef struct {
-		char serverName[58];
-		char gameName[58];
-		uint32_t serverIP;
-		uint16_t contentPort;
-		uint16_t serverTCPPort;
-		uint16_t serverUDPPort;
-	} ServerInfo;
-
-	ServerDiscovery* serverDiscoveryStart();
-	ServerInfo serverNextInfo(ServerDiscovery* discovery);
-	void serverDiscoveryStop(ServerDiscovery* discovery);
+	ServiceFinder* serviceFinderCreate(const char* toFind, uint16_t port, serviceFound function);
+	void serviceFinderDestroy(ServiceFinder*);
+	void serviceFinderQuery(ServiceFinder*);
+	bool serviceFinderPollFound(ServiceFinder*);
 
 	//-----------------------------
 	//		remote_log.h
 	//-----------------------------
-	void remoteLogInitialize(const char* loggingID, uint16_t loggingPort);
-	void remoteLogTerm();
-	void remoteLuaLog(int verbosity, const char* message);
+	void remoteLogStart(const char* loggingID);
+	void remoteLogStop();
+	void remoteLog(int verbosity, const char* message);
 
 	// ----------------------------
 	//  	game.h
@@ -314,6 +344,30 @@ ffi.cdef[[
 
 	extern Game* gGame;
 
+	//-----------------------
+	// core stuff 
+	//-----------------------
+
+	void* malloc(uint32_t);
+	void free(void*);
+
+	//-----------------------
+	// socket_helpers.h
+	//-----------------------
+	static const uint32_t TCP_SOCKET = 1;
+	static const uint32_t UDP_SOCKET = 2;
+
+	//Socket common
+	int socketCreate(int type);
+	bool socketBind(int socket, uint32_t ip, uint16_t port);
+	void socketSetBlocking(int socket, bool value);
+	void socketSendTimeout(int socket, uint32_t msecs);
+	void socketRecvTimeout(int socket, uint32_t mescs);
+	void socketDestroy(int socket);
+	
+	bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs);
+	size_t socketSend(int socket, Buffer* toSend);
+	size_t socketReceive(int socket, Buffer* buffer);
 ]]
 
 
@@ -322,133 +376,6 @@ C = ffi.C
 Time = {}
 Time.total   = 0
 Time.elapsed = 0
-
-Network = {
-	send = function()
-	    C.networkSend(C.gGame.network)
-	end,
-  usend = function()
-      C.networkUnreliableSend(C.gGame.network)
-  end,
-	isAlive = function()
-		ffi.C.networkIsAlive(C.gGame.network)
-	end,
-	update = function()
-		Network.elapsed = Network.elapsed + Time.elapsed
-		if Network.elapsed > Network.sendInterval then
-		    Network.elapsed = 0
-			Network.send()
-		end
-	end
-}
-Network.elapsed = 0
-Network.sendInterval = 0.1
-
-Out = { }
- function Out.writeByte(byte)
-	C.bufferWriteByte(C.gGame.network.out, byte)
-end
-function Out.writeShort(short)
-	C.bufferWriteShort(C.gGame.network.out, short)
-end
-function Out.writeInt(int)
-	C.bufferWriteInt(C.gGame.network.out, int)
-end
-function Out.writeLong(long)
-	C.bufferWriteShort(C.gGame.network.out, long)
-end
-function Out.writeFloat(float)
-	C.bufferWriteFloat(C.gGame.network.out, float)
-end
-function Out.writeDouble(double)
-	C.bufferWriteDouble(C.gGame.network.out, double)
-end
-function Out.writeVec2(v)
-	Out.writeFloat(v.x)
-	Out.writeFloat(v.y)
-end
-function Out.writeVec3(v)
-	Out.writeFloat(v.x)
-	Out.writeFloat(v.y)
-	Out.writeFloat(v.z)
-end
-function Out.writeUTF8(s)
-	C.bufferWriteUTF8(C.gGame.network.out, s);
-end
-
-UOut = { }
- function UOut.writeByte(byte)
-	C.bufferWriteByte(C.gGame.network.uout, byte)
-end
-function UOut.writeShort(short)
-	C.bufferWriteShort(C.gGame.network.uout, short)
-end
-function UOut.writeInt(int)
-	C.bufferWriteInt(C.gGame.network.uout, int)
-end
-function UOut.writeLong(long)
-	C.bufferWriteShort(C.gGame.network.uout, long)
-end
-function UOut.writeFloat(float)
-	C.bufferWriteFloat(C.gGame.network.uout, float)
-end
-function UOut.writeDouble(double)
-	C.bufferWriteDouble(C.gGame.network.uout, double)
-end
-
-function UOut.writeVec2(v)
-	UOut.writeFloat(v.x)
-	UOut.writeFloat(v.y)
-end
-
-function UOut.writeVec3(v)
-	UOut.writeFloat(v.x)
-	UOut.writeFloat(v.y)
-	UOut.writeFloat(v.z)
-end
-
-function UOut.writeUTF8(s)
-	C.bufferWriteUTF8(C.gGame.network.out, s);
-end
-
-
-In = { }
-In.readByte  = function()
-	return C.bufferReadByte(C.gGame.network.in_)
-end
-In.readShort = function()
-	return C.bufferReadShort(C.gGame.network.in_)
-end
-In.readInt  = function()
-	return C.bufferReadInt(C.gGame.network.in_)
-end
-In.readLong = function()
-	return C.bufferReadLong(C.gGame.network.in_)
-end
-In.readFloat = function()
-	return C.bufferReadFloat(C.gGame.network.in_)
-end
-In.readDouble = function()
-	return C.bufferReadDouble(C.gGame.network.in_)
-end
-In.readVec2 = function()
-	return vec2(In.readFloat(), In.readFloat())
-end
-In.readVec3 = function()
-	return vec3(In.readFloat(), In.readFloat(), In.readFloat())
-end
-In.readUTF8 = function()
-	return ffi.string(C.bufferReadLuaString(C.gGame.network.in_))
-end
-
-In.readByteArray = function()
-	local len = In.readShort()
-	local array = {}
-	for i=0, len-1, 1 do
-		array[i] = In.readByte()
-	end
-	return array
-end
 
 function vibrate(milliseconds)
 	return C.vibrate(milliseconds)
@@ -547,34 +474,34 @@ function unbindState()
 	Game.start = doNothing
 	Game.stop = doNothing
 	Game.restart = doNothing
+
 end
 
 Log = {}
 
 function Log.info(msg)
-	C.remoteLuaLog(0, msg)
+	C.remoteLog(0, msg)
 end
 
 function Log.warn(msg)
-	C.remoteLuaLog(1, msg)
+	C.remoteLog(1, msg)
 end
 
 function Log.error(msg)
-	C.remoteLuaLog(2, msg)
+	C.remoteLog(2, msg)
 end
 
 function Log.infof(fmt, ...)
-	C.remoteLuaLog(0, string.format(fmt, ...))
+	C.remoteLog(0, string.format(fmt, ...))
 end
 
 function Log.warnf(fmt, ...)
-	C.remoteLuaLog(1, string.format(fmt, ...))
+	C.remoteLog(1, string.format(fmt, ...))
 end
 
 function Log.errorf(fmt, ...)
-	C.remoteLuaLog(2, string.format(fmt, ...))
+	C.remoteLog(2, string.format(fmt, ...))
 end
-
 
 
 Resources = {}
@@ -708,6 +635,8 @@ setmetatable(global, GlobalMT)
 do
 	GLOBAL_lock(_G)
 	runInternalFile("gl.lua")
-	runInternalFile("lobby.lua")
+	runInternalFile("socket.lua")
+	runInternalFile("resources.lua")
 	runInternalFile("renderer.lua")
+	runInternalFile("lobby.lua")
 end

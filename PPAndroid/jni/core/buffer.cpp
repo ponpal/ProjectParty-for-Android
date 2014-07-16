@@ -7,6 +7,7 @@
 
 #include "buffer.h"
 #include "assert.h"
+#include "platform.h"
 
 #define __STDC_FORMAT_MACROS
 
@@ -21,6 +22,7 @@ if(!(bufferBytesRemaining(buffer) >= len)) \
 		bufferBytesRemaining(buffer), len, __FILE__, __LINE__); \
 	RLOGE("%s", message___Buffer); \
 	delete [] message___Buffer; \
+	platformExit(); \
 }
 
 Buffer* bufferCreate(size_t bufferSize)
@@ -62,8 +64,8 @@ void bufferWriteUTF8(Buffer* buffer, const char* data)
 	size_t length = strlen(data);
 	BOUNDS_CHECK(buffer, length);
 
-	bufferWriteShort(buffer, length);
-	bufferWriteBytes(buffer, (uint8_t*)data, length);
+	bufferWriteShort(buffer, length + 1);
+	bufferWriteBytes(buffer, (uint8_t*)data, length + 1);
 }
 
 void bufferWriteBytes(Buffer* buffer, uint8_t* data, size_t length)
@@ -148,9 +150,22 @@ size_t bufferReadUTF8(Buffer* buffer, char** dest)
 {
 	size_t length = bufferReadShort(buffer);
 	BOUNDS_CHECK(buffer, length);
-	*dest = new char[length + 1];
-	(*dest)[length] = '\0';
-	return bufferReadBytes(buffer, (uint8_t*)(*dest), length);
+	*dest = new char[length];
+	size_t size =  bufferReadBytes(buffer, (uint8_t*)(*dest), length);
+
+	ASSERT(*(buffer->ptr - 1) == '\0', "Tried to read a string that was not null terminated!");
+	return size;
+}
+
+char* bufferReadTempUTF8(Buffer* buffer)
+{
+	size_t length = bufferReadShort(buffer);
+	BOUNDS_CHECK(buffer, length);
+	char* ptr = (char*)buffer->ptr;
+	buffer->ptr += length;
+
+	ASSERT(*(buffer->ptr - 1) == '\0', "Tried to read a string that was not null terminated!");
+	return ptr;
 }
 
 size_t bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes)

@@ -11,6 +11,7 @@
 #include "external_libs/lodepng.h"
 #include "types.h"
 #include "assert.h"
+#include "image_loader.h"
 
 Texture loadTexture(uint8_t* buffer, uint32_t length)
 {

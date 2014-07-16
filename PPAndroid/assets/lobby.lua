@@ -15,23 +15,41 @@ local fileSendingHandle = 0
 local receiveFiles = 0
 local receivedFiles
 local chosenServer = nil
+local bgFrame = nil
+
+local function onServerFound(serviceID, buffer)
+	--Temporary c_name
+	local c_name = C.bufferReadTempUTF8(buffer); 
+	--Converts to a lua string. (Makes a copy) 
+	local str 	= ffi.string(c_name)
+	local ip 	= C.bufferReadInt(buffer)
+	local tcpPort 	= C.bufferReadShort(buffer)
+	local udpPort   = C.bufferReadShort(buffer)
+
+	Log.infof("Server Found! \nName: %s IP: %X TcpPort: %d UdpPort: %d", str, ip, tcpPort, udpPort)
+end
 
 function Game.start()
-	discovery = C.serverDiscoveryStart()
+	discovery = C.serviceFinderCreate("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound)
 	renderer = CRenderer(256)
-	resources = C.resourceCreateLocal(10)
-    font = C.resourceLoad(resources, "arial50.fnt")
+	resources = ResourceManager(40)
+    font = resources:load("arial50.fnt")
     font = ffi.cast("Font*", font.item)
     Screen.setOrientation(Orientation.portrait)
+
+    local tex_data = C.platformLoadInternalResource("server_bg.png");
+    Log.info("Loaded tex_data")
+  	local tex = C.loadTexture(tex_data.buffer, tex_data.length);
+  	Log.info("Tex loaded")
+  	bgFrame = FrameRef(Frame(tex, 0, 0, 1, 1))
 end
 
 function Game.restart()
 	local state = Resources.loadTable("lobby_save_state.luac")
 	if state.shouldTransition then
-
 		unbindState()
 		C.loadLuaScripts(C.gGame.L, state.gameName)
-		Resources.setCLoader(C.resourceCreateNetwork(40, state.gameName))
+		Resources.setCLoader(C.resourceCreateNetwork(10, state.gameName))
 		Resources.gameName = state.gameName
 		Game.restart()
 	else 
@@ -40,7 +58,6 @@ function Game.restart()
 end
 
 function Game.stop()
-
 	local toSave = { }
 	if chosenServer then
 		toSave.gameName = ffi.string(chosenServer.gameName)
@@ -53,49 +70,19 @@ function Game.stop()
 
 	Resources.saveTable(toSave, "lobby_save_state.luac")
 
-	C.serverDiscoveryStop(discovery)
+	C.serviceFinderDestroy(discovery)
 	C.resourceUnloadAll(resources)
 	C.resourceDestroy(resources)
 
 	unbindState()
 end
 
-
 local function updateServerInfo()
-    local info = C.serverNextInfo(discovery)
-    if info.serverIP ~= 0 then
-    	local exists = false
-    	for i, v in ipairs(servers) do
-    		if v.serverIP == info.serverIP then 
-    			exists = true
-    			serverTimers[i] = 0
-    			break
-    		end
-    	end
-
-    	if not exists then   	
-	    	local rect = { }
-	    	local dim = C.fontMeasure(font, string.format("%s %s", ffi.string(info.serverName), ffi.string(info.gameName)))
-	    	rect.x = 100
-	    	rect.y = 100 * #servers
-	    	rect.width = dim.x
-	    	rect.height = dim.y
-
-	    	table.insert(servers, info)
-	    	table.insert(serverRects, rect)
-	    	table.insert(serverTimers, 0)
-	    end
-    end
-
-    for i = #serverTimers, 1, -1 do
-    	if serverTimers[i] > serverTimeout then
-    		table.remove(servers, i)
-    		table.remove(serverRects, i)
-    		table.remove(serverTimers, i)
-    	else
-	    	serverTimers[i] = serverTimers[i] + C.clockElapsed(C.gGame.clock)
-	    end 
-    end
+	C.serviceFinderQuery(discovery)
+	local res = C.serviceFinderPollFound(discovery)
+	if res then
+		Log.info("Found server!")
+	end
 end
 
 local function checkForTransition()
@@ -105,12 +92,12 @@ local function checkForTransition()
 			return true
 		end
 	end
-
 	return false
 end
 
 function Game.step()
 	updateServerInfo()
+	
 	local shouldTransition = checkForTransition()
     if shouldTransition then
 		Game.stop()
@@ -121,7 +108,7 @@ function Game.step()
 		return;
     end
 
-	gl.glClearColor(1,0,0,1)
+	gl.glClearColor(0,0,0,0)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
     gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
     gl.glEnable(gl.GL_BLEND)
@@ -149,7 +136,8 @@ function Game.step()
 		end
 	end
 
-	renderer:addText(font, msg, vec2(100, Screen.height - 100), 0xFFFFFFFF)
+	renderer:addFrame(bgFrame, vec2(0,0), vec2(Screen.width, Screen.height), 0xFFFFFFFF)
+	renderer:addText(font, msg, vec2(50, Screen.height - 100), 0xFFFFFFFF)
 	renderer:draw()
 end
 

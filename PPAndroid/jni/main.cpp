@@ -241,6 +241,7 @@ void surfaceChanged() {
 
 void handle_cmd(android_app* app, int32_t cmd) {
 	switch (cmd) {
+
 	//Basic Lifecycle events
 	case APP_CMD_START:
 		lifecycle::start();
@@ -298,18 +299,47 @@ void initializeFileSystem() {
 		RLOGI("Error is: %d %s", errno, strerror(errno));
 }
 
+
+void sighandler(int signum)
+{
+	switch(signum)
+	{
+		case SIGSEGV:
+			RLOGE("Crash due to %d SIGSEGV! (invalid memory access)", signum);
+			break;
+		case SIGFPE:
+			RLOGE("Crash due to %d SIGFPE! (divide by zero)", signum);
+			break;
+		default:
+			RLOGE("Crash due to %d signal!", signum);
+			break;
+	}
+
+	gameStop();
+	RLOGE("%s", "Exiting application");
+	sleep(1);
+	exit(-1);
+}
+
 void android_main(android_app* state) {
 	app_dummy();
-	state->onAppCmd = &handle_cmd;
+
+    signal(SIGSEGV, sighandler);
+    signal(SIGFPE, 	sighandler);
+
+
+    state->onAppCmd = &handle_cmd;
 	state->onInputEvent = &handle_input;
 	gApp = state;
 
+	remoteLogInitialize();
 	initializeFileSystem();
 	initSensors();
 	lifecycle::create();
 
+
 	bool fullyActive = false;
-	while (1) {
+	while (true) {
 		int ident, fdesc, events;
 		android_poll_source* source;
 

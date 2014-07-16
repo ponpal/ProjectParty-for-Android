@@ -96,12 +96,15 @@ const char* platformDeviceName()
 
 Resource platformLoadInternalResource(const char* path)
 {
-    RLOGI("Trying to load file %s", path);
+    RLOGI("Trying to internal load file %s", path);
 	auto mgr  = gApp->activity->assetManager;
 	auto asset = AAssetManager_open(mgr, path, AASSET_MODE_RANDOM);
+	ASSERTF(asset != 0, "The asset %s does not exist", path);
+
 	auto length = AAsset_getLength(asset);
 	auto buffer = new uint8_t[length];
 	auto err = AAsset_read(asset, buffer, length);
+
 	ASSERTF(err >= 0, "Failed to load internal resource %s. Error was: %d", path, err);
 	AAsset_close(asset);
 
@@ -115,7 +118,7 @@ const char* platformExternalResourceDirectory()
 
 Resource platformLoadExternalResource(const char* path)
 {
-    RLOGI("Trying to load file %s", path);
+    RLOGI("Trying to external load file %s", path);
 	auto resourcePath = path::buildPath(gApp->activity->externalDataPath, path);
 	return platformLoadAbsolutePath(resourcePath.c_str());
 }
@@ -137,6 +140,24 @@ Resource platformLoadAbsolutePath(const char* resourcePath)
 void platformUnloadResource(Resource resource)
 {
 	delete [] resource.buffer;
+}
+
+void platformCrash()
+{
+	auto env = gApp->activity->env;
+	auto vm = gApp->activity->vm;
+	auto obj = gApp->activity->clazz;
+
+	vm->AttachCurrentThread( &env, NULL );
+	LOGI("A");
+	auto clazz = env->GetObjectClass(obj);
+	LOGI("A");
+	jmethodID methodID = env->GetMethodID(clazz, "nativeCrash", "()I");
+	LOGI("A");
+	env->CallIntMethod(obj, methodID);
+	LOGI("A");
+	vm->DetachCurrentThread();
+	LOGI("A");
 }
 
 void platformExit()

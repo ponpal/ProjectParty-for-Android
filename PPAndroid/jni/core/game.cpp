@@ -42,7 +42,7 @@ static void gameRestart() {
 void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 	if (gGame)
 		return;
-	remoteLogInitialize(platformDeviceName(), 54321);
+	remoteLogStart(platformDeviceName());
 
 
 	gGame = new Game();
@@ -67,8 +67,8 @@ void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 void gameStop() {
 	if(!gGame)
 		return;
-	remoteLogTerm();
 
+	remoteLogStop();
 	luaStopCall(gGame->L);
 	luaCoreDestroy(gGame->L);
 	delete gGame->clock;

@@ -154,12 +154,12 @@ void luaHandleMessageCall(lua_State* L, Buffer* buffer, uint32_t id)
 
 bool luaMenuCall(lua_State* L)
 {
-	return callEmptyLuaFunctionBool(L, "onMenuButton");
+	return callEmptyLuaFunctionBool(L, "Input.onMenuButton");
 }
 
 bool luaBackCall(lua_State* L)
 {
-	return callEmptyLuaFunctionBool(L, "onBackButton");
+	return callEmptyLuaFunctionBool(L, "Input.onBackButton");
 }
 
 void luaOnUpCall(lua_State* L, uint32_t pointerID, float x, float y)

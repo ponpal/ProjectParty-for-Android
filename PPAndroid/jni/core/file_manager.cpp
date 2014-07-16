@@ -60,23 +60,21 @@ static void sendMapFile(const char* dirName, int socket)
 	}
 }
 
-static void receiveFile(SocketStream* stream, const char* fileDirectory)
+bool receiveFile(SocketStream* stream, const char* fileDirectory, const char* name)
 {
-	uint8_t nameBuffer[196];
-    uint16_t nameLen = streamReadShort(stream);
-    streamReadBytes(stream, nameBuffer, nameLen);
-    std::string name((char*)nameBuffer, nameLen);
-    RLOGI("Receiving file: %s", name.c_str());
+    RLOGI("Receiving file: %s", name);
 
     int32_t fileSize = streamReadInt(stream);
     RLOGI("FileSize: %d", fileSize);
     RLOGI("FileDir: %s", fileDirectory);
 
-    auto filePath = path::buildPath(fileDirectory, name.c_str()).c_str();
+    auto filePath = path::buildPath(fileDirectory, name).c_str();
     RLOGI("FilePath: %s", filePath);
     auto file = fopen(filePath, "w");
-    if(file == NULL)
+    if(file == NULL) {
     	RLOGI("File is null! Name: %s", filePath);
+    	return false;
+    }
 
     while(fileSize != 0)
     {
@@ -85,9 +83,12 @@ static void receiveFile(SocketStream* stream, const char* fileDirectory)
         fwrite(ptr, sizeof(uint8_t), length, file);
         fileSize -= length;
     }
+
     fflush(file);
     fclose(file);
-    RLOGI("Received file: %s", name.c_str());
+    RLOGI("Received file: %s", name);
+
+    return true;
 }
 static void removeFiles(SocketStream* stream, const char* fileDirectory)
 {
@@ -119,7 +120,13 @@ static void receiveFiles(const char* fileDirectory, int socket)
         }
         else if(messageID == FILE_SENT_MESSAGE)
         {
-        	receiveFile(stream, fileDirectory);
+
+        	uint8_t nameBuffer[196];
+            uint16_t nameLen = streamReadShort(stream);
+            streamReadBytes(stream, nameBuffer, nameLen);
+            std::string name((char*)nameBuffer, nameLen);
+
+        	receiveFile(stream, fileDirectory, name.c_str());
         }
         else if(messageID == FILE_REMOVE_MESSAGE)
         {
@@ -221,8 +228,7 @@ static void* fileTask(void* ptr)
 
 uint32_t receiveFiles(uint32_t ip, uint16_t port, const char* fileDirectory)
 {
-	ASSERT(taskStatus != TASK_PROCESSING,
-			"Already in the process of receiving files");
+	ASSERT(taskStatus != TASK_PROCESSING, "Already in the process of receiving files");
 	auto task = new ReceiveFileTask();
 	task->ip = ip;
 	task->port = port;
@@ -230,7 +236,7 @@ uint32_t receiveFiles(uint32_t ip, uint16_t port, const char* fileDirectory)
 	taskStatus = TASK_PROCESSING;
     RLOGI("Receiving files from: [PORT: %d, IP:%x] %s", (uint32_t)port, ip, fileDirectory);
     pthread_t t;
-    pthread_create(&t, nullptr, &fileTask, task);
+    pthread_create(&t, 0, &fileTask, task);
     return taskStatus;
 }
 

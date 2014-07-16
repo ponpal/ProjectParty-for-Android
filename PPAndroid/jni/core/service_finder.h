@@ -12,6 +12,7 @@
 
 extern "C"
 {
+	static const uint16_t servicePort = 34299;
 	typedef void (*serviceFound)(const char*, Buffer*);
 	struct ServiceFinder;
 

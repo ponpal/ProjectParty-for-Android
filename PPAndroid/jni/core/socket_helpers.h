@@ -8,10 +8,26 @@
 #ifndef SOCKET_HELPERS_H_
 #define SOCKET_HELPERS_H_
 
-void socketSetBlocking(int socket, bool value);
-void socketSendTimeout(int socket, uint32_t msecs);
-void socketRecvTimeout(int socket, uint32_t mescs);
-bool socketConnectTimeout(int socket, uint32_t ip, uint16_t port, uint32_t msecs);
+#include "buffer.h"
 
+extern "C"
+{
+	//Socket common
+	int socketCreate(int type);
+	bool socketBind(int socket, uint32_t ip, uint16_t port);
+	void socketSetBlocking(int socket, bool value);
+	bool socketIsBlocking(int socket);
+	void socketSendTimeout(int socket, uint32_t msecs);
+	void socketRecvTimeout(int socket, uint32_t mescs);
+	void socketDestroy(int socket);
+
+	//For tcp sockets
+	bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs);
+	bool socketTCPSend(int socket, Buffer* toSend);
+
+	//For udp sockets
+	bool socketSend(int socket, Buffer* toSend, uint32_t ip, uint16_t port);
+	bool socketReceive(int socket, Buffer* buffer);
+}
 
 #endif /* SOCKET_HELPERS_H_ */
