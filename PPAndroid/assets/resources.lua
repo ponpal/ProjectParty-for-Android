@@ -9,11 +9,14 @@ function Res:load(path)
 		local name, ext = Path.baseName(path)
 		local hash = C.bytesHash(name, #name, 0)
 		local toLoad = Resources.gameName.."/"..tostring(hash)..".".. ext
-		return runExternalFile(toLoad)
+		
+		local item = runExternalFile(toLoad)
+		self.loaded[hash] = runExtern
+		return item
 	end 
 
-
 	local handle = C.resourceLoad(self.cHandle, path)
+	self.loaded[handle.hash]	
 	return handle
 end
 
