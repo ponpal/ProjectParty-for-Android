@@ -46,7 +46,8 @@ static void loadLuaScript(lua_State* L, const std::string& pathInFiles)
 	platformUnloadResource(script);
 }
 
-void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
+
+static void loadScripts(lua_State* L, const char* scriptsDirectory, const char* fileExt)
 {
 	RLOGI("Entered initializeLuaScript: %s", scriptsDirectory);
 	std::string scriptsDir = path::buildPath(platformExternalResourceDirectory(), scriptsDirectory);
@@ -54,7 +55,7 @@ void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
 	struct dirent* ent;
 	if ((dir = opendir (scriptsDir.c_str())) != NULL) {
 		while ((ent = readdir (dir)) != NULL) {
-			if(path::hasExtension(ent->d_name, ".lua")) {
+			if(path::hasExtension(ent->d_name, fileExt)) {
 				std::string scriptPath = path::buildPath(scriptsDirectory, ent->d_name);
 				loadLuaScript(L, scriptPath);
 				RLOGI("Loading script %s", scriptPath.c_str());
@@ -68,6 +69,13 @@ void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
 	RLOGI("%s", "About to exit initializeLuaScript");
 }
 
+
+void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
+{
+	loadScripts(L, scriptsDirectory, ".lua");
+	loadScripts(L, scriptsDirectory, ".luag");
+}
+
 void luaRunGarbageCollector(lua_State* L, int milisecs)
 {
 	uint64_t nsecs = milisecs * 1000000L;
@@ -77,14 +85,31 @@ void luaRunGarbageCollector(lua_State* L, int milisecs)
 		if(lua_gc(L, LUA_GCSTEP, 0)) break;
 }
 
-static void callEmptyLuaFunction(lua_State* L, const char* buffer)
+static void lua_xpcall(lua_State* L, const char* buffer, const char* id)
 {
-	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "empty");
-	error = error | lua_pcall(L, 0, 0, 0);
-	if(error) {
-		RLOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
+	lua_getglobal(L, "debug");
+	lua_getfield(L, -1, "traceback");
+	int err = luaL_loadbuffer(L, buffer, strlen(buffer), id);
+	if(err)
+	{
+		RLOGE("Failed to load lua buffer! %s", buffer);
+		lua_pop(L, 2);
+		return;
+	}
+
+	err = lua_pcall(L, 0, 0, -2);
+	if(err)
+	{
+		RLOGE("Lua error: %s", lua_tostring(L, -1));
 		lua_pop(L, 1);
 	}
+
+	lua_pop(L, 2);
+}
+
+static void callEmptyLuaFunction(lua_State* L, const char* buffer)
+{
+	lua_xpcall(L, buffer, "empty");
 }
 
 static bool callEmptyLuaFunctionBool(lua_State* L, const char* buffer)
@@ -110,15 +135,8 @@ static bool callEmptyLuaFunctionBool(lua_State* L, const char* buffer)
 static void callIntFloat2LuaFunction(lua_State* L, const char* methodName, uint32_t i, float x, float y)
 {
 	char buffer[128];
-	sprintf(buffer, "%s(%d,%f,%f)", methodName, i, x, y);
-
-	int error = luaL_loadbuffer(L, buffer, strlen(buffer), "int float float");
-	error = error | lua_pcall(L, 0, 0, 0);
-
-	if(error) {
-		RLOGW("LUA Execution Error while calling %s. %s", methodName, lua_tostring(L, -1));
-		lua_pop(L, 1);
-	}
+	snprintf(buffer, 128, "%s(%d,%f,%f)", methodName, i, x, y);
+	lua_xpcall(L, buffer, "int float float");
 }
 
 void luaStopCall(lua_State* L)

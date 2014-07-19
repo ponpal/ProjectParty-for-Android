@@ -47,7 +47,6 @@ local function reloadItem()
 		--We are in the complicated case! Reloading of lua files!
 		--Simplest strategy Call Game.stop() reload the file and then Game.restart()
 		--It is anying to do this every time :(
-
 		Log.info("reloading lua file!")
 		Log.info("Stopping game!")
 		Game.stop()

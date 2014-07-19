@@ -65,6 +65,10 @@ function ISMT:dataLength()
 	return C.streamInputDataLength(self.cHandle)
 end
 
+function ISMT:buffer()
+	return C.streamBuffer(self.cHandle)
+end
+
 function global.InputSocketStream(sock, size)
 	local t =  { }
 	setmetatable(t, ISMT)
@@ -126,6 +130,10 @@ end
 function OSMT:dataLength()
 	return C.streamOutputDataLength(self.cHandle)
 end 
+
+function OSMT:buffer()
+	return C.streamBuffer(self.cHandle)
+end
 
 function OSMT:flush()
 	C.streamFlush(self.cHandle, true)
