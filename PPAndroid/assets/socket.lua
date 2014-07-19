@@ -57,14 +57,18 @@ function ISMT:readString()
 	return data
 end 
 
-function ISMT:hasData()
-	return C.streamHasInputData(self.cHandle)
+function ISMT:receive()
+	C.streamReceive(self.cHandle)
 end
 
-function global.InputSocketStream(size)
+function ISMT:dataLength()
+	return C.streamInputDataLength(self.cHandle)
+end
+
+function global.InputSocketStream(sock, size)
 	local t =  { }
 	setmetatable(t, ISMT)
-	t.cHandle = ffi.gc(C.streamCreate(size), C.streamDestroy)
+	t.cHandle = ffi.gc(C.streamCreate(sock, size, C.INPUT_STREAM), C.streamDestroy)
 	return t
 end
 
@@ -119,18 +123,18 @@ function OSMT:writeString(value)
 	end 
 end 
 
-function OSMT:hasData()
-	return C.streamHasOutputData(self.cHandle)
+function OSMT:dataLength()
+	return C.streamOutputDataLength(self.cHandle)
 end 
 
 function OSMT:flush()
 	C.streamFlush(self.cHandle, true)
 end 
 
-function global.OutputSocketStream(size)
+function global.OutputSocketStream(sock, size)
 	local t =  { }
 	setmetatable(t, OSMT)
-	t.cHandle = ffi.gc(C.streamCreate(size), C.streamDestroy)
+	t.cHandle = ffi.gc(C.streamCreate(sock, size, C.OUTPUT_STREAM), C.streamDestroy)
 	return t
 end
 
@@ -142,6 +146,10 @@ end
 
 function tcpMT:blocking(value)
 	C.socketSetBlocking(self.handle, value)
+end
+
+function tcpMT:close()
+	C.socketDestroy(self.handle)
 end
 
 function tcpMT:sendTimeout(value)
@@ -157,8 +165,8 @@ function tcpMT:connect(ip, port, msecs)
 	return C.socketConnect(self.handle, ip, port, msecs)
 end
 
-local function TcpSocketDtor(socket)
-	C.socketDestroy(socket)
+function tcpMT:receive()
+	self.inStream:receive()
 end
 
 function global.TcpSocket(inSize, outSize)
@@ -167,8 +175,8 @@ function global.TcpSocket(inSize, outSize)
 
 	local t = { }
 	t.handle    = C.socketCreate(C.TCP_SOCKET)
-	t.inStream  = InputSocketStream(inSize) 
-	t.outStream = OutputSocketStream(outSize)
+	t.inStream  = InputSocketStream(t.handle,  inSize) 
+	t.outStream = OutputSocketStream(t.handle, outSize)
 	setmetatable(t, tcpMT)
 
 	--Figure out how to do it with GC here.
@@ -185,6 +193,14 @@ function udpMT:blocking(value)
 	C.socketSetBlocking(self.handle, value)
 end
 
+function udpMT:close()
+	C.socketDestroy(self.handle)
+
+	self.handle 	= nil
+	self.inBuffer 	= nil
+	self.outBuffer 	= nil
+end
+
 function udpMT:sendTimeout(value)
 	C.socketSendTimeout(self.handle, value)
 end
@@ -193,23 +209,21 @@ function udpMT:receiveTimeout(value)
 	C.socketRecvTimeout(self.handle, value)
 end
 
+function udpMT:connect(ip, port)
+	self.ip = ip
+	self.port = port
+end
+
 function udpMT:receive()
 	return C.socketReceive(self.handle, self.inBuffer)
 end
 
 function udpMT:send(ip, port)
+	if not ip then ip = self.ip end
+	if not port then port = self.port end
 	return C.socketSend(self.handle, self.outBuffer, ip, port)
 end
 
-function udpMT:sendBuffer(buffer, ip, port)
-	return C.socketSend(self.handle, buffer, ip, port)
-end
-
-local function UdpSocketDtor(socket)
-	C.bufferDestroy(socket.inBuffer)
-	C.bufferDestroy(socket.outBuffer)
-	C.socketDestroy(socket.handle)
-end
 
 function global.UdpSocket(inSize, outSize)
 	if not inSize then inSize = 1024 end
@@ -217,10 +231,10 @@ function global.UdpSocket(inSize, outSize)
 
 	local t = { }
 	t.handle 	= C.socketCreate(C.UDP_SOCKET)
-	t.inBuffer  = C.bufferCreate(inSize)
-	t.outBuffer = C.bufferCreate(outSize)
+	t.inBuffer  = ffi.gc(C.bufferCreate(inSize), C.bufferDestroy)
+	t.outBuffer = ffi.gc(C.bufferCreate(outSize), C.bufferDestroy)
+
 	setmetatable(t, udpMT)
-	
 	--Need to fix with the GC so that it closes the socket when it can.
 	return t
 end

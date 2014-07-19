@@ -11,11 +11,11 @@
 
 extern "C" {
 
-typedef uint32_t HashID;
-typedef uint16_t ShortHash;
+	typedef uint32_t HashID;
+	typedef uint16_t ShortHash;
 
-HashID bytesHash(const void* buf, size_t len, size_t seed);
-ShortHash shortHash(const void* buf, size_t len, size_t seed);
+	HashID bytesHash(const void* buf, size_t len, size_t seed);
+	ShortHash shortHash(const void* buf, size_t len, size_t seed);
 
 }
 

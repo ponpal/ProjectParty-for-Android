@@ -49,6 +49,11 @@ void bufferDestroy(Buffer* buffer)
 	delete buffer;
 }
 
+uint32_t bufferCapacityRemaining(Buffer* buffer)
+{
+	return buffer->capacity - (buffer->ptr - buffer->base);
+}
+
 uint32_t bufferBytesRemaining(Buffer* buffer)
 {
 	return buffer->length - (buffer->ptr - buffer->base);

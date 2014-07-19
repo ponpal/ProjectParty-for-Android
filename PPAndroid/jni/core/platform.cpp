@@ -123,6 +123,27 @@ Resource platformLoadExternalResource(const char* path)
 	return platformLoadAbsolutePath(resourcePath.c_str());
 }
 
+Resource platformLoadResource(const char* path)
+{
+	RLOGI("Opening resource %s", path);
+	auto externalPath = path::buildPath(gApp->activity->externalDataPath, path);
+	auto file = fopen(externalPath.c_str(), "r+");
+	if(file == nullptr)
+	{
+		RLOGI("File is not external %s", path);
+		return platformLoadInternalResource(path);
+	}
+
+	fseek( file, 0L, SEEK_END);
+	auto length = ftell(file);
+	rewind(file);
+	auto buffer = new uint8_t[length];
+	fread(buffer, length, 1, file);
+	fclose(file);
+
+	return (Resource) { buffer, (uint32_t)length };
+}
+
 Resource platformLoadAbsolutePath(const char* resourcePath)
 {
     auto file = fopen(resourcePath, "r+");
@@ -140,24 +161,6 @@ Resource platformLoadAbsolutePath(const char* resourcePath)
 void platformUnloadResource(Resource resource)
 {
 	delete [] resource.buffer;
-}
-
-void platformCrash()
-{
-	auto env = gApp->activity->env;
-	auto vm = gApp->activity->vm;
-	auto obj = gApp->activity->clazz;
-
-	vm->AttachCurrentThread( &env, NULL );
-	LOGI("A");
-	auto clazz = env->GetObjectClass(obj);
-	LOGI("A");
-	jmethodID methodID = env->GetMethodID(clazz, "nativeCrash", "()I");
-	LOGI("A");
-	env->CallIntMethod(obj, methodID);
-	LOGI("A");
-	vm->DetachCurrentThread();
-	LOGI("A");
 }
 
 void platformExit()

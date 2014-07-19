@@ -131,7 +131,7 @@ obj/local/armeabi/objs/mystery/core/image_loader.o: \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
- jni/core/remote_log.h
+ jni/core/remote_log.h jni/core/image_loader.h
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/GLES2/gl2.h:
 
@@ -506,3 +506,5 @@ jni/core/font.h:
 jni/lua/luajit.h:
 
 jni/core/remote_log.h:
+
+jni/core/image_loader.h:

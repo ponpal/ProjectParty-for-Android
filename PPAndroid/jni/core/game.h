@@ -12,7 +12,6 @@
 #define ORIENTATION_PORTRAIT  ((uint8_t)1)
 
 #include "types.h"
-#include "network.h"
 #include "time_helpers.h"
 #include "lua_core_private.h"
 #include "GLContext.h"

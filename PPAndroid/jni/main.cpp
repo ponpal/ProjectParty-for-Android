@@ -9,6 +9,7 @@
 #include "sys/stat.h"
 #include "errno.h"
 #include "core/remote_log.h"
+#include "unistd.h"
 
 ndk_helper::GLContext* context;
 

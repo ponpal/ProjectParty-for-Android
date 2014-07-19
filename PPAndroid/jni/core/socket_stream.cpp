@@ -10,15 +10,43 @@
 #include "buffer.h"
 #include "socket_helpers.h"
 
-SocketStream* streamCreate(int socket, size_t bufferSize)
+SocketStream* streamCreate(int socket, size_t bufferSize, int type)
 {
 	SocketStream* stream = new SocketStream();
 	stream->buffer.ptr = stream->buffer.base = new uint8_t[bufferSize];
-	stream->buffer.length = 0;
+	if(type == INPUT_STREAM)
+		stream->buffer.length = 0;
+	else
+		stream->buffer.length = bufferSize;
+	stream->buffer.capacity = bufferSize;
 	stream->socket = socket;
-	stream->size = bufferSize;
+
 	stream->operationFailed = false;
 	return stream;
+}
+
+uint32_t streamGetPosition(SocketStream* stream)
+{
+	return stream->buffer.ptr - stream->buffer.base;
+}
+
+void streamPosition(SocketStream* stream, uint32_t position)
+{
+	if(position < stream->buffer.capacity)
+	{
+		stream->buffer.ptr = stream->buffer.base + position;
+		stream->operationFailed = false;
+	}
+	else
+	{
+		stream->operationFailed = true;
+	}
+}
+
+
+Buffer* streamBuffer(SocketStream* stream)
+{
+	return &stream->buffer;
 }
 
 void streamDestroy(SocketStream* toDestroy)
@@ -28,11 +56,15 @@ void streamDestroy(SocketStream* toDestroy)
 	delete toDestroy;
 }
 
+bool streamCheckError(SocketStream* stream)
+{
+	return stream->operationFailed != false;
+}
 
-bool streamHasOutputData(SocketStream* stream)
+uint32_t streamOutputDataLength(SocketStream* stream)
 {
 	auto buffer = stream->buffer;
-	return buffer.ptr != buffer.base;
+	return buffer.ptr - buffer.base;
 }
 
 void streamFlush(SocketStream* stream, bool untilFinished)
@@ -153,7 +185,8 @@ void streamWriteBytes(SocketStream* stream, uint8_t* data, uint32_t length)
 {
 	if(length > stream->buffer.capacity)
 	{
-		RLOGE("%s", "Trying to send more data that can be sent in a single send");
+		RLOGE("%s %d %d", "Trying to send more data that can be sent in a single send",
+			  length, stream->buffer.capacity);
 		stream->operationFailed = true;
 		return;
 	}
@@ -161,6 +194,7 @@ void streamWriteBytes(SocketStream* stream, uint8_t* data, uint32_t length)
 	auto rem = bufferBytesRemaining(&stream->buffer);
 	if(rem < length)
 	{
+		RLOGI("%s %d %d", "Need to flush buffer!", rem, length);
 		streamFlush(stream, true);
 		if(stream->operationFailed)
 			return;
@@ -178,38 +212,26 @@ void streamWriteUTF8(SocketStream* stream, const char* data)
 }
 
 
-static bool streamReceive(SocketStream* stream)
+uint32_t streamInputDataLength(SocketStream* stream)
 {
-	size_t length = bufferBytesRemaining(&stream->buffer);
-	memmove(stream->buffer.base, stream->buffer.ptr, length);
-	stream->buffer.ptr = stream->buffer.base;
-	auto r = recv(stream->socket, stream->buffer.ptr + length, stream->size - length, 0);
-	if (r < 0)
-	{
-		RLOGI("Error while receiving from stream: %d %s", errno, strerror(errno));
-		return false;
-	}
-
-	stream->buffer.length = r + length;
-	return true;
+	return bufferBytesRemaining(&stream->buffer);
 }
 
-bool streamHasInputData(SocketStream* stream)
+void streamReceive(SocketStream* stream)
 {
-	auto buffer = stream->buffer;
-	bool hasData = buffer.ptr - buffer.base < buffer.length;
-	if(!hasData)
+	if(socketReceive(stream->socket, &stream->buffer))
 	{
-		streamReceive(stream);
-		hasData = buffer.ptr - buffer.base < buffer.length;
+		stream->operationFailed = false;
 	}
-
-	return hasData;
+	else
+	{
+		stream->operationFailed = true;
+	}
 }
 
 static bool receiveUntil(SocketStream* stream, uint32_t len)
 {
-	streamReceive(stream);
+	socketReceive(stream->socket, &stream->buffer);
 	if(bufferBytesRemaining(&stream->buffer) >= len)
 		return true;
 
@@ -221,7 +243,7 @@ static bool receiveUntil(SocketStream* stream, uint32_t len)
 			auto size =  bufferBytesRemaining(&stream->buffer);
 			if(size >= len) break;
 
-			if(!streamReceive(stream))
+			if(!socketReceive(stream->socket, &stream->buffer))
 			{
 				RLOGE("%s", "Failed to receive data!");
 				stream->operationFailed = true;
@@ -259,7 +281,6 @@ uint16_t streamReadShort(SocketStream* stream)
 		auto success = receiveUntil(stream, 2);
 		if(!success) return -1;
 	}
-
 	return bufferReadShort(&stream->buffer);
 }
 
@@ -309,7 +330,7 @@ double streamDouble(SocketStream* stream)
 
 size_t streamReadBytes(SocketStream* stream, uint8_t* dest, uint32_t length)
 {
-	ASSERT(length <= stream->size, "Stream buffer too small");
+	ASSERT(length <= stream->buffer.capacity, "Stream buffer too small");
 	if(bufferBytesRemaining(&stream->buffer) < length)
 	{
 		auto success = receiveUntil(stream, length);
@@ -319,9 +340,18 @@ size_t streamReadBytes(SocketStream* stream, uint8_t* dest, uint32_t length)
 	return bufferReadBytes(&stream->buffer, dest, length);
 }
 
+
+const char* streamReadTempUTF8(SocketStream* stream)
+{
+	auto len = streamReadShort(stream);
+	ASSERT(len <= stream->buffer.capacity, "Stream buffer to small!");
+	stream->buffer.ptr -= 2; //Wierd but ok.
+	return bufferReadTempUTF8(&stream->buffer);
+}
+
 const uint8_t* streamReadInPlace(SocketStream* stream, uint32_t length)
 {
-	ASSERT(length <= stream->size, "Stream buffer too small");
+	ASSERT(length <= stream->buffer.capacity, "Stream buffer too small");
 	if(bufferBytesRemaining(&stream->buffer) < length)
 	{
 		auto success = receiveUntil(stream, length);

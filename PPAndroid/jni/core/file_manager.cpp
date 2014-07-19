@@ -64,24 +64,26 @@ bool receiveFile(SocketStream* stream, const char* fileDirectory, const char* na
 {
     RLOGI("Receiving file: %s", name);
 
-    int32_t fileSize = streamReadInt(stream);
+    uint32_t fileSize = streamReadInt(stream);
     RLOGI("FileSize: %d", fileSize);
     RLOGI("FileDir: %s", fileDirectory);
 
-    auto filePath = path::buildPath(fileDirectory, name).c_str();
-    RLOGI("FilePath: %s", filePath);
-    auto file = fopen(filePath, "w");
+    auto filePath = path::buildPath(fileDirectory, name);
+    RLOGI("FilePath: %s", filePath.c_str());
+    auto file = fopen(filePath.c_str(), "w");
     if(file == NULL) {
-    	RLOGI("File is null! Name: %s", filePath);
+    	RLOGE("File is null! Name: %s", filePath.c_str());
+    	char* ptr = nullptr;
+    	ptr[0] = ' ';
     	return false;
     }
 
     while(fileSize != 0)
     {
-        auto length = std::min(0xffff, fileSize);
+        auto length = std::min(stream->buffer.capacity, fileSize);
         auto ptr = streamReadInPlace(stream, length);
-        fwrite(ptr, sizeof(uint8_t), length, file);
-        fileSize -= length;
+       	fwrite(ptr, sizeof(uint8_t), length, file);
+       	fileSize -= length;
     }
 
     fflush(file);
@@ -90,6 +92,8 @@ bool receiveFile(SocketStream* stream, const char* fileDirectory, const char* na
 
     return true;
 }
+
+
 static void removeFiles(SocketStream* stream, const char* fileDirectory)
 {
     uint16_t messageLength = streamReadShort(stream);
@@ -108,7 +112,7 @@ static void removeFiles(SocketStream* stream, const char* fileDirectory)
 
 static void receiveFiles(const char* fileDirectory, int socket)
 {
-	auto stream = streamCreate(socket, 0xffff);
+	auto stream = streamCreate(socket, 0xffff, INPUT_STREAM);
 
 	while(true)
 	{
@@ -221,6 +225,7 @@ static void* fileTask(void* ptr)
 	receiveFiles(task->fileDirectory.c_str(), sockfd);
 
 	RLOGI("%s", "All files received!");
+
 	close(sockfd);
 	taskStatus = TASK_SUCCESS;
 	return nullptr;

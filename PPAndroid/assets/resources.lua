@@ -1,112 +1,180 @@
 local Res = { }
 Res.__index = Res;
-function Res:load(path)
-	if self.loaded[path] then 
-		return self.loaded[path]
-	end 
 
-	if Path.endswith("luac", path) then 
-		local name, ext = Path.baseName(path)
-		local hash = C.bytesHash(name, #name, 0)
-		local toLoad = Resources.gameName.."/"..tostring(hash)..".".. ext
-		
-		local item = runExternalFile(toLoad)
-		self.loaded[hash] = runExtern
-		return item
-	end 
+local loaders   = { }
+local unloaders = { }
+local reloaders = { }
 
-	local handle = C.resourceLoad(self.cHandle, path)
-	self.loaded[handle.hash]	
+function global.addContentType(ext, loader, unloader, reloader)
+	loaders[ext]   	= loader
+	unloaders[ext] 	= unloader
+	reloaders[ext]  = reloader
+end
+
+function Res:load(item)
+	if self.loaded[item.hash] then
+		return self.loaded
+	end
+
+	local handle = loaders[item.type](self, item.path)
+	handle.__RESOURCE_TYPE_ID__ = item.type;
+
+	self.loaded[item.hash] = handle
+
+	Log.infof("Loaded asset: %s %s %d", handle, item.path, item.hash)
 	return handle
 end
 
-function Res:unloadHandle(handle)
-	return C.resourceUnloadHandle(self.cHandle, handle);
+function Res:reloadFromName(name)
+	local base, ext = Path.baseName(name)
+	local item = { }
+	item.path = Game.name .. "/" .. name
+	item.hash = tonumber(base)
+	item.type = ext
+
+	Log.infof("Hash: %d", item.hash)
+
+	self:reload(item)
 end
 
-function Res:unloadString(path)
-	return C.resourceUnloadPath(self.cHandle, path)
+function Res:reload(item) 
+	local handle = nil
+	if self.loaded[item.hash] then
+		local func = reloaders[item.type]
+		func(self, self.loaded[item.hash], item.path)
+		Log.info("Reloaded item: %s", item.path)
+	else
+		Log.errorf("Reload called on asset that was not loaded: %s", item.path)
+	end
 end
 
-function Res:reload(path)
-	return C.resourceReload(self.cHandle, path)
-end
-
-function Res:isLoaded(path)
-	return C.resourceIsPathLoaded(self.cHandle, path)
+function Res:unload(item)
+	if not self.loaded[item.hash] then return end
+	
+	local item = self.loaded[item.hash]
+	local func = unloaders[item.type]
+	func(self, item)
+	Log.infof("Unloaded item: %s", item.path)
 end
 
 function Res:unloadAll()
-	C.resourceUnloadAll(self.cHandle)
+	for k,v in pairs(self.loaded) do 
+		self.loaded[k] = nil 
+		local func = unloaders[v.__RESOURCE_TYPE_ID__]
+		func(self, v)
+	end
 end
 
-function global.ResourceManager(numResources, resourceFolder)
-	Log.info("Calling ResourceManager ctor")
-	local t = { }
-	setmetatable(t, Res)
-	
-	if resourceFolder then
-		t.cHandle = ffi.gc(C.resourceCreateNetwork(numResources, resourceFolder), 
-							 C.resourceDestroy)
+function Res:isLoaded(item)
+	local hash = 0
+	if type(item) == "table" then 
+		hash = item.hash
 	else
-		t.cHandle = ffi.gc(C.resourceCreateLocal(numResources), C.resourceDestroy)
+		--Assume int here if not no big deal
+		hash = item
 	end
 
+	return self.loaded[hash] ~= nil
+end
+
+
+function global.ResourceManager()
+	Log.info("Calling ResourceManager ctor")
+	local t = { }
+	t.loaded = { }
+	setmetatable(t, Res)
 	return t
 end
 
-local reloading = { }
-local function onReload(service, buffer)
-	local ip 	= C.bufferReadInt(buffer)
-	local port 	= C.bufferReadShort(buffer)
+local function loadLuac(self, path)
+	return runExternalFile(path, self)
+end 
 
-	local sock = TcpSocket(1024, 128)
-	local res  = sock:connect(ip, port, 1000)
+local function unloadLuac(self, item)
+	--NO OP
+end
 
-	if res then 
-		sock:blocking(false)
-		reloading.connection = sock
-		C.streamWriteUTF8(reloading.folder)
+--Might have to get fancier then this!
+local function reloadLuac(self, item, item)
+	local newItem = loadLuac(self, path)
+	for k,v in pairs(newItem) do
+		item[k] = v 
 	end
 end
 
-local function reloadItem()
-	local sock = reloading.connection
-	local stream = sock.inStream
-
-	sock:blocking(true)
-	local name = stream:readString()
-	local result = C.receiveFile(stream.cHandle, reloading.folder, name)
-	sock:blocking(false)
-
-	if result then 	
-		if reloading.manager and reloading.manager:isLoaded(name) then 
-			reloading.manager:reload(name)
-		end 			
-	end 
+local function loadPng(self, path)
+	local texture = C.loadTexture(path)
+	local frame   = FrameRef(Frame(texture[0], 0, 0, 1, 1))
+	
+	local t = { }
+	t.frame = frame
+	return t	
 end
 
-function global.initializeReloading(folder, manager)
-	reloading.finder = C.serviceFinderCreate("FILE_RELOADING_SERVICE", 
-										     C.servicePort, onReload) 
-	reloading.folder = folder
-	reloading.manager = manager
+local function unloadPng(self, item)
+	local texture = ffi.new("Texture[1]", item.frame[0].texture)
+	C.unloadTexture(texture)
 end
 
-function global.terminateReloading()
-	C.serviceFinderDestroy(reloading.finder)
+local function reloadPng(self, item, path)
+	--Ugly temporary 
+	local texture = ffi.new("Texture[1]", item.frame[0].texture)
+	texture = C.reloadTexture(path, texture)
+	item.frame[0].texture = texture[0]
 end
 
-function global.updateReloading()
-	if reloading.connection then
-		local hasData = reloading.connection:hasData()		
-		if hasData then
-			reloadItem()
-		end
-	else 
-		local result = C.serviceFinderPollFound(self.finder)
-		if not result then
-			C.serviceFinderQuery(self.finder)
+local function loadFnt(self, path)
+	local fnt = C.loadFont(path)
+	local t = { }
+	t.font = fnt
+	return t
+end
+
+local function unloadFnt(self, item)
+	C.unloadFont(item.font)
+end
+
+local function reloadFnt(self, item, path)
+	C.reloadFont(item.font)
+end
+
+local function loadAtl(self, path)
+	local tex = C.loadTexture(Path.changeExt(path, "png"))
+	local atl = runExternalFile(path)
+
+	for k, v in pairs(atl) do
+		atl[k] = FrameRef(Frame(tex, v[1], v[2], v[3], v[4]))
+	end
+
+	atl.__TEXTURE__ = tex
+	return atl
+end
+
+local function unloadAtl(self, item)
+	C.unloadTexture(item.__TEXTURE__)
+end
+
+local function reloadAtl(self, item, path)
+	local tex = C.reloadTexture(Path.changeExt(path, "png"), item.__TEXTURE__)
+	local atl = runExternalFile(path, tex)
+
+	item.__TEXTURE__ = tex
+	item.width  = atl.width
+	item.height = atl.height
+	for k, v in pairs(atl) do
+		if item[k] then 
+			item[k][0].texture = tex
+			item[k][0].x	   = v[1]
+			item[k][0].y	   = v[2]
+			item[k][0].width   = v[3]
+			item[k][0].height  = v[4]
+		else 
+			item[k] = v
 		end
 	end
 end
+
+addContentType("luac", loadLuac, unloadLuac, reloadLuac)
+addContentType("png",  loadPng,  unloadPng,  reloadPng)
+addContentType("fnt",  loadFnt,  unloadFnt,  reloadFnt)
+addContentType("atl",  loadAtl,  unloadAtl,  reloadAtl)

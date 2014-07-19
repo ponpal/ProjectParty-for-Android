@@ -109,41 +109,12 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/log.h \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
- jni/core/game.h jni/core/network.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/errno.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/errno.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/errno.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/socket.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/socket.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/socket.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/sockios.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/sockios.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/uio.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/netinet/in.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/endian.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/endian.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/endian.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/in.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/byteorder.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/byteorder/little_endian.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/byteorder/swab.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/byteorder/generic.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/in6.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/ipv6.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/netinet/in6.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/unistd.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysconf.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/capability.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/pathconf.h \
- jni/core/time_helpers.h \
+ jni/core/game.h jni/core/time_helpers.h \
  C:/Android/android-ndk-r9d/sources/android/ndk_helper/GLContext.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h jni/core/path.h \
- jni/core/platform.h jni/core/resource_manager.h jni/core/hash.h \
+ jni/core/platform.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h \
  jni/core/remote_log.h \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib
@@ -472,64 +443,6 @@ C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring:
 
 jni/core/game.h:
 
-jni/core/network.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/errno.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/errno.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/errno.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/errno.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/errno-base.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/socket.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/socket.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/socket.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/sockios.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/sockios.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/uio.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/netinet/in.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/endian.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/endian.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/endian.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/in.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/byteorder.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/byteorder/little_endian.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/byteorder/swab.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/byteorder/generic.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/in6.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/ipv6.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/netinet/in6.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/unistd.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysconf.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/capability.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/pathconf.h:
-
 jni/core/time_helpers.h:
 
 C:/Android/android-ndk-r9d/sources/android/ndk_helper/GLContext.h:
@@ -547,10 +460,6 @@ jni/lua/luajit.h:
 jni/core/path.h:
 
 jni/core/platform.h:
-
-jni/core/resource_manager.h:
-
-jni/core/hash.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h:
 

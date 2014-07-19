@@ -10,7 +10,7 @@ function RendMT:addFrame(frame, pos, dim, color)
 end
 
 function RendMT:addFrameTransform(frame, pos, dim, color, origin, rotation, mirrored)
-	C.rendererAddFrame(self.cRenderer, frame, pos, dim, color, origin, rotation, mirrored)	
+	C.rendererAddFrame2(self.cRenderer, frame, pos, dim, color, origin, rotation, mirrored)	
 end
 
 function RendMT:addText(font, text, pos, color)

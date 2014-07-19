@@ -15,7 +15,6 @@
 
 #include <cstdlib>
 #include "game.h"
-#include "network.h"
 #include "remote_log.h"
 
 #define ASSERT(b, msg) \

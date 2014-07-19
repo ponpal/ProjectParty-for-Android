@@ -135,7 +135,6 @@ bool socketSend(int sock, Buffer* buffer, uint32_t ip, uint16_t port)
 	return true;
 }
 
-
 bool socketTCPSend(int sock, Buffer* buffer)
 {
 	auto toSend = (uint32_t)(buffer->ptr - buffer->base);
@@ -200,5 +199,3 @@ void socketRecvTimeout(int socket, uint32_t msecs)
 
 	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 }
-
-

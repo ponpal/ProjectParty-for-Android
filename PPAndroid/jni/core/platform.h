@@ -8,7 +8,6 @@
 #ifndef PLATFORM_H_
 #define PLATFORM_H_
 
-#include "resource_manager.h"
 
 #ifdef __ANDROID__
 	#include "android_native_app_glue.h"
@@ -17,16 +16,23 @@
 
 extern "C"
 {
+	typedef struct Resource
+	{
+		uint8_t* buffer;
+		uint32_t length;
+	} Resource;
+
+
 	int platformVibrate(uint64_t milliseconds);
 	uint32_t platformGetBroadcastAddress();
 	uint32_t platformLanIP();
 	const char* platformDeviceName();
 	const char* platformExternalResourceDirectory();
 	Resource platformLoadAbsolutePath(const char* name);
+	Resource platformLoadResource(const char* path);
 	Resource platformLoadInternalResource(const char* path);
 	Resource platformLoadExternalResource(const char* path);
 	void platformUnloadResource(Resource resource);
-	void platformCrash();
 	void platformExit();
 }
 

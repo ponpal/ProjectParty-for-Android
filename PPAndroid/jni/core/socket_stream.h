@@ -16,17 +16,26 @@ extern "C"
 	typedef struct {
 		Buffer buffer;
 		int socket;
-		size_t size;
-		bool blocking;
 		bool operationFailed;
 	} SocketStream;
 
-	SocketStream* streamCreate(int socket, size_t bufferSize);
+	enum
+	{
+		INPUT_STREAM = 0,
+		OUTPUT_STREAM = 1
+	};
+
+	SocketStream* streamCreate(int socket, size_t bufferSize, int type);
 	void streamDestroy(SocketStream* toDestroy);
+	void streamReceive(SocketStream* stream);
 	void streamFlush(SocketStream* stream, bool untilFinished);
 
-	bool streamHasInputData(SocketStream* stream);
-	bool streamHasOutputData(SocketStream* stream);
+	uint32_t streamGetPosition(SocketStream* stream);
+	void streamPosition(SocketStream* stream, uint32_t position);
+
+	uint32_t streamInputDataLength(SocketStream* stream);
+	uint32_t streamOutputDataLength(SocketStream* stream);
+	Buffer* streamBuffer(SocketStream* stream);
 	bool streamCheckError(SocketStream* stream);
 
 	//Input

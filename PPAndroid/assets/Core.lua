@@ -2,7 +2,6 @@
 ffi = require("ffi")
 
 ffi.cdef[[
-
 	// ----------------------------
 	//  	types.h
 	// ----------------------------
@@ -22,12 +21,6 @@ ffi.cdef[[
 		Texture texture;
 		float x, y, width, height;
 	} Frame;
-
-	//----------------------------
-	//	image_loader.h
-	//----------------------------
-	Texture loadTexture(uint8_t* data, uint32_t length);
-
 
 	// ----------------------------
 	//  	buffer.h
@@ -72,14 +65,26 @@ ffi.cdef[[
 	//-----------------------------
 	typedef struct SocketStream SocketStream;
 
-	SocketStream* streamCreate(int socket, size_t bufferSize);
+	enum
+	{
+		INPUT_STREAM = 0,
+		OUTPUT_STREAM = 1
+	};
+
+	SocketStream* streamCreate(int socket, size_t bufferSize, int type);
 	void streamDestroy(SocketStream* toDestroy);
+	void streamReceive(SocketStream* stream);
 	void streamFlush(SocketStream* stream, bool untilFinished);
 
-	bool streamHasInputData(SocketStream* stream);
-	bool streamHasOutputData(SocketStream* stream);
+	uint32_t streamGetPosition(SocketStream* stream);
+	void streamPosition(SocketStream* stream, uint32_t position);
+
+	uint32_t streamInputDataLength(SocketStream* stream);
+	uint32_t streamOutputDataLength(SocketStream* stream);
+	Buffer* streamBuffer(SocketStream* stream);
 	bool streamCheckError(SocketStream* stream);
 
+	//Input
 	uint8_t streamReadByte(SocketStream* stream);
 	uint16_t streamReadShort(SocketStream* stream);
 	uint32_t streamReadInt(SocketStream* stream);
@@ -90,6 +95,7 @@ ffi.cdef[[
 	const char* streamReadTempUTF8(SocketStream* stream);
 	const uint8_t* streamReadInPlace(SocketStream* stream, uint32_t length);
 
+	//Output
 	void streamWriteByte(SocketStream* stream, uint8_t data);
 	void streamWriteShort(SocketStream* stream, uint16_t data);
 	void streamWriteInt(SocketStream* stream, uint32_t data);
@@ -98,6 +104,7 @@ ffi.cdef[[
 	void streamWriteDouble(SocketStream* stream, double data);
 	void streamWriteBytes(SocketStream* stream, uint8_t* data, uint32_t length);
 	void streamWriteUTF8(SocketStream* stream, const char* data);
+
 
 	// ----------------------------
 	//  	font.h
@@ -122,8 +129,19 @@ ffi.cdef[[
 	} Font;
 
 	const CharInfo* fontCharInfo(const Font* font, size_t index);
-
 	vec2f fontMeasure(const Font* f, const char* text);
+
+
+	//----------------------------
+	//	resources.h
+	//----------------------------
+	Texture loadTexture(const char* path);
+	void unloadTexture(Texture tex);
+	Texture reloadTexture(const char* path, Texture tex);
+
+	Font* loadFont(const char* path);
+	void unloadFont(Font* font);
+	Font* reloadFont(const char* path, Font* font);
 
 
 	// ----------------------------
@@ -152,58 +170,22 @@ ffi.cdef[[
 	HashID bytesHash(const void* buf, size_t len, size_t seed);
 	ShortHash shortHash(const void* buf, size_t len, size_t seed);
 
-
 	// ----------------------------
-	//  	resource_manager.h
+	//  	platform.h
 	// ----------------------------
-
-	typedef struct
-	{
-		HashID hashID;
-		HashID typeID;
-		void* item;
-	}Handle;
-
 	typedef struct
 	{
 		uint8_t* buffer;
 		uint32_t length;
 	} Resource;
 
-	struct ResourceManager;
-
-	typedef struct ResourceManager
-	{
-		const char* resourceDir;
-		Resource (*loadResource)(struct ResourceManager* resources, const char* name);
-	    Handle* handles;
-	    size_t handlesLength;
-	} ResourceManager;
-
-	ResourceManager* resourceCreateLocal(size_t numResources);
-	ResourceManager* resourceCreateNetwork(size_t numResources, const char* resourceFolder);
-	void resourceDestroy(ResourceManager* resources);
-
-	bool resourceIsPathLoaded(ResourceManager* resources, const char* path);
-	bool resourceIsHashLoaded(ResourceManager* resources, HashID id);
-
-	Handle* resourceLoad(ResourceManager* resources, const char* path);
-	Handle* resourceGetHandle(ResourceManager* resources, HashID id);
-
-	bool resourceUnloadPath(ResourceManager* resources, const char* path);
-	bool resourceUnloadHandle(ResourceManager* resources, Handle* handle);
-
-	void resourceUnloadAll(ResourceManager* resources);
-
-
-	// ----------------------------
-	//  	platform.h
-	// ----------------------------
-
 	int platformVibrate(uint64_t milliseconds);
 	uint32_t platformGetBroadcastAddress();
+	uint32_t platformLanIP();
+	const char* platformDeviceName();
 	const char* platformExternalResourceDirectory();
 	Resource platformLoadAbsolutePath(const char* name);
+	Resource platformLoadResource(const char* path);
 	Resource platformLoadInternalResource(const char* path);
 	Resource platformLoadExternalResource(const char* path);
 	void platformUnloadResource(Resource resource);
@@ -264,40 +246,6 @@ ffi.cdef[[
 	void clockResume(Clock* clock);
 	void clockStart(Clock* clock);
 	void clockStop(Clock* clock);
-
-
-	// ----------------------------
-	//  	network.h
-	// ----------------------------
-
-	typedef struct
-	{
-		Buffer* in_;
-		Buffer* uin;
-		Buffer* out;
-		Buffer* uout;
-		uint32_t remoteIP;
-		uint16_t remoteUdpPort;
-		int udpSocket;
-		int tcpSocket;
-		uint64_t sessionID;
-		void (*handleMessage)(Buffer* buffer, uint16_t messageID);
-	} Network;
-
-    Network* networkCreate(size_t bufferSize);
-    void networkDestroy(Network* network);
-
-	int networkSend(Network* network);
-	int networkUnreliableSend(Network* network);
-	int networkReceive(Network* network);
-	int networkUnreliableReceive(Network* network);
-
-	bool networkIsAlive(Network* network);
-	int networkConnect(Network* network, uint32_t ip, uint16_t udpPort, uint16_t tcpPort);
-	int networkReconnect(Network* network);
-	void networkDisconnect(Network* network);
-
-	void networkSendLogMessage(Network* network, const char* message);
 
 	//------------------------------
 	//		service_finder.h
@@ -373,10 +321,6 @@ ffi.cdef[[
 
 C = ffi.C
 
-Time = {}
-Time.total   = 0
-Time.elapsed = 0
-
 function vibrate(milliseconds)
 	return C.vibrate(milliseconds)
 end
@@ -386,7 +330,8 @@ Orientation.landscape = 0
 Orientation.portrait  = 1
 
 Sensors = C.gGame.sensor
-Screen  = { 
+Screen  = 
+{ 
 	orientation = Orientation.landscape,
 	width  = C.gGame.screen.width,
 	height = C.gGame.screen.height
@@ -405,6 +350,7 @@ function Screen.setOrientation(orientation)
 end
 
 RawInput = { }
+Input = { }
 
 local function transformInput(x,y)
 	if Screen.orientation == Orientation.portrait then
@@ -474,7 +420,6 @@ function unbindState()
 	Game.start = doNothing
 	Game.stop = doNothing
 	Game.restart = doNothing
-
 end
 
 Log = {}
@@ -503,11 +448,7 @@ function Log.errorf(fmt, ...)
 	C.remoteLog(2, string.format(fmt, ...))
 end
 
-
-Resources = {}
-Resources.gameName = ""
 Path = {}
-
 local function split(string, token)
 	local toReturn = { }
 	for word in string.gmatch(string, '([^'..token..']+)') do
@@ -527,64 +468,88 @@ function Path.baseName(path)
 	return temp2[1], temp2[2]
 end
 
-local function saveTable(file, t)
+function Path.changeExt(path, newExt)
+	local tmp = split(path, ".")
+	return tmp[#tmp - 1] .. "." .. newExt
+end
+
+
+Game = { }
+Game.resourceDir = ffi.string(C.platformExternalResourceDirectory()) .. "/"
+
+File = { }
+local function saveTable2(file, t, tName)
 	for k, v in pairs(t) do
-		if type(v) == "table" then
-			file:write(tostring(k).." = {")
-			saveTable(file, v)
-			file:write("}")
-		elseif type(v) == "string" then
-			file:write(tostring(k) .. " = \"" .. tostring(v) .. "\"")
-		else
-			file:write(tostring(k).." = "..tostring(v))
+		
+		local keyStr = nil
+		if type(k) == "string" then 
+			keyStr = "\"" .. k .. "\""
+		else 
+			keyStr = tostring(k)
 		end
-		file:write(",")
+
+		file:write(tName);
+		file:write("[")
+		file:write(keyStr)
+		file:write("] = ")
+
+		if type(v) == "table" then
+			file:write("{ }\n");
+			saveTable2(file, v, tName .. "[" .. keyStr .. "]")
+		elseif type(v) == "string" then
+			file:write("\"" .. v .. "\"")
+		else
+			file:write(tostring(v))
+		end
+		file:write("\n")
 	end
 end
 
-function Resources.saveTable(t, name)
-	local path = ffi.string(C.platformExternalResourceDirectory()).."/"..Resources.gameName.."/"..name
+function File.saveTable(t, name)
+	local path = Game.resourceDir .. name
 	Log.infof("Starting saveTable with name %s", path)
 
 	local file = assert(io.open(path, "w"))
-	file:write("return {")
-	saveTable(file, t)
-	file:write("}")
+	file:write("local t = { }\n")
+	saveTable2(file, t, "t")
+	file:write("return t")
+
 	assert(file:close())
+
 	Log.infof("Table Saved %s", path)
 end
 
-function Resources.loadTable(name)
-	return runExternalFile(Resources.gameName.."/"..name)
-end
-
-function Resources.loadFile(path)
-	if Path.hasExtension(path, "luac") then
-		local name, ext = Path.baseName(path)
-		local hash = C.bytesHash(name, #name, 0)
-		local toLoad = Resources.gameName.."/"..tostring(hash).."."..ext
-		return runExternalFile(toLoad)
-	else
-		return C.resourceLoad(Resources.loader, path)
+function File.loadTable(name)
+	if not Game.name then 
+		return runExternalFile(name)
+	else 
+		return runExternalFile(Game.name .. "/" .. name)
 	end
-end
-
-function Resources.setCLoader(resourceLoader)
-	Resources.loader = resourceLoader
 end
 
 function runInternalFile(path)
 	local resource = C.platformLoadInternalResource(path)
-	local func = loadstring(ffi.string(resource.buffer, resource.length))
+	local func, err = loadstring(ffi.string(resource.buffer, resource.length))
 	C.platformUnloadResource(resource)
-	return func()
+
+	if not func then 
+		Log.errorf("Failed to load internal %s Error: %s", path, err)
+	else 
+		return func()
+	end 
 end
 
 function runExternalFile(path)
 	local resource = C.platformLoadExternalResource(path)
-	local func = loadstring(ffi.string(resource.buffer, resource.length))
+	local str = ffi.string(resource.buffer, resource.length)
+	local func, err= loadstring(str)
 	C.platformUnloadResource(resource)
-	return func()
+
+	if not func then 
+		Log.errorf("Failed to load external %s Error: %s", path, err)
+	else 
+		return func()
+	end 
 end
 
 local function unlock_new_index(t, k, v)
@@ -634,9 +599,12 @@ setmetatable(global, GlobalMT)
 
 do
 	GLOBAL_lock(_G)
+
+	runInternalFile("R.lua")
 	runInternalFile("gl.lua")
 	runInternalFile("socket.lua")
 	runInternalFile("resources.lua")
 	runInternalFile("renderer.lua")
 	runInternalFile("lobby.lua")
+	runInternalFile("reloading.lua")
 end

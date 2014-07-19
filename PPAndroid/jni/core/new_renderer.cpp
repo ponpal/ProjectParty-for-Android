@@ -159,6 +159,11 @@ static void rendererFlushIfNeeded(Renderer* renderer, Texture tex, size_t count)
 void rendererAddFrame(Renderer* renderer, const Frame* frame,
 					  vec2f inPos, vec2f inDim, uint32_t color)
 {
+	if(frame == nullptr) {
+		RLOGE("%s", "rendererAddFrame called with null frame!");
+		return;
+	}
+
 	rendererFlushIfNeeded(renderer, frame->texture, 4);
 	using namespace glm;
 	vec2 bl  = vec2(inPos.x, inPos.y);
@@ -206,6 +211,11 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 					   vec2f inPos, vec2f inDim, uint32_t color,
 					   vec2f inOrigin, float rotation, int mirrored)
 {
+	if(frame == nullptr) {
+		RLOGE("%s", "rendererAddFrame2 called with null frame!");
+		return;
+	}
+
 	rendererFlushIfNeeded(renderer, frame->texture, 4);
 
 	using namespace glm;
@@ -220,9 +230,8 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 
 	if(mirrored)
 	{
-		float tmp = botLeft.x;
-		botLeft.x = topRight.x;
-		topRight.x = tmp;
+		botLeft.x = botLeft.x + topRight.x;
+		topRight.x = - topRight.x;
 	}
 
 	Vertex vert;
@@ -238,15 +247,15 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 	*(ptr++) = vert;
 
 	vert.position = rotated(pos, -origin + glm::vec2(0, dim.y), sinus, cosinus);
-	vert.texcoord = glm::vec2(botLeft.x, topRight.y);
+	vert.texcoord = botLeft + glm::vec2(topRight.x,0);
 	*(ptr++) = vert;
 
 	vert.position = rotated(pos, -origin + glm::vec2(dim.x, 0), sinus, cosinus);
-	vert.texcoord = glm::vec2(topRight.x, botLeft.y);
+	vert.texcoord = botLeft + glm::vec2(0, topRight.y);
 	*(ptr++) = vert;
 
 	vert.position = rotated(pos, -origin + dim, sinus, cosinus);
-	vert.texcoord = topRight;
+	vert.texcoord = botLeft + topRight;
 	*(ptr++) = vert;
 
 	renderer->elements += 4;
@@ -321,6 +330,12 @@ inline static glm::vec2 measureFont(const Font* font, const char* text)
 
 void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec2f inPos, uint32_t color)
 {
+	if(font == nullptr) {
+		RLOGE("%s", "rendererAddText called with null font.");
+		return;
+	}
+
+
 	using namespace glm;
 	auto pos = glm::vec2(inPos.x, inPos.y);
 	glm::vec2 size = measureFont(font, text);
