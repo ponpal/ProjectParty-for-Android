@@ -230,10 +230,9 @@ function global.UdpSocket(inSize, outSize)
 
 	local t = { }
 	t.handle 	= C.socketCreate(C.UDP_SOCKET)
-	t.inBuffer  = ffi.gc(C.bufferCreate(inSize), C.bufferDestroy)
-	t.outBuffer = ffi.gc(C.bufferCreate(outSize), C.bufferDestroy)
+	t.inBuffer  = ffi.gc(C.bufferNew(inSize), C.bufferDelete)
+	t.outBuffer = ffi.gc(C.bufferNew(outSize), C.bufferDelete)
 
 	setmetatable(t, udpMT)
-	--Need to fix with the GC so that it closes the socket when it can.
 	return t
 end

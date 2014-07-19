@@ -25,16 +25,19 @@ if(!(bufferBytesRemaining(buffer) >= len)) \
 	platformExit(); \
 }
 
-Buffer* bufferCreate(size_t bufferSize)
+Buffer* bufferNew(uint32_t bufferSize)
 {
+	LOGI("Creating buffer %d", bufferSize);
+
 	auto buffer = new Buffer();
-	buffer->base = buffer->ptr = new uint8_t[bufferSize];
+	buffer->base = new uint8_t[bufferSize];
+	buffer->ptr  = buffer->base;
 	buffer->length = 0;
 	buffer->capacity = bufferSize;
 	return buffer;
 }
 
-Buffer bufferWrapArray(uint8_t* array, size_t length)
+Buffer bufferWrapArray(uint8_t* array, uint32_t length)
 {
 	Buffer buffer;
 	buffer.base     = buffer.ptr = array;
@@ -43,15 +46,10 @@ Buffer bufferWrapArray(uint8_t* array, size_t length)
 	return buffer;
 }
 
-void bufferDestroy(Buffer* buffer)
+void bufferDelete(Buffer* buffer)
 {
 	delete [] buffer->base;
 	delete buffer;
-}
-
-uint32_t bufferCapacityRemaining(Buffer* buffer)
-{
-	return buffer->capacity - (buffer->ptr - buffer->base);
 }
 
 uint32_t bufferBytesRemaining(Buffer* buffer)
@@ -73,7 +71,7 @@ void bufferWriteUTF8(Buffer* buffer, const char* data)
 	bufferWriteBytes(buffer, (uint8_t*)data, length + 1);
 }
 
-void bufferWriteBytes(Buffer* buffer, uint8_t* data, size_t length)
+void bufferWriteBytes(Buffer* buffer, uint8_t* data, uint32_t length)
 {
 	BOUNDS_CHECK(buffer, length);
 
@@ -151,7 +149,7 @@ void bufferWriteDouble(Buffer* buffer, double data)
 	bufferWriteLong(buffer, u.b);
 }
 
-size_t bufferReadUTF8(Buffer* buffer, char** dest)
+uint32_t bufferReadUTF8(Buffer* buffer, char** dest)
 {
 	size_t length = bufferReadShort(buffer);
 	BOUNDS_CHECK(buffer, length);
@@ -173,7 +171,7 @@ char* bufferReadTempUTF8(Buffer* buffer)
 	return ptr;
 }
 
-size_t bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes)
+uint32_t bufferReadBytes(Buffer* buffer, uint8_t* dest, uint32_t numBytes)
 {
 	BOUNDS_CHECK(buffer, numBytes);
 	memcpy(dest, buffer->ptr, numBytes);

@@ -12,7 +12,7 @@
 
 extern "C"
 {
-	typedef struct
+	typedef struct Buffer
 	{
 		uint8_t* base;
 		uint8_t* ptr;
@@ -20,15 +20,16 @@ extern "C"
 		uint32_t capacity;
 	} Buffer;
 
-	Buffer* bufferCreate(size_t size);
-	Buffer bufferWrapArray(uint8_t* array, size_t arraySize);
-	void bufferDestroy(Buffer* buffer);
 
+	Buffer* bufferNew(uint32_t bufferSize);
+	void bufferDelete(Buffer* buffer);
+
+	Buffer bufferWrapArray(uint8_t* array, uint32_t arraySize);
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 	uint32_t bufferBytesConsumed(Buffer* buffer);
 
 	//Output buffer
-	void bufferWriteBytes(Buffer* buffer, uint8_t* data, size_t length);
+	void bufferWriteBytes(Buffer* buffer, uint8_t* data, uint32_t length);
 	void bufferWriteByte(Buffer* buffer, uint8_t data);
 	void bufferWriteShort(Buffer* buffer, uint16_t data);
 	void bufferWriteInt(Buffer* buffer, uint32_t data);
@@ -38,9 +39,9 @@ extern "C"
 	void bufferWriteDouble(Buffer* buffer,double data);
 
 	//Input Buffer
-	size_t bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes);
+	uint32_t bufferReadBytes(Buffer* buffer, uint8_t* dest, uint32_t numBytes);
 	char* bufferReadTempUTF8(Buffer* buffer);
-	size_t bufferReadUTF8(Buffer* buffer, char** dest);
+	uint32_t bufferReadUTF8(Buffer* buffer, char** dest);
 	uint8_t  bufferReadByte(Buffer* buffer);
 	uint16_t bufferReadShort(Buffer* buffer);
 	uint32_t bufferReadInt(Buffer* buffer);

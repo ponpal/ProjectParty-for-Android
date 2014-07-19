@@ -25,8 +25,7 @@ ffi.cdef[[
 	// ----------------------------
 	//  	buffer.h
 	// ----------------------------
-
-	typedef struct
+	typedef struct Buffer
 	{
 		uint8_t* base;
 		uint8_t* ptr;
@@ -34,31 +33,36 @@ ffi.cdef[[
 		uint32_t capacity;
 	} Buffer;
 
-	Buffer* bufferCreate(size_t size);
-	void bufferDestroy(Buffer* buffer);
 
+	Buffer* bufferNew(uint32_t bufferSize);
+	void bufferDelete(Buffer* buffer);
+
+	Buffer bufferWrapArray(uint8_t* array, uint32_t arraySize);
 	uint32_t bufferBytesRemaining(Buffer* buffer);
+	uint32_t bufferBytesConsumed(Buffer* buffer);
 
-	void bufferWriteBytes(Buffer* buffer, uint8_t* data, size_t length);
+	//Output buffer
+	void bufferWriteBytes(Buffer* buffer, uint8_t* data, uint32_t length);
 	void bufferWriteByte(Buffer* buffer, uint8_t data);
 	void bufferWriteShort(Buffer* buffer, uint16_t data);
 	void bufferWriteInt(Buffer* buffer, uint32_t data);
 	void bufferWriteLong(Buffer* buffer, uint64_t data);
 	void bufferWriteUTF8(Buffer* buffer, const char* data);
-
 	void bufferWriteFloat(Buffer* buffer, float data);
 	void bufferWriteDouble(Buffer* buffer,double data);
 
-	size_t bufferReadBytes(Buffer* buffer, uint8_t* dest, size_t numBytes);
-	size_t bufferReadUTF8(Buffer* buffer, char** dest);
+	//Input Buffer
+	uint32_t bufferReadBytes(Buffer* buffer, uint8_t* dest, uint32_t numBytes);
 	char* bufferReadTempUTF8(Buffer* buffer);
+	uint32_t bufferReadUTF8(Buffer* buffer, char** dest);
 	uint8_t  bufferReadByte(Buffer* buffer);
 	uint16_t bufferReadShort(Buffer* buffer);
 	uint32_t bufferReadInt(Buffer* buffer);
 	uint64_t bufferReadLong(Buffer* buffer);
-
 	float  bufferReadFloat(Buffer* buffer);
 	double bufferReadDouble(Buffer* buffer);
+
+
 
 	//-----------------------------
 	//	    socket_stream.h

@@ -84,6 +84,7 @@ bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs)
 
 bool socketReceive(int sock, Buffer* buffer)
 {
+
 	size_t length = bufferBytesRemaining(buffer);
 	memmove(buffer->base, buffer->ptr, length);
 	buffer->ptr = buffer->base;
