@@ -33,7 +33,7 @@ function Game.start()
     Screen.setOrientation(Orientation.portrait)
 end
 
-local function transition(server)
+local function transition(server, shouldRestart)
 	unbindState()
 	
 	Game.name = server.name
@@ -42,14 +42,19 @@ local function transition(server)
 
 	initializeReloading(resources)
 	C.loadLuaScripts(C.gGame.L, Game.name)
-	Game.restart()
+
+	if shouldRestart then
+		Game.restart()
+	else
+		Game.start()
+	end
 end
 
 
 function Game.restart()
 	local state = File.loadTable("lobby_save_state.luac")
 	if state.shouldTransition then
-		transition(state.server)
+		transition(state.server, true)
 	else 
 		Game.start();
 	end
@@ -105,7 +110,7 @@ function Game.step()
 	local shouldTransition = checkForTransition()
     if shouldTransition then
 		Game.stop()
-		transition(chosenServer)
+		transition(chosenServer, false)
 		return;
     end
 

@@ -224,7 +224,6 @@ function udpMT:send(ip, port)
 	return C.socketSend(self.handle, self.outBuffer, ip, port)
 end
 
-
 function global.UdpSocket(inSize, outSize)
 	if not inSize then inSize = 1024 end
 	if not outSize then outSize = 1024 end

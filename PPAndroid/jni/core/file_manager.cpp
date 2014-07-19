@@ -217,7 +217,6 @@ static void* fileTask(void* ptr)
 	}
 	RLOGI("%s", "Connected");
 	sendMapFile(task->fileDirectory.c_str(), sockfd);
-
 	RLOGI("%s", "Sent map file");
 
 	RLOGI("FileDirectory = %s", task->fileDirectory.c_str());

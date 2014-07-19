@@ -59,6 +59,11 @@ static void onServiceFound(const char* service, Buffer* buffer)
 
 static bool sendLogMessage(int verbosity, const char* toLog)
 {
+	if(verbosity > 2)
+	{
+		LOGE("Invalid verbosity! %d", verbosity);
+	}
+
 	auto len = strlen(toLog);
 	auto err = send(tcpSocket, &verbosity, 1, 0);
 	if(err < 0)	goto failure;
@@ -148,6 +153,9 @@ void remoteLogStart(const char* loggingID)
 	remoteLogReset();
 	finder = serviceFinderCreate(SERVICE_NAME, servicePort, &onServiceFound);
    	isInitialized = true;
+
+	if(!serviceFinderPollFound(finder))
+		serviceFinderQuery(finder);
 }
 
 void remoteLogStop()
