@@ -59,7 +59,6 @@ bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs)
 		timeout.tv_sec = msecs / 1000;
 		timeout.tv_usec = (msecs % 1000) * 1000;
 
-		RLOGI("Connecting socket with timeout %d", msecs);
 		auto err = connect(socket, (struct sockaddr *)&servaddr, sizeof(servaddr));
 		auto status = select(socket + 1, NULL, &set, NULL, &timeout);
 
@@ -69,8 +68,6 @@ bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs)
 			RLOGE("Could not connect socket, %d %s", errno, strerror(errno));
 			return false;
 		}
-
-		RLOGI("%s", "Socket connected!");
 	}
 	else
 	{

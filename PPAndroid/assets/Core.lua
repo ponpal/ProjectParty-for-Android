@@ -599,7 +599,6 @@ setmetatable(global, GlobalMT)
 
 do
 	GLOBAL_lock(_G)
-
 	runInternalFile("R.lua")
 	runInternalFile("gl.lua")
 	runInternalFile("socket.lua")
