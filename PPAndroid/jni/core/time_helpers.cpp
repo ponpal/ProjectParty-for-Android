@@ -27,6 +27,16 @@ uint64_t timeNowMonoliticNsecs()
 	return getCurrentTime();
 }
 
+uint64_t timeTargetMonolitic(uint32_t msecs)
+{
+	uint64_t time = msecs;
+	time *= 1000000;
+	time += timeNowMonoliticNsecs();
+	return time;
+
+}
+
+
 void clockStart(Clock* clock)
 {
 	clock->_totalTime = 0;

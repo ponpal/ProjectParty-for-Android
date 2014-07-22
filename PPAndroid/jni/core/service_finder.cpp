@@ -19,6 +19,7 @@
 #include <cstdio>
 #include "socket_helpers.h"
 #include "buffer.h"
+#include "async_operations.h"
 
 #define SERVICE_MESSAGE_MAX 256
 #define ANY_SERVICE_ID "ANY_NETWORK_SERVICE"
@@ -30,7 +31,6 @@ typedef struct ServiceFinder
 	struct sockaddr_in broadcastAddr;
 	serviceFound serviceFunction;
 } ServiceFinder;
-
 
 ServiceFinder* serviceFinderCreate(const char* serviceID, uint16_t port, serviceFound function)
 {
@@ -52,7 +52,7 @@ ServiceFinder* serviceFinderCreate(const char* serviceID, uint16_t port, service
 
 	int err = bind(finder->socket, (struct sockaddr *)&myaddr, sizeof(myaddr));
 	if(err < 0) {
-		LOGE("Could not bind socket, %d %s", errno, strerror(err));
+		RLOGE("Could not bind socket, %d %s", errno, strerror(err));
 		free(finder);
 		free(serviceIDCpy);
 		return 0;
@@ -67,7 +67,7 @@ ServiceFinder* serviceFinderCreate(const char* serviceID, uint16_t port, service
 	err = setsockopt(finder->socket, SOL_SOCKET, SO_BROADCAST, &broadcastEnable, sizeof(broadcastEnable));
 	if(err < 0)
 	{
-		LOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
+		RLOGE("Could not enable broadcasting, %d %s", errno, strerror(err));
 		free(finder);
 		free(serviceIDCpy);
 		return 0;
@@ -97,7 +97,7 @@ void serviceFinderQuery(ServiceFinder* finder)
 				     sizeof(finder->broadcastAddr));
 	if(err < 0)
 	{
-        LOGE("Could not send, %d %s", errno, strerror(err));
+        RLOGE("Could not send, %d %s", errno, strerror(errno));
 	}
 }
 
@@ -113,10 +113,8 @@ bool serviceFinderPollFound(ServiceFinder* finder)
 	}
 	else
 	{
-
 		buffer.length = r;
 		auto name = bufferReadTempUTF8(&buffer);
-
 
 		if(strcmp(name, finder->serviceID) != 0 &&
 		   strcmp(finder->serviceID, ANY_SERVICE_ID) != 0)
@@ -129,4 +127,82 @@ bool serviceFinderPollFound(ServiceFinder* finder)
 	}
 
 	return true;
+}
+
+typedef struct
+{
+	ServiceFinder* finder;
+	foundService   handler;
+	uint32_t 	   interval;
+	uint64_t	   target;
+} AsyncFindContext;
+
+static int asyncFindService(void* ptr)
+{
+	auto context = (AsyncFindContext*)ptr;
+	auto finder = context->finder;
+
+	//Don't query every frame!
+	if(context->target < timeNowMonoliticNsecs()) {
+		serviceFinderQuery(finder);
+		context->target = timeTargetMonolitic(context->interval);
+	}
+
+	int result = 0;
+	uint8_t arrayBuffer[SERVICE_MESSAGE_MAX];
+	Buffer buffer = bufferWrapArray(arrayBuffer, SERVICE_MESSAGE_MAX);
+	auto r = recv(finder->socket, arrayBuffer, SERVICE_MESSAGE_MAX, 0);
+	if(r < 0)
+	{
+		if(errno != EWOULDBLOCK && errno != EAGAIN) {
+			RLOGE("Failed to send data: Error %d %s", errno, strerror(errno));
+			context->handler(nullptr, false); //Failed!
+			result = ASYNC_OPERATION_FAILURE;
+		}
+
+		result = ASYNC_OPERATION_RUNNING;
+	}
+	else
+	{
+		buffer.length = r;
+		auto name = bufferReadTempUTF8(&buffer);
+
+		if(strcmp(name, finder->serviceID) != 0 &&
+		   strcmp(finder->serviceID, ANY_SERVICE_ID) != 0)
+		{
+			result = ASYNC_OPERATION_RUNNING;
+		}
+		else
+		{
+			ServiceEvent event;
+			event.buffer = &buffer;
+			event.serviceID = name;
+			event.shouldContinue = false;
+
+			context->handler(&event, true);
+			if(event.shouldContinue)
+				result = ASYNC_OPERATION_RUNNING;
+			else
+				result = ASYNC_OPERATION_COMPLETE;
+		}
+	}
+
+	if(result != ASYNC_OPERATION_RUNNING)
+	{
+		serviceFinderDestroy(finder);
+		delete context;
+	}
+
+	return result;
+}
+
+void serviceFinderAsync(const char* serviceID, uint16_t port, foundService function, uint32_t queryInterval)
+{
+	auto data   = new AsyncFindContext;
+	data->finder = serviceFinderCreate(serviceID, port, nullptr);
+	data->handler = function;
+	data->interval = queryInterval;
+	data->target   = timeTargetMonolitic(queryInterval);
+
+	asyncOperation(data, &asyncFindService, "Service Finder Operation");
 }

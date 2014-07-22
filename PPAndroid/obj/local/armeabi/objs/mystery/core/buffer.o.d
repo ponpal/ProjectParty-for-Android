@@ -109,7 +109,7 @@ obj/local/armeabi/objs/mystery/core/buffer.o: jni/core/buffer.cpp \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
- jni/core/remote_log.h jni/core/platform.h \
+ jni/core/remote_debug.h jni/core/platform.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h
 
 jni/core/buffer.h:
@@ -438,7 +438,7 @@ jni/core/font.h:
 
 jni/lua/luajit.h:
 
-jni/core/remote_log.h:
+jni/core/remote_debug.h:
 
 jni/core/platform.h:
 

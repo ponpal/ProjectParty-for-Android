@@ -9,7 +9,7 @@
 #include "platform.h"
 #include "dirent.h"
 #include "lua.hpp"
-#include "remote_log.h"
+#include "remote_debug.h"
 
 lua_State* luaCoreCreate()
 {
@@ -137,6 +137,21 @@ static void callIntFloat2LuaFunction(lua_State* L, const char* methodName, uint3
 	char buffer[128];
 	snprintf(buffer, 128, "%s(%d,%f,%f)", methodName, i, x, y);
 	lua_xpcall(L, buffer, "int float float");
+}
+
+bool luaConsoleInputCall(lua_State* L, const char* input, char** result)
+{
+	lua_getglobal(L, "consoleCall");
+	lua_pushstring(L, input);
+
+	bool sucess = lua_pcall(L, 1, 1, 0) == 0;
+	if(sucess)
+		*result = (char*)lua_tostring(L , -1);
+	else
+		*result = (char*)lua_tostring(L, -1);
+
+	lua_pop(L, 2);
+	return sucess;
 }
 
 void luaStopCall(lua_State* L)

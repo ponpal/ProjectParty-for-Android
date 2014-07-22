@@ -8,7 +8,7 @@
 #include "main.h"
 #include "sys/stat.h"
 #include "errno.h"
-#include "core/remote_log.h"
+#include "core/remote_debug.h"
 #include "unistd.h"
 
 ndk_helper::GLContext* context;
@@ -333,7 +333,7 @@ void android_main(android_app* state) {
 	state->onInputEvent = &handle_input;
 	gApp = state;
 
-	remoteLogInitialize();
+	remoteDebugInitialize();
 	initializeFileSystem();
 	initSensors();
 	lifecycle::create();

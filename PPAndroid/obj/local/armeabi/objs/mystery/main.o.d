@@ -124,7 +124,7 @@ obj/local/armeabi/objs/mystery/main.o: jni/main.cpp jni/main.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/endian.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/endian.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/endian.h \
- jni/core/remote_log.h \
+ jni/core/remote_debug.h \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/unistd.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h \
@@ -494,7 +494,7 @@ C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/endian.
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/endian.h:
 
-jni/core/remote_log.h:
+jni/core/remote_debug.h:
 
 C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
 

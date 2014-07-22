@@ -113,12 +113,13 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
  jni/core/assert.h \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
- jni/core/remote_log.h jni/core/lua_core.h jni/core/platform.h \
+ jni/core/remote_debug.h jni/core/lua_core.h jni/core/platform.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/unistd.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysconf.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/capability.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/pathconf.h \
+ jni/core/async_operations.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h
 
 jni/core/game.h:
@@ -457,7 +458,7 @@ jni/core/assert.h:
 
 C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
 
-jni/core/remote_log.h:
+jni/core/remote_debug.h:
 
 jni/core/lua_core.h:
 
@@ -472,5 +473,7 @@ C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysconf
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/capability.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/pathconf.h:
+
+jni/core/async_operations.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h:

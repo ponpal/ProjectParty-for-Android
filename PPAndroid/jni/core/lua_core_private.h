@@ -24,7 +24,7 @@ void luaStopCall(lua_State* L);
 void luaStepCall(lua_State* L);
 void luaRunGarbageCollector(lua_State* L, int milisecs);
 
-void luaOnTouch(lua_State* L, int x, int y, int pointerIndex);
+bool luaConsoleInputCall(lua_State* L, const char* input, char** result);
 
 bool luaMenuCall(lua_State* L);
 bool luaBackCall(lua_State* L);

@@ -23,7 +23,15 @@ extern "C"
 
 	//For tcp sockets
 	bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs);
+
+	//Need non-blocking connect.
+	typedef void (*connectedCallback)(int socket, bool result);
+	void socketAsyncConnect(int socket, uint32_t ip,
+							uint16_t port, uint32_t msecs,
+							connectedCallback callback);
+
 	bool socketTCPSend(int socket, Buffer* toSend);
+	void socketTcpNoDelay(int socket, bool value);
 
 	//For udp sockets
 	bool socketSend(int socket, Buffer* toSend, uint32_t ip, uint16_t port);

@@ -1,4 +1,3 @@
-local discovery
 local renderer
 local texture
 local font 
@@ -14,23 +13,41 @@ local chosenServer = nil
 
 global.resources = ResourceManager()
 
-local function onServerFound(serviceID, buffer)
-	--Temporary c_name
-	local c_name = C.bufferReadTempUTF8(buffer); 
+local function startReceivingFiles(serverInfo)
+	if receiveFiles == 0 then
+		local dir = ffi.string(C.platformExternalResourceDirectory()) .. "/" .. serverInfo.name
+		receiveFiles = C.receiveFiles(serverInfo.ip, serverInfo.contentPort, dir)
+	end 
+end
 
-	chosenServer = { }
-	chosenServer.name 			= ffi.string(c_name);
-	chosenServer.ip   			= C.bufferReadInt(buffer)
-	chosenServer.tcpPort   		= C.bufferReadShort(buffer)
-	chosenServer.udpPort  		= C.bufferReadShort(buffer)
-	chosenServer.contentPort 	= C.bufferReadShort(buffer)
+local function onServerFound(event, success)
+	if success then 
+		Log.info("Found a server!")
+
+		local buffer = event.buffer
+		--Temporary c_name
+		local c_name = C.bufferReadTempUTF8(buffer)
+
+		chosenServer = { }
+		chosenServer.name 			= ffi.string(c_name)
+		chosenServer.ip   			= C.bufferReadInt(buffer)
+		chosenServer.tcpPort   		= C.bufferReadShort(buffer)
+		chosenServer.udpPort  		= C.bufferReadShort(buffer)
+		chosenServer.contentPort 	= C.bufferReadShort(buffer)
+		startReceivingFiles(chosenServer)		
+	else 
+		--If the service finder operation failed restart it!
+   		C.serviceFinderAsync("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound, 500)
+	end
 end
 
 function Game.start()
-	discovery = C.serviceFinderCreate("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound)
 	renderer = CRenderer(256)
     font = resources:load(R.arial50)
     Screen.setOrientation(Orientation.portrait)
+
+    C.serviceFinderAsync("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound, 500)
+
 end
 
 local function transition(server, shouldRestart)
@@ -49,7 +66,6 @@ local function transition(server, shouldRestart)
 		Game.start()
 	end
 end
-
 
 function Game.restart()
 	local state = File.loadTable("lobby_save_state.luac")
@@ -71,26 +87,10 @@ function Game.stop()
 
 	File.saveTable(toSave, "lobby_save_state.luac")
 
-	C.serviceFinderDestroy(discovery)
 	resources:unloadAll()
 	unbindState()
 end
 
-
-local function startReceivingFiles(serverInfo)
-	if receiveFiles == 0 then
-		local dir = ffi.string(C.platformExternalResourceDirectory()) .. "/" .. serverInfo.name
-		receiveFiles = C.receiveFiles(serverInfo.ip, serverInfo.contentPort, dir)
-	end 
-end
-
-local function updateServerInfo()
-	C.serviceFinderQuery(discovery)
-	local res = C.serviceFinderPollFound(discovery)
-	if res then
-		startReceivingFiles(chosenServer)
-	end
-end
 
 local function checkForTransition()
 	if receiveFiles ~= 0 then
@@ -106,7 +106,7 @@ local function checkForTransition()
 end
 
 function Game.step()
-	updateServerInfo()
+	C.remoteDebugUpdate()
 	local shouldTransition = checkForTransition()
     if shouldTransition then
 		Game.stop()

@@ -81,9 +81,6 @@ HashID bytesHash(const void* buf, size_t len, size_t seed)
 
 ShortHash shortHash(const void* buf, size_t len, size_t seed)
 {
-	LOGI("Before bytesHash");
 	uint32_t hash = bytesHash(buf, len, seed);
-	LOGI("After bytesHash");
-
 	return (ShortHash)((hash & 0xFFFF) ^ ((hash >> 16) & 0xFFFF));
 }

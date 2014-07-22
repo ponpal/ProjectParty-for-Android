@@ -11,11 +11,13 @@
 #include <cstdlib>
 extern "C"
 {
-	void remoteLogInitialize();
-	void remoteLogStart(const char* loggingID);
-	void remoteLogStop();
+	void remoteDebugInitialize();
+	void remoteDebugStart(const char* debugID);
+	void remoteDebugStop();
+
 	void remoteLog(int verbosity, const char* message);
 	void remoteLogFormat(int verbosity, const char* fmt, ...);
+	void remoteDebugUpdate();
 }
 
 

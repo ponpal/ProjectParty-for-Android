@@ -7,7 +7,7 @@
 
 #include "shader.h"
 #include <stdlib.h>
-#include "remote_log.h"
+#include "remote_debug.h"
 
 namespace shader
 {

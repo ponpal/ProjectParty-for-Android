@@ -1,18 +1,30 @@
 local reloading = { }
-local function onReload(service, buffer)
-	local ip 	= C.bufferReadInt(buffer)
-	local port 	= C.bufferReadShort(buffer)
 
-	local sock = TcpSocket(1024, 128)
-	local res  = sock:connect(ip, port, 1000)
+local SERVICE_NAME = "RELOADING_SERVICE"
+local PORT = 22222
+local QUERY_INTERVAL = 1000
 
-	if res then 
-		sock:blocking(false)
-		reloading.connection = sock
-		sock.outStream:writeString("tower_defence")
-		sock.outStream:flush()
+
+local function onReload(event, success)
+	if success then 
+		local buffer = event.buffer
+
+		local ip 	= C.bufferReadInt(buffer)
+		local port 	= C.bufferReadShort(buffer)
+		local sock = TcpSocket(1024, 128)
+		local res  = sock:connect(ip, port, 1000)
+
+		if res then 
+			sock:blocking(false)
+			reloading.connection = sock
+			sock.outStream:writeString("tower_defence")
+			sock.outStream:flush()
+		end
+
+		Log.info("Connected to reloading!")
+	else
+		C.serviceFinderAsync(SERVICE_NAME, PORT, onReload, QUERY_INTERVAL)
 	end
-	Log.info("Connected to reloading!")
 end
 
 local function reloadItem()
@@ -60,10 +72,9 @@ end
 
 function global.initializeReloading(manager)
 	terminateReloading()
-
-	reloading.finder = ffi.gc(C.serviceFinderCreate("FILE_RELOADING_SERVICE", 22222, onReload),
-							  C.serviceFinderDestroy)
 	reloading.manager = manager
+
+	C.serviceFinderAsync(SERVICE_NAME, PORT, onReload, QUERY_INTERVAL)
 end
 
 function global.terminateReloading()
@@ -81,12 +92,6 @@ function global.updateReloading()
 		inStream:receive()	
 		if inStream:dataLength() > 0 then
 			reloadItem()
-		end
-	else 
-		local result = C.serviceFinderPollFound(reloading.finder)
-		if not result then
-			Log.info("Reloader not found!")
-			C.serviceFinderQuery(reloading.finder)
 		end
 	end
 end

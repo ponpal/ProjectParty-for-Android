@@ -12,7 +12,7 @@
 #define __STDC_FORMAT_MACROS
 
 #include <inttypes.h>
-#include "remote_log.h"
+#include "remote_debug.h"
 
 #define BOUNDS_CHECK(buffer, len) \
 if(!(bufferBytesRemaining(buffer) >= len)) \
@@ -27,8 +27,6 @@ if(!(bufferBytesRemaining(buffer) >= len)) \
 
 Buffer* bufferNew(uint32_t bufferSize)
 {
-	LOGI("Creating buffer %d", bufferSize);
-
 	auto buffer = new Buffer();
 	buffer->base = new uint8_t[bufferSize];
 	buffer->ptr  = buffer->base;

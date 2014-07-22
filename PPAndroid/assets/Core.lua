@@ -255,20 +255,23 @@ ffi.cdef[[
 	//		service_finder.h
 	//------------------------------
 	static const uint16_t servicePort = 34299;
-	typedef void (*serviceFound)(const char*, Buffer*);
-	typedef struct ServiceFinder ServiceFinder;
 
-	ServiceFinder* serviceFinderCreate(const char* toFind, uint16_t port, serviceFound function);
-	void serviceFinderDestroy(ServiceFinder*);
-	void serviceFinderQuery(ServiceFinder*);
-	bool serviceFinderPollFound(ServiceFinder*);
+	typedef struct
+	{
+		const char* serviceID;
+		Buffer* buffer;
+		bool shouldContinue;
+	} ServiceEvent;
+
+	typedef void (*foundService)(ServiceEvent*, bool success);
+	void serviceFinderAsync(const char* toFind, uint16_t port,
+							foundService handler, uint32_t interval);
 
 	//-----------------------------
 	//		remote_log.h
 	//-----------------------------
-	void remoteLogStart(const char* loggingID);
-	void remoteLogStop();
 	void remoteLog(int verbosity, const char* message);
+	void remoteDebugUpdate();
 
 	// ----------------------------
 	//  	game.h
@@ -313,13 +316,18 @@ ffi.cdef[[
 	int socketCreate(int type);
 	bool socketBind(int socket, uint32_t ip, uint16_t port);
 	void socketSetBlocking(int socket, bool value);
+	bool socketIsBlocking(int socket);
 	void socketSendTimeout(int socket, uint32_t msecs);
 	void socketRecvTimeout(int socket, uint32_t mescs);
 	void socketDestroy(int socket);
-	
+
+	//For tcp sockets
 	bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs);
-	size_t socketSend(int socket, Buffer* toSend);
-	size_t socketReceive(int socket, Buffer* buffer);
+	bool socketTCPSend(int socket, Buffer* toSend);
+
+	//For udp sockets
+	bool socketSend(int socket, Buffer* toSend, uint32_t ip, uint16_t port);
+	bool socketReceive(int socket, Buffer* buffer);
 ]]
 
 
@@ -425,6 +433,11 @@ function unbindState()
 	Game.stop = doNothing
 	Game.restart = doNothing
 end
+
+function consoleCall(input)
+	Log.info(input)
+end
+
 
 Log = {}
 

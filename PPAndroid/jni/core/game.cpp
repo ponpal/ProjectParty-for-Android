@@ -14,6 +14,7 @@
 #include <time.h>
 #include "platform.h"
 #include "unistd.h"
+#include "async_operations.h"
 
 #define __STDC_FORMAT_MACROS
 
@@ -42,8 +43,7 @@ static void gameRestart() {
 void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 	if (gGame)
 		return;
-	remoteLogStart(platformDeviceName());
-
+	remoteDebugStart(platformDeviceName());
 
 	gGame = new Game();
 	gGame->clock = new Clock();
@@ -52,7 +52,6 @@ void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 	gGame->screen = new Screen();
 	gGame->screen->width = screenWidth;
 	gGame->screen->height = screenHeight;
-
 	gGame->fps = 60;
 
 	RLOGI("%s", "Initializing Game!");
@@ -68,7 +67,7 @@ void gameStop() {
 	if(!gGame)
 		return;
 
-	remoteLogStop();
+	remoteDebugStop();
 	luaStopCall(gGame->L);
 	luaCoreDestroy(gGame->L);
 	delete gGame->clock;
@@ -88,8 +87,10 @@ uint64_t next_second = 0;
 int32_t sleep_offset = 0;
 void gameStep(ndk_helper::GLContext* context) {
     clockStep(gGame->clock);
+    asyncOperationsProcess();
     luaStepCall(gGame->L);
     luaRunGarbageCollector(gGame->L, 3);
+
     struct timespec time1, time2;
     time1.tv_sec = 0;
     time1.tv_nsec = target_frame - sleep_offset - timeNowMonoliticNsecs();

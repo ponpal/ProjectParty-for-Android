@@ -20,6 +20,19 @@ extern "C"
 	void serviceFinderDestroy(ServiceFinder*);
 	void serviceFinderQuery(ServiceFinder*);
 	bool serviceFinderPollFound(ServiceFinder*);
+
+	typedef struct
+	{
+		const char* serviceID;
+		Buffer* buffer;
+		bool shouldContinue;
+	} ServiceEvent;
+
+	//The Context Pointer is a pointer that decides if the
+	//ServiceFinder should continue to look for more stuff or not.
+	typedef void (*foundService)(ServiceEvent*, bool success);
+	void serviceFinderAsync(const char* toFind, uint16_t port,
+							foundService handler, uint32_t interval);
 }
 
 

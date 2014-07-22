@@ -31,5 +31,6 @@ extern "C"
 }
 
 uint64_t timeNowMonoliticNsecs();
+uint64_t timeTargetMonolitic(uint32_t msecs);
 
 #endif

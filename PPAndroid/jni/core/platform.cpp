@@ -73,22 +73,15 @@ const char* platformDeviceName()
 	auto obj = gApp->activity->clazz;
 
 	vm->AttachCurrentThread( &env, NULL );
-
-
 	auto clazz = env->GetObjectClass(obj);
 	jmethodID methodID = env->GetMethodID(clazz, "getDeviceName", "()[B");
-	LOGI("Method : %d", (uint32_t)methodID);
 
 	auto array = (jbyteArray)env->CallObjectMethod(obj, methodID);
 	auto ptr   = env->GetByteArrayElements(array, 0);
 	int len   = env->GetArrayLength(array);
 
-	LOGI("Exit");
-
 	memcpy(deviceName, ptr, len);
 	deviceName[len] = '\0';
-
-	LOGI("DName %s", deviceName);
 
 	vm->DetachCurrentThread();
 	return deviceName;

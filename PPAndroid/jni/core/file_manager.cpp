@@ -18,7 +18,7 @@
 #include "socket_stream.h"
 #include "platform.h"
 #include "assert.h"
-#include "remote_log.h"
+#include "remote_debug.h"
 #include "sys/stat.h"
 
 #define MAP_FILE_NAME "Map.sdl"
@@ -183,7 +183,7 @@ static void* fileTask(void* ptr)
 
 	int err = bind(sockfd, (struct sockaddr *)&myaddr, sizeof(myaddr));
 	if(err < 0)
-		LOGE("Could not bind socket, %d %s", errno, strerror(err));
+		RLOGE("Could not bind socket, %d %s", errno, strerror(err));
 	struct timeval tv;
 	tv.tv_sec = 5;
 	tv.tv_usec = 0;
