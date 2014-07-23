@@ -151,6 +151,9 @@ bool luaConsoleInputCall(lua_State* L, const char* input, char** result)
 		*result = (char*)lua_tostring(L, -1);
 
 	lua_pop(L, 2);
+
+	RLOGI("%s", "Exit console input");
+
 	return sucess;
 }
 

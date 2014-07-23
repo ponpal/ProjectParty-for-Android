@@ -1,3 +1,5 @@
+--Lobby.lua
+
 local renderer
 local texture
 local font 
@@ -88,7 +90,6 @@ function Game.stop()
 	File.saveTable(toSave, "lobby_save_state.luac")
 
 	resources:unloadAll()
-	unbindState()
 end
 
 
@@ -134,6 +135,7 @@ function Game.step()
 			receivedFiles = 1
 		end
 	end
+
 
 	renderer:addText(font.font, msg, vec2(50, Screen.height - 100), 0xFFFFFFFF)
 	renderer:draw()

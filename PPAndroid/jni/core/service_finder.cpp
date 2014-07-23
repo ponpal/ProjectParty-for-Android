@@ -137,9 +137,15 @@ typedef struct
 	uint64_t	   target;
 } AsyncFindContext;
 
-static int asyncFindService(void* ptr)
+
+static void asyncDtor(AsyncFindContext* context)
 {
-	auto context = (AsyncFindContext*)ptr;
+	serviceFinderDestroy(context->finder);
+	delete context;
+}
+
+static int asyncFindService(AsyncFindContext* context)
+{
 	auto finder = context->finder;
 
 	//Don't query every frame!
@@ -187,14 +193,9 @@ static int asyncFindService(void* ptr)
 		}
 	}
 
-	if(result != ASYNC_OPERATION_RUNNING)
-	{
-		serviceFinderDestroy(finder);
-		delete context;
-	}
-
 	return result;
 }
+
 
 void serviceFinderAsync(const char* serviceID, uint16_t port, foundService function, uint32_t queryInterval)
 {
@@ -204,5 +205,7 @@ void serviceFinderAsync(const char* serviceID, uint16_t port, foundService funct
 	data->interval = queryInterval;
 	data->target   = timeTargetMonolitic(queryInterval);
 
-	asyncOperation(data, &asyncFindService, "Service Finder Operation");
+	serviceFinderQuery(data->finder);
+
+	asyncOperation(data,(asyncHandler)&asyncFindService, (asyncDestructor)&asyncDtor, "Service Finder Operation");
 }

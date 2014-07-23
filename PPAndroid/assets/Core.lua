@@ -422,6 +422,17 @@ vec2 = ffi.metatype("vec2f", vec2_MT)
 
 local function doNothing(...) end
 
+function restartGame()
+	Game.stop()
+	Log.info("stopped the game")
+
+--	C.loadLuaScripts(C.gGame.L, Game.name)
+	
+	Game.restart()
+	Log.info("restarted the game")
+end
+
+
 function unbindState()
 	Input.onDown = doNothing
 	Input.onUp = doNothing
@@ -435,7 +446,12 @@ function unbindState()
 end
 
 function consoleCall(input)
-	Log.info(input)
+	local func, err = loadstring(input)
+	if not func then 
+		return err
+	end
+
+	return func()
 end
 
 
@@ -492,10 +508,17 @@ end
 
 
 Game = { }
+Game.name = ""
 Game.resourceDir = ffi.string(C.platformExternalResourceDirectory()) .. "/"
 
+TextWriter = { }
+TextWriter.data = ""
+function TextWriter:write(text)
+	self.data = self.data .. text;
+end
+
 File = { }
-local function saveTable2(file, t, tName)
+local function serialize2(sink, t, tName)
 	for k, v in pairs(t) do
 		
 		local keyStr = nil
@@ -505,32 +528,43 @@ local function saveTable2(file, t, tName)
 			keyStr = tostring(k)
 		end
 
-		file:write(tName);
-		file:write("[")
-		file:write(keyStr)
-		file:write("] = ")
+		sink:write(tName)
+		sink:write("[")
+		sink:write(keyStr)
+		sink:write("] = ")
 
 		if type(v) == "table" then
-			file:write("{ }\n");
-			saveTable2(file, v, tName .. "[" .. keyStr .. "]")
+			sink:write("{ }\n")
+			serialize2(sink, v, tName .. "[" .. keyStr .. "]")
 		elseif type(v) == "string" then
-			file:write("\"" .. v .. "\"")
+			sink:write("\"" .. v .. "\"")
 		else
-			file:write(tostring(v))
+			sink:write(tostring(v))
 		end
-		file:write("\n")
+		sink:write("\n")
 	end
 end
 
+
+function serialize(sink, t, name)
+	if type(t) == "table" then 
+		sink:write("local ")
+		sink:write(name)
+		sink:write(" = { }\n")
+		serialize2(sink, t, name)
+		sink:write("return ")
+		sink:write(name)
+	else 
+		sink:write(name .. " = " .. tostring(t))
+	end
+
+	return sink
+end 
+
 function File.saveTable(t, name)
 	local path = Game.resourceDir .. name
-	Log.infof("Starting saveTable with name %s", path)
-
 	local file = assert(io.open(path, "w"))
-	file:write("local t = { }\n")
-	saveTable2(file, t, "t")
-	file:write("return t")
-
+	serialize(file, t, "t")
 	assert(file:close())
 
 	Log.infof("Table Saved %s", path)
@@ -559,6 +593,7 @@ end
 function runExternalFile(path)
 	local resource = C.platformLoadExternalResource(path)
 	local str = ffi.string(resource.buffer, resource.length)
+	Log.info(str)
 	local func, err= loadstring(str)
 	C.platformUnloadResource(resource)
 

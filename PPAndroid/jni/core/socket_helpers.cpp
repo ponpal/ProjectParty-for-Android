@@ -106,11 +106,15 @@ typedef struct
 	uint64_t timeoutTime;
 } ConnectData;
 
-static int asyncConnect(void* ptr)
+static void connectDtor(ConnectData* data)
+{
+	//Free memory it's a pain. But unavoidable?
+	delete data;
+}
+
+static int asyncConnect(ConnectData* data)
 {
 	int result = 0;
-	auto data = (ConnectData*)ptr;
-
 	auto res  = connect(data->socket, (struct sockaddr *)&data->server, sizeof(data->server));
 
 	if(res < 0)
@@ -140,12 +144,6 @@ static int asyncConnect(void* ptr)
 		//Restore original blocking value.
 		socketSetBlocking(data->socket, data->blocking);
 		data->callback(data->socket, true);
-	}
-
-	if(result != ASYNC_OPERATION_RUNNING)
-	{
-		//Free memory it's a pain. But unavoidable?
-		delete data;
 	}
 
 	return result;
@@ -182,7 +180,7 @@ void socketAsyncConnect(int socket, uint32_t ip,
 	data->blocking    = socketIsBlocking(socket);
 
 	socketSetBlocking(socket, false);
-	asyncOperation(data, &asyncConnect, "Connection Operation");
+	asyncOperation(data, (asyncHandler)&asyncConnect, (asyncDestructor)&connectDtor,  "Connection Operation");
 }
 
 

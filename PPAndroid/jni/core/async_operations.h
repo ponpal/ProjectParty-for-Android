@@ -17,10 +17,16 @@ enum
 
 
 
-typedef int (*asyncHandler)(void* data);
+typedef int (*asyncHandler)(void* context);
+typedef void (*asyncDestructor)(void* context);
 
-void asyncOperation(void* userPtr, asyncHandler funptr, const char* operationID);
+void asyncOperation(void* userPtr,
+					asyncHandler funptr,
+					asyncDestructor dtor,
+					const char* operationID);
+
 void asyncOperationsProcess();
+void asyncOperationsCancel();
 
 
 #endif /* ASYNC_OPERATIONS_H_ */

@@ -196,8 +196,6 @@ void remoteDebugUpdate()
 {
 	if(!isConnected) return;
 
-	LOGI("Reading messages!");
-
 	//Read message: Do message and then Resend message.
 	uint16_t length;
 	int read = recv(tcpSocket, &length, 2, 0);
