@@ -23,7 +23,10 @@ void rendererAddFrame(Renderer* renderer, const Frame* frame,
 void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 		vec2f pos, vec2f dim, uint32_t color,
 		vec2f origin, float rotation, int mirrored);
-void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec2f pos, uint32_t color);
+void rendererAddText(Renderer* renderer, const Font* font,
+					 const char* text, vec2f inPos,
+					 uint32_t color, float pixels, vec2f thresholds);
+
 void rendererDraw(Renderer* renderer); // Force a draw.
 
 }

@@ -25,7 +25,6 @@
 #define MAP_FILE_FOUND 1
 #define MAP_FILE_NOT_FOUND 0
 
-
 enum {
 	FILE_SENT_MESSAGE     = 0,
 	FILE_REMOVE_MESSAGE   = 1,
@@ -92,7 +91,6 @@ bool receiveFile(SocketStream* stream, const char* fileDirectory, const char* na
 
     return true;
 }
-
 
 static void removeFiles(SocketStream* stream, const char* fileDirectory)
 {
@@ -248,4 +246,3 @@ int32_t receiveFilesStatus(uint32_t)
 {
 	return taskStatus;
 }
-

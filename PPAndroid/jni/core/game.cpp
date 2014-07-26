@@ -21,7 +21,6 @@
 #include <inttypes.h>
 
 Game* gGame;
-
 bool hasStarted = false;
 
 bool gameInitialized() {

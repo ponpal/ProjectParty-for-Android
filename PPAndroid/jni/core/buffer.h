@@ -18,6 +18,8 @@ extern "C"
 		uint8_t* ptr;
 		uint32_t length;
 		uint32_t capacity;
+
+		uint32_t error;
 	} Buffer;
 
 
@@ -27,6 +29,8 @@ extern "C"
 	Buffer bufferWrapArray(uint8_t* array, uint32_t arraySize);
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 	uint32_t bufferBytesConsumed(Buffer* buffer);
+
+	bool bufferCheckError();
 
 	//Output buffer
 	void bufferWriteBytes(Buffer* buffer, uint8_t* data, uint32_t length);
@@ -41,7 +45,6 @@ extern "C"
 	//Input Buffer
 	uint32_t bufferReadBytes(Buffer* buffer, uint8_t* dest, uint32_t numBytes);
 	char* bufferReadTempUTF8(Buffer* buffer);
-	uint32_t bufferReadUTF8(Buffer* buffer, char** dest);
 	uint8_t  bufferReadByte(Buffer* buffer);
 	uint16_t bufferReadShort(Buffer* buffer);
 	uint32_t bufferReadInt(Buffer* buffer);

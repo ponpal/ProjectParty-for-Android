@@ -135,7 +135,7 @@ local function unloadFnt(self, item)
 end
 
 local function reloadFnt(self, item, path)
-	C.reloadFont(item.font)
+	C.reloadFont(path, item.font)
 end
 
 local function loadAtl(self, path)

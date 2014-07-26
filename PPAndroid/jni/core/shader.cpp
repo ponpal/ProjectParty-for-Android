@@ -25,19 +25,15 @@ namespace shader
 			glCompileShader(shader);
 			GLint compiled = 0;
 			glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-			if (!compiled) {
-				GLint infoLen = 0;
-				glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
-				if (infoLen) {
-					char* buf = (char*) malloc(infoLen);
-					if (buf) {
-						glGetShaderInfoLog(shader, infoLen, NULL, buf);
-						RLOGE("Could not compile shader %d:\n%s\n",
-								shaderType, buf);
-						free(buf);
-					}
-					glDeleteShader(shader);
-					shader = 0;
+			GLint infoLen = 0;
+			glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
+			if (infoLen) {
+				char* buf = (char*) malloc(infoLen);
+				if (buf) {
+					glGetShaderInfoLog(shader, infoLen, NULL, buf);
+					RLOGE("Could not compile shader %d:\n%s\n",
+							shaderType, buf);
+					free(buf);
 				}
 			}
 		}

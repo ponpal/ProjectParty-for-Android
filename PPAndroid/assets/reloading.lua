@@ -1,6 +1,6 @@
 local reloading = { }
 
-local SERVICE_NAME = "RELOADING_SERVICE"
+local SERVICE_NAME = "FILE_RELOADING_SERVICE"
 local PORT = 22222
 local QUERY_INTERVAL = 1000
 
@@ -65,8 +65,8 @@ local function reloadItem()
 
 		Log.info("running lua script")
 		runExternalFile(Game.name .. "/" .. mainFile)
-		Log.info("restarting game")
 		Game.restart()
+		Log.info("Reloaded lua script!")
 	end 
 end
 
@@ -92,6 +92,9 @@ function global.updateReloading()
 		inStream:receive()	
 		if inStream:dataLength() > 0 then
 			reloadItem()
+			return true
 		end
 	end
+
+	return false
 end

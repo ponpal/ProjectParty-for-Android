@@ -13,11 +13,12 @@ function RendMT:addFrameTransform(frame, pos, dim, color, origin, rotation, mirr
 	C.rendererAddFrame2(self.cRenderer, frame, pos, dim, color, origin, rotation, mirrored)	
 end
 
-function RendMT:addText(font, text, pos, color)
-	C.rendererAddText(self.cRenderer, font, text, pos, color)
+function RendMT:addText(font, text, pos, color, size, thresh)
+	C.rendererAddText(self.cRenderer, font, text, pos, color, size, thresh)
 end
 
 function RendMT:draw(matrix)
+	Log.info("Rend0")
 	if not matrix then
 	    matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
 	    if Screen.orientation == Orientation.portrait then
@@ -25,7 +26,9 @@ function RendMT:draw(matrix)
 		    matrix = C.matrixRotate(matrix, math.pi/2)
 		end
 	end
+	Log.info("Rend0")
 	C.rendererSetTransform(self.cRenderer, matrix)
+	Log.info("Rend1")
 	C.rendererDraw(self.cRenderer)
 
 end

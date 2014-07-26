@@ -75,7 +75,6 @@ HashID bytesHash(const void* buf, size_t len, size_t seed)
     h1 *= 0xc2b2ae35;
     h1 ^= h1 >> 16;
 
-
     return h1;
 }
 

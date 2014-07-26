@@ -128,7 +128,7 @@ Font* reloadFont(const char* path, Font* fnt)
 
 	Resource fontAsset = platformLoadResource(path);
 	const size_t padding = sizeof(Texture) + sizeof(CharInfo*) + sizeof(size_t)*2;
-	auto fontBuffer = malloc(fontAsset.length + padding);
+	auto fontBuffer = (uint8_t*)malloc(fontAsset.length + padding);
 	memcpy(fontBuffer + padding, fontAsset.buffer, fontAsset.length);
 	auto font = (Font*)fontBuffer;
 

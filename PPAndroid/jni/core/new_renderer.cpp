@@ -5,7 +5,6 @@
  *      Author: Lukas_2
  */
 
-
 #include "new_renderer.h"
 #include "types.h"
 #include "shader.h"
@@ -17,28 +16,52 @@
 #include "JNIHelper.h"
 #include "assert.h"
 
+#define FRAME_EXTRA  0
+#define FONT_EXTRA   1
 
 static const char gVertexShader[] =
-    "attribute vec2 vPosition;\n"
-	"attribute vec4 vColor;\n"
-	"varying vec4 color;\n"
-	"attribute vec2 vTexcoord;\n"
-	"varying vec2 texcoord;\n"
-	"uniform mat4 transform;"
-	"void main() {\n"
-	"  color       = vColor;\n"
-	"  texcoord    = vTexcoord;\n"
-    "  gl_Position = transform * vec4(vPosition,0,1);\n"
-    "}\n";
+"attribute vec2 vPosition;\n"
+"attribute vec4 vColor;\n"
+"attribute vec2 vTexcoord;\n"
+"attribute vec4 vExtra;\n"
+"\n"
+"varying vec2 texcoord;\n"
+"varying vec4 color;\n"
+"varying vec4 extra;\n"
+"\n"
+"uniform mat4 transform;\n"
+"void main() \n"
+"{\n"
+"  color       = vColor;\n"
+"  texcoord    = vTexcoord;\n"
+"  extra	   = vec4(vExtra.x, vExtra.yzw / 255.0);\n"
+"  gl_Position = transform * vec4(vPosition ,0 ,1 );\n"
+"}\n";
 
 static const char gFragmentShader[] =
-    "precision mediump float;\n"
-	"uniform sampler2D sampler;\n"
-	"varying vec2 texcoord;\n"
-	"varying vec4 color;\n"
-    "void main() {\n"
-    "  gl_FragColor = texture2D(sampler, texcoord) * color;\n"
-    "}\n";
+"precision mediump float;\n"
+"uniform sampler2D sampler;\n"
+"varying vec2 texcoord;\n"
+"varying vec4 color;\n"
+"varying vec4 extra;\n"
+"void main() {\n"
+"	vec4 sample = texture2D(sampler, texcoord);\n"
+"	vec4 result = vec4(1,1,1,1);\n"
+"	if(extra.x == 0.0) \n"
+"	{\n"
+"		//result = sample * color;\n"
+"	} \n"
+"	else \n"
+"	{\n"
+"		if(sample.a < extra.y) \n"
+"			discard; \n"
+"	 \n"
+"	    result = color; \n"
+"	    result.a = smoothstep(extra.y, extra.z, sample.a);\n"
+"	}\n"
+"\n"
+"	gl_FragColor = result;\n"
+"}\n";
 
 void checkGlError(const char* op) {
     for (GLint error = glGetError(); error; error
@@ -85,11 +108,10 @@ GLuint createIBO(size_t count)
 	return buffer;
 }
 
-
 typedef struct
 {
 	glm::vec2 position, texcoord;
-	uint32_t color;
+	uint32_t color, extra;
 } Vertex;
 
 struct Renderer
@@ -98,7 +120,7 @@ struct Renderer
 	size_t elements, capacity;
 	GLuint ibo, vbo, program;
 	GLuint samplerUniform, transformUniform;
-	GLuint posAttrib, colorAttrib, texcoordAttrib;
+	GLuint posAttrib, colorAttrib, texcoordAttrib, extraAttrib;
 	glm::mat4 transform;
 	Texture activeTexture;
 };
@@ -118,6 +140,7 @@ static void rendererActivate(Renderer* renderer) //Must be called before any att
 	renderer->posAttrib   		= glGetAttribLocation(renderer->program, "vPosition");
 	renderer->colorAttrib 		= glGetAttribLocation(renderer->program, "vColor");
 	renderer->texcoordAttrib 	= glGetAttribLocation(renderer->program, "vTexcoord");
+	renderer->extraAttrib       = glGetAttribLocation(renderer->program, "vExtra");
 }
 
 Renderer* rendererCreate(size_t maxBatchSize) //This is not yet usable.
@@ -139,7 +162,6 @@ void rendererDestroy(Renderer* renderer)
 	delete renderer;
 }
 
-
 void rendererSetTransform(Renderer* renderer, matrix4 matrix)
 {
 	renderer->transform = *((glm::mat4*) &matrix);
@@ -154,7 +176,6 @@ static void rendererFlushIfNeeded(Renderer* renderer, Texture tex, size_t count)
 		renderer->activeTexture = tex;
 	}
 }
-
 
 void rendererAddFrame(Renderer* renderer, const Frame* frame,
 					  vec2f inPos, vec2f inDim, uint32_t color)
@@ -175,6 +196,7 @@ void rendererAddFrame(Renderer* renderer, const Frame* frame,
 	auto ptr = &(renderer->vertices[renderer->elements]);
 
 	Vertex vert;
+	vert.extra    = FRAME_EXTRA;
 	vert.position = bl;
 	vert.texcoord = bottomLeft;
 	vert.color    = color;
@@ -200,11 +222,6 @@ static inline glm::vec2 rotated(glm::vec2 pos, glm::vec2 offset, float sinus, fl
 	pos.x += offset.x * cosinus - offset.y * sinus;
 	pos.y += offset.x * sinus   + offset.y * cosinus;
 	return pos;
-}
-
-void rendererSetOrientation(uint32_t orientation)
-{
-
 }
 
 void rendererAddFrame2(Renderer* renderer, const Frame* frame,
@@ -235,6 +252,7 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 	}
 
 	Vertex vert;
+	vert.extra	  = FRAME_EXTRA;
 	vert.color    = color;
 
 	float sinus = sin(rotation),
@@ -262,18 +280,21 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 }
 
 static inline void rendererDrawChar(Renderer* renderer, Texture texture, const CharInfo* info,
-									glm::vec2 pos, glm::vec2 offset, uint32_t color)
+									glm::vec2 pos, glm::vec2 offset, uint32_t color, float scale,
+									uint32_t extra)
 {
 	rendererFlushIfNeeded(renderer, texture, 4);
 	auto ptr = &(renderer->vertices[renderer->elements]);
 
 
-	glm::vec2 location   = pos + offset;
+	glm::vec2 location   = (pos + offset);
 	glm::vec2 bottomLeft = glm::vec2(info->textureCoords.x, info->textureCoords.y);
 	glm::vec2 topRight   = glm::vec2(info->textureCoords.z, info->textureCoords.w);
-	glm::vec2 dim        = glm::vec2(info->srcRect.z, info->srcRect.w);
+	glm::vec2 dim        = glm::vec2(info->srcRect.z, info->srcRect.w) * scale;
+
 
 	Vertex vert;
+	vert.extra	  = extra;
 	vert.position = location;
 	vert.texcoord = bottomLeft;
 	vert.color    = color;
@@ -296,11 +317,16 @@ static inline void rendererDrawChar(Renderer* renderer, Texture texture, const C
 
 inline static glm::vec2 measureFont(const Font* font, const char* text)
 {
+	RLOGI("%s", "measureFont!1");
 	float width = 0, height = 0, cursor = 0;
 
+	RLOGI("%s", "measureFont!2");
 	auto spaceInfo = fontCharInfo(font, ' ');
+	RLOGI("%s", "measureFont!3");
 	auto itr   = &text[0];
+	RLOGI("%s", "measureFont!4");
 	auto end   = &text[strlen(text)];
+	RLOGI("%s", "measureFont!5");
 
 	while(itr != end)
 	{
@@ -328,48 +354,76 @@ inline static glm::vec2 measureFont(const Font* font, const char* text)
 	return glm::vec2(width, height);
 }
 
-void rendererAddText(Renderer* renderer, const Font* font, const char* text, vec2f inPos, uint32_t color)
+void rendererAddText(Renderer* renderer, const Font* font,
+					 const char* text, vec2f inPos,
+					 uint32_t color, float pixels, vec2f thresholds)
 {
 	if(font == nullptr) {
 		RLOGE("%s", "rendererAddText called with null font.");
 		return;
+	} else if(text == nullptr)
+	{
+		RLOGE("%s", "rendererAddText called with null text");
+		return;
 	}
 
 
+	uint32_t extra = FONT_EXTRA |
+					(((uint32_t)(thresholds.x * 255.0f) & 0xFF) << 8) |
+					(((uint32_t)(thresholds.y * 255.0f) & 0xFF) << 16);
+					//((uint32_t)(0xFF) << 24);
+
+	RLOGI("%s", "Render text called!1");
+	float scale = pixels / font->size;
+
 	using namespace glm;
+	RLOGI("%s", "Render text called!2");
 	auto pos = glm::vec2(inPos.x, inPos.y);
-	glm::vec2 size = measureFont(font, text);
-	auto cursor = glm::vec2(0, size.y - font->base);
+	RLOGI("%s", "Render text called!3");
+	glm::vec2 size = measureFont(font, text) * scale;
+	RLOGI("%s", "Render text called!4");
+	auto cursor = glm::vec2(0, size.y - font->base * scale);
+	RLOGI("%s", "Render text called!5");
 	auto spaceInfo = fontCharInfo(font, ' ');
+
+	RLOGI("%s", "Render text called!");
 
 	auto itr   = &text[0];
 	auto end   = &text[strlen(text)];
 
+
+	RLOGI("%s", "Render text called!");
+
 	while(itr != end)
 	{
+
+		RLOGI("%s", "Render text called Loop!");
 		auto c = utf8::next(itr, end);
 		if(c == '\r') continue;
 
 			if(c == ' ') {
-				cursor.x += spaceInfo->advance;
+				cursor.x += spaceInfo->advance * scale;
 				continue;
 			} else if(c == '\n') {
-				cursor.y -= font->lineHeight;
+				cursor.y -= font->lineHeight * scale;
 				cursor.x = 0;
 				continue;
 			} else if(c == '\t') {
-				cursor.x += spaceInfo->advance * 4;
+				cursor.x += spaceInfo->advance * 4 * scale;
 				continue;
 			}
 
 			auto info = fontCharInfo(font, c);
-			glm::vec2 offset(info->offset.x, info->offset.y);
-			rendererDrawChar(renderer, font->page, info, pos, cursor + offset, color);
+			glm::vec2 offset = glm::vec2(info->offset.x, info->offset.y) * scale;
+			rendererDrawChar(renderer, font->page, info, pos, cursor + offset, color, scale, extra);
 
-			cursor.x += info->advance;
+			cursor.x += info->advance * scale;
 	}
-}
 
+
+	RLOGI("%s", "Render text exit!");
+
+}
 
 void rendererDraw(Renderer* renderer)
 {
@@ -389,15 +443,16 @@ void rendererDraw(Renderer* renderer)
 	glEnableVertexAttribArray(renderer->posAttrib);
 	glEnableVertexAttribArray(renderer->colorAttrib);
 	glEnableVertexAttribArray(renderer->texcoordAttrib);
+	glEnableVertexAttribArray(renderer->extraAttrib);
 
 	glVertexAttribPointer(renderer->posAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), NULL);
 	glVertexAttribPointer(renderer->texcoordAttrib, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex),(const void*)(sizeof(float) * 2));
 	glVertexAttribPointer(renderer->colorAttrib, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (const void*)(sizeof(float) * 4));
+	glVertexAttribPointer(renderer->extraAttrib, 4, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(Vertex), (const void*)(sizeof(float) * 4 + sizeof(uint32_t)));
 
 	glDrawElements(GL_TRIANGLES, (renderer->elements / 4) * 6, GL_UNSIGNED_SHORT, (void*)0);
 
 	renderer->elements = 0;
 
 	checkGlError("draw");
-
 }

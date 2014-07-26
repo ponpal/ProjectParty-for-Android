@@ -173,6 +173,11 @@ function tcpMT:connect(ip, port, msecs)
 	return C.socketConnect(self.handle, ip, port, msecs)
 end
 
+function tcpMT:isAlive( )
+	-- Call some C function here
+	return true
+end
+
 function tcpMT:receive()
 	self.inStream:receive()
 end
@@ -230,6 +235,11 @@ function udpMT:send(ip, port)
 	if not ip then ip = self.ip end
 	if not port then port = self.port end
 	return C.socketSend(self.handle, self.outBuffer, ip, port)
+end
+
+function udpMT:isAlive()
+	--Call some C function here.
+	return true
 end
 
 function global.UdpSocket(inSize, outSize)

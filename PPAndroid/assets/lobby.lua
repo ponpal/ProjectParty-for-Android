@@ -136,8 +136,8 @@ function Game.step()
 		end
 	end
 
-
-	renderer:addText(font.font, msg, vec2(50, Screen.height - 100), 0xFFFFFFFF)
+	--Need to scale threshold based upon some value instead!
+	renderer:addText(font.font, msg, vec2(50, Screen.height - 100), 0xFFFFFFFF, font.font.size, vec2(0.2, 0.5))
 	renderer:draw()
 end
 
