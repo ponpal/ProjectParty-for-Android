@@ -44,7 +44,6 @@ Font* fontAtlasFindFont(FontAtlas* atlas, const char* fontName)
 vec2f fontMeasure(const Font* font, const char* text)
 {
     float width = 0, height = 0, cursor = 0;
-
     auto spaceInfo = fontCharInfo(font, ' ');
     auto itr   = &text[0];
     auto end   = &text[strlen(text)];
@@ -74,3 +73,7 @@ vec2f fontMeasure(const Font* font, const char* text)
     width = fmaxf(width, cursor);
     return (vec2f){width, height};
 }
+
+
+
+

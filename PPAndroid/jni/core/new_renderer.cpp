@@ -281,7 +281,7 @@ void rendererAddFrame2(Renderer* renderer, const Frame* frame,
 }
 
 static inline void rendererDrawChar(Renderer* renderer, Texture texture, const CharInfo* info,
-									glm::vec2 pos, glm::vec2 offset, uint32_t color, float scale,
+									glm::vec2 pos, glm::vec2 offset, uint32_t color, glm::vec2 scale,
 									uint32_t extra)
 {
 	rendererFlushIfNeeded(renderer, texture, 4);
@@ -352,7 +352,7 @@ inline static glm::vec2 measureFont(const Font* font, const char* text)
 
 void rendererAddText(Renderer* renderer, const Font* font,
 					 const char* text, vec2f inPos,
-					 uint32_t color, float pixels, vec2f thresholds)
+					 uint32_t color, vec2f dim, vec2f thresholds)
 {
 	if(font == nullptr) {
 		RLOGE("%s", "rendererAddText called with null font.");
@@ -369,12 +369,12 @@ void rendererAddText(Renderer* renderer, const Font* font,
 					(((uint32_t)(thresholds.y * 255.0f) & 0xFF) << 16);
 					//((uint32_t)(0xFF) << 24);
 
-	float scale = pixels / font->size;
+	glm::vec2 scale(dim.x / font->size, dim.y  / font->size);
 
 	using namespace glm;
 	auto pos = glm::vec2(inPos.x, inPos.y);
 	glm::vec2 size = measureFont(font, text) * scale;
-	auto cursor = glm::vec2(0, size.y - font->size * scale);
+	auto cursor = glm::vec2(0, size.y - font->size * scale.y);
 	auto spaceInfo = fontCharInfo(font, ' ');
 
 
@@ -387,14 +387,14 @@ void rendererAddText(Renderer* renderer, const Font* font,
 		if(c == '\r') continue;
 
 			if(c == ' ') {
-				cursor.x += spaceInfo->advance * scale;
+				cursor.x += spaceInfo->advance * scale.x;
 				continue;
 			} else if(c == '\n') {
-				cursor.y -= font->lineHeight * scale;
+				cursor.y -= font->lineHeight * scale.y;
 				cursor.x = 0;
 				continue;
 			} else if(c == '\t') {
-				cursor.x += spaceInfo->advance * 4 * scale;
+				cursor.x += spaceInfo->advance * 4 * scale.x;
 				continue;
 			}
 
@@ -402,7 +402,7 @@ void rendererAddText(Renderer* renderer, const Font* font,
 			glm::vec2 offset = glm::vec2(info->offset.x, info->offset.y) * scale;
 			rendererDrawChar(renderer, font->page, info, pos, cursor + offset, color, scale, extra);
 
-			cursor.x += info->advance * scale;
+			cursor.x += info->advance * scale.x;
 	}
 }
 

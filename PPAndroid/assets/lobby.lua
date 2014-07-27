@@ -137,14 +137,10 @@ function Game.step()
 	end
 
 	--Need to scale threshold based upon some value instead!
-	local size = font.font.fonts[3].size;
-	renderer:addText(font:find("consola"), msg, vec2(50, Screen.height - 100), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
-	renderer:addText(font:find("consolas"), msg, vec2(50, Screen.height - 200), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
-	renderer:addText(font.font.fonts[2], msg, vec2(50, Screen.height - 300), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
-	renderer:addText(font.font.fonts[3], msg, vec2(50, Screen.height - 400), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
-	renderer:addText(font.font.fonts[4], msg, vec2(50, Screen.height - 500), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
-	renderer:addText(font.font.fonts[5], msg, vec2(50, Screen.height - 600), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
+	local consolas = font:find("consola")
+	local dim      = C.fontMeasure(consolas, msg)
 
+	renderer:addText(font:find("consola"), msg, vec2(50, Screen.height - 100), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
 	renderer:draw()
 end
 
