@@ -10,6 +10,8 @@
 #include <cmath>
 #include "font.h"
 #include "external_libs/utf8.h"
+#include "hash.h"
+#include "remote_debug.h"
 
 const CharInfo* fontCharInfo(const Font* font, size_t index)
 {
@@ -24,6 +26,19 @@ const CharInfo* fontCharInfo(const Font* font, size_t index)
         else
             return info;
     }
+}
+
+Font* fontAtlasFindFont(FontAtlas* atlas, const char* fontName)
+{
+	HashID hash = bytesHash(fontName, strlen(fontName), 0);
+	for(int i = 0; i < atlas->fontsLength ;i++)
+	{
+		if(atlas->fonts[i].hashID == hash)
+			return &atlas->fonts[i];
+	}
+
+	RLOGI("Failed to find font! %s", fontName);
+	return nullptr;
 }
 
 vec2f fontMeasure(const Font* font, const char* text)

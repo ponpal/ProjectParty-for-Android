@@ -74,7 +74,9 @@ obj/local/armeabi/objs/mystery/core/font.o: jni/core/font.cpp \
  jni/external_libs/utf8/core.h \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/iterator \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/stdexcept \
- jni/external_libs/utf8/unchecked.h
+ jni/external_libs/utf8/unchecked.h jni/core/hash.h \
+ jni/core/remote_debug.h \
+ C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib
 
 jni/glm/glm/glm.hpp:
 
@@ -321,3 +323,9 @@ C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/iterator:
 C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/stdexcept:
 
 jni/external_libs/utf8/unchecked.h:
+
+jni/core/hash.h:
+
+jni/core/remote_debug.h:
+
+C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:

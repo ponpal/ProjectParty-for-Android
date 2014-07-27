@@ -1,4 +1,4 @@
 global.R = 
 {
-	arial50 = { path = "1485296559.fnt", hash = 1485296559, type = "fnt"}
+	Fonts = { path = "2338379748.fnt", hash = 2338379748, type = "fnt"}
 }

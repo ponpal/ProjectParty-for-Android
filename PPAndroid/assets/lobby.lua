@@ -45,7 +45,7 @@ end
 
 function Game.start()
 	renderer = CRenderer(256)
-    font = resources:load(R.arial50)
+    font = resources:load(R.Fonts)
     Screen.setOrientation(Orientation.portrait)
 
     C.serviceFinderAsync("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound, 500)
@@ -137,7 +137,14 @@ function Game.step()
 	end
 
 	--Need to scale threshold based upon some value instead!
-	renderer:addText(font.font, msg, vec2(50, Screen.height - 100), 0xFFFFFFFF, font.font.size, vec2(0.2, 0.5))
+	local size = font.font.fonts[3].size;
+	renderer:addText(font:find("consola"), msg, vec2(50, Screen.height - 100), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
+	renderer:addText(font:find("consolas"), msg, vec2(50, Screen.height - 200), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
+	renderer:addText(font.font.fonts[2], msg, vec2(50, Screen.height - 300), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
+	renderer:addText(font.font.fonts[3], msg, vec2(50, Screen.height - 400), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
+	renderer:addText(font.font.fonts[4], msg, vec2(50, Screen.height - 500), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
+	renderer:addText(font.font.fonts[5], msg, vec2(50, Screen.height - 600), 0xFFFFFFFF, 50, vec2(0.4, 0.5))
+
 	renderer:draw()
 end
 

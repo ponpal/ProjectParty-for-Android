@@ -29,13 +29,21 @@ typedef struct
 	size_t charsLength;
 	size_t defaultChar;
 	float size;
-	float base;
 	float lineHeight;
+	uint32_t layer;
+	uint32_t hashID;
 } Font;
 
+typedef struct
+{
+	Font* fonts;
+	size_t fontsLength;
+	Texture page;
+} FontAtlas;
+
+
+Font* fontAtlasFindFont(FontAtlas* atlas, const char* fontName);
 const CharInfo* fontCharInfo(const Font* font, size_t index);
-
-
 vec2f fontMeasure(const Font* f, const char* text);
 
 }

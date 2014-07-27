@@ -67,78 +67,99 @@ Texture reloadTexture(const char* path, Texture tex)
 	return tex;
 }
 
-Font* loadFont(const char* path)
+
+typedef struct
 {
-	Resource fontAsset = platformLoadResource(path);
+	float size, lineHeight;
+	uint dataOffset, dataLength;
+	uint layer, hashID;
+} FontHeader;
+
+static size_t loadHeader(Resource asset, FontHeader** fonts, size_t* length)
+{
+	Buffer buf = bufferWrapArray(asset.buffer, asset.length);
+	uint16_t count = bufferReadShort(&buf);
+	*fonts = (FontHeader*)(asset.buffer + sizeof(uint16_t));
+	*length = count;
+	return sizeof(uint16_t) + count * sizeof(FontHeader);
+}
+
+static FontAtlas* loadFontAtlas(Resource fontAsset, Texture texture)
+{
+	RLOGI("Loading font %d", 0);
+
+	FontHeader* header;
+	size_t headerLength;
+	size_t headerSize = loadHeader(fontAsset, &header, &headerLength);
+
+	RLOGI("Header Length %d, Header Size %d", headerLength, headerSize);
+
+	int dataSize = sizeof(FontAtlas) + sizeof(Font) * headerLength;
+	RLOGI("Data size %d", dataSize);
+	int length = dataSize;
+	for(int i = 0; i < headerLength; i++)
+		length += header[i].dataLength * sizeof(CharInfo);
+	RLOGI("Length: %d", length);
+
+	auto data = (uint8_t*)malloc(length);
+	memcpy(data + dataSize, fontAsset.buffer + headerSize, fontAsset.length - headerSize);
+
+	auto atlas = (FontAtlas*)data;
+	atlas->page 	   = texture;
+	atlas->fontsLength = headerLength;
+	atlas->fonts       = (Font*)(data + sizeof(FontAtlas));
+	for(int i = 0; i < headerLength; i++)
+	{
+		auto font = &atlas->fonts[i];
+		font->size = header[i].size;
+		font->lineHeight = header[i].lineHeight;
+		font->page	= texture;
+
+		int start = dataSize + header[i].dataOffset;
+		RLOGI("Start %d", start);
+		font->chars = (CharInfo*)((data) + start);
+		font->charsLength = header[i].dataLength;
+		font->layer  = header[i].layer;
+		font->hashID = header[i].hashID;
+		if(font->layer == 0)
+			font->layer = 2;
+		else if(font->layer == 2)
+			font->layer = 0;
+
+		font->defaultChar = '_';
+
+		RLOGI("Font: Size=%f LH=%f CLen=%d Layer=%d",
+			  font->size, font->lineHeight,
+			  font->charsLength, font->layer);
+	}
+
+	return atlas;
+}
+
+FontAtlas* loadFont(const char* path)
+{
 	auto texture = loadTexture(path::changeExtension(path, ".png").c_str());
+	Resource fontAsset = platformLoadResource(path);
 
-	const size_t padding = sizeof(Texture) + sizeof(CharInfo*) + sizeof(size_t)*2;
-	auto fontBuffer = malloc(fontAsset.length + padding);
-	memcpy(fontBuffer + padding, fontAsset.buffer, fontAsset.length);
-	auto font = (Font*)fontBuffer;
-
-	font->chars = (CharInfo*)(fontBuffer + sizeof(Font));
-	font->charsLength = (fontAsset.length + padding - sizeof(Font))/sizeof(CharInfo);
-
-	font->page = texture;
-	font->defaultChar = '_';
-
+	auto atlas = loadFontAtlas(fontAsset, texture);
 	platformUnloadResource(fontAsset);
-	return font;
-
-	//    RLOGI("Font size: %f", font->size);
-	//    RLOGI("Font base: %f", font->base);
-	//    RLOGI("Font lineHeight: %f", font->lineHeight);
-	//
-	//    RLOGI("Font page glName: %d", font->page.glName);
-	//    RLOGI("Font page width: %d", font->page.width);
-	//    RLOGI("Font page height: %d", font->page.height);
-	//
-	//    RLOGI("Font charslength: %d", font->charsLength);
-	//    RLOGI("Font defaultChar: %d", font->defaultChar);
-	//    for(int i = 0; i < font->charsLength; i++)
-	//    {
-	//        RLOGI("Font first char advance: %f", font->chars[i].advance);
-	//        RLOGI("Font first char offset: x = %f | y = %f", font->chars[i].offset.x, font->chars[i].offset.y);
-	//        RLOGI("Font first char srcrect: [%f,%f,%f,%f]",
-	//                font->chars[i].srcRect.x,
-	//                font->chars[i].srcRect.y,
-	//                font->chars[i].srcRect.z,
-	//                font->chars[i].srcRect.w);
-	//        RLOGI("Font first char textureCoords: [%f,%f,%f,%f]",
-	//                font->chars[i].textureCoords.x,
-	//                font->chars[i].textureCoords.y,
-	//                font->chars[i].textureCoords.z,
-	//                font->chars[i].textureCoords.w);
-	//    }
-
+	return atlas;
 }
 
 
-void unloadFont(Font* font)
+void unloadFont(FontAtlas* font)
 {
 	unloadTexture(font->page);
 	free(font);
 }
 
-Font* reloadFont(const char* path, Font* fnt)
+FontAtlas* reloadFont(const char* path, FontAtlas* atlas)
 {
-	Texture texture = reloadTexture(path::changeExtension(path, ".png").c_str(), fnt->page);
-	free(fnt);
+	Texture texture = reloadTexture(path::changeExtension(path, ".png").c_str(), atlas->page);
+	free(atlas);
 
 	Resource fontAsset = platformLoadResource(path);
-	const size_t padding = sizeof(Texture) + sizeof(CharInfo*) + sizeof(size_t)*2;
-	auto fontBuffer = (uint8_t*)malloc(fontAsset.length + padding);
-	memcpy(fontBuffer + padding, fontAsset.buffer, fontAsset.length);
-	auto font = (Font*)fontBuffer;
-
-	font->chars = (CharInfo*)(fontBuffer + sizeof(Font));
-	font->charsLength = (fontAsset.length + padding - sizeof(Font))/sizeof(CharInfo);
-
-	font->page = texture;
-	font->defaultChar = '_';
-
+	auto newAtlas = loadFontAtlas(fontAsset, texture);
 	platformUnloadResource(fontAsset);
-	return font;
+	return newAtlas;
 }
-

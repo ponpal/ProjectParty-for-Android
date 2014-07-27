@@ -17,7 +17,6 @@
 #include "assert.h"
 
 #define FRAME_EXTRA  0
-#define FONT_EXTRA   1
 
 static const char gVertexShader[] =
 "attribute vec2 vPosition;\n"
@@ -47,17 +46,19 @@ static const char gFragmentShader[] =
 "void main() {\n"
 "	vec4 sample = texture2D(sampler, texcoord);\n"
 "	vec4 result = vec4(1,1,1,1);\n"
-"	if(extra.x == 0.0) \n"
+"	int typ = int(extra.x);\n"
+"	if(typ == 0) \n"
 "	{\n"
-"		//result = sample * color;\n"
+"		result = sample * color;\n"
 "	} \n"
 "	else \n"
 "	{\n"
-"		if(sample.a < extra.y) \n"
+"		float s = sample[typ - 1];"
+"		if(s < extra.y) \n"
 "			discard; \n"
 "	 \n"
 "	    result = color; \n"
-"	    result.a = smoothstep(extra.y, extra.z, sample.a);\n"
+"	    result.a = smoothstep(extra.y, extra.z, s);\n"
 "	}\n"
 "\n"
 "	gl_FragColor = result;\n"
@@ -317,16 +318,11 @@ static inline void rendererDrawChar(Renderer* renderer, Texture texture, const C
 
 inline static glm::vec2 measureFont(const Font* font, const char* text)
 {
-	RLOGI("%s", "measureFont!1");
 	float width = 0, height = 0, cursor = 0;
 
-	RLOGI("%s", "measureFont!2");
 	auto spaceInfo = fontCharInfo(font, ' ');
-	RLOGI("%s", "measureFont!3");
 	auto itr   = &text[0];
-	RLOGI("%s", "measureFont!4");
 	auto end   = &text[strlen(text)];
-	RLOGI("%s", "measureFont!5");
 
 	while(itr != end)
 	{
@@ -350,7 +346,7 @@ inline static glm::vec2 measureFont(const Font* font, const char* text)
 	}
 
 	width = fmaxf(width, cursor);
-	height += font->base;
+	height += font->size;
 	return glm::vec2(width, height);
 }
 
@@ -368,36 +364,25 @@ void rendererAddText(Renderer* renderer, const Font* font,
 	}
 
 
-	uint32_t extra = FONT_EXTRA |
+	uint32_t extra = (font->layer + 1) |
 					(((uint32_t)(thresholds.x * 255.0f) & 0xFF) << 8) |
 					(((uint32_t)(thresholds.y * 255.0f) & 0xFF) << 16);
 					//((uint32_t)(0xFF) << 24);
 
-	RLOGI("%s", "Render text called!1");
 	float scale = pixels / font->size;
 
 	using namespace glm;
-	RLOGI("%s", "Render text called!2");
 	auto pos = glm::vec2(inPos.x, inPos.y);
-	RLOGI("%s", "Render text called!3");
 	glm::vec2 size = measureFont(font, text) * scale;
-	RLOGI("%s", "Render text called!4");
-	auto cursor = glm::vec2(0, size.y - font->base * scale);
-	RLOGI("%s", "Render text called!5");
+	auto cursor = glm::vec2(0, size.y - font->size * scale);
 	auto spaceInfo = fontCharInfo(font, ' ');
 
-	RLOGI("%s", "Render text called!");
 
 	auto itr   = &text[0];
 	auto end   = &text[strlen(text)];
 
-
-	RLOGI("%s", "Render text called!");
-
 	while(itr != end)
 	{
-
-		RLOGI("%s", "Render text called Loop!");
 		auto c = utf8::next(itr, end);
 		if(c == '\r') continue;
 
@@ -419,10 +404,6 @@ void rendererAddText(Renderer* renderer, const Font* font,
 
 			cursor.x += info->advance * scale;
 	}
-
-
-	RLOGI("%s", "Render text exit!");
-
 }
 
 void rendererDraw(Renderer* renderer)

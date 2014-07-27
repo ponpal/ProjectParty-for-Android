@@ -121,6 +121,7 @@ ffi.cdef[[
 		float  advance;
 	} CharInfo;
 
+	
 	typedef struct
 	{
 		Texture page;
@@ -128,10 +129,20 @@ ffi.cdef[[
 		size_t charsLength;
 		size_t defaultChar;
 		float size;
-		float base;
 		float lineHeight;
+		uint32_t layer;
+		uint32_t hashID;
 	} Font;
 
+	typedef struct
+	{
+		Font* fonts;
+		size_t fontsLength;
+		Texture page;
+	} FontAtlas;
+
+
+	Font* fontAtlasFindFont(FontAtlas* atlas, const char* fontName);
 	const CharInfo* fontCharInfo(const Font* font, size_t index);
 	vec2f fontMeasure(const Font* f, const char* text);
 
@@ -139,13 +150,14 @@ ffi.cdef[[
 	//----------------------------
 	//	resources.h
 	//----------------------------
+
 	Texture loadTexture(const char* path);
 	void unloadTexture(Texture tex);
 	Texture reloadTexture(const char* path, Texture tex);
 
-	Font* loadFont(const char* path);
-	void unloadFont(Font* font);
-	Font* reloadFont(const char* path, Font* font);
+	FontAtlas* loadFont(const char* path);
+	void unloadFont(FontAtlas* font);
+	FontAtlas* reloadFont(const char* path, FontAtlas* font);
 
 
 	// ----------------------------

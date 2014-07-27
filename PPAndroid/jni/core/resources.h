@@ -14,9 +14,9 @@ extern "C"
 	void unloadTexture(Texture tex);
 	Texture reloadTexture(const char* path, Texture tex);
 
-	Font* loadFont(const char* path);
-	void unloadFont(Font* font);
-	Font* reloadFont(const char* path, Font* font);
+	FontAtlas* loadFont(const char* path);
+	void unloadFont(FontAtlas* font);
+	FontAtlas* reloadFont(const char* path, FontAtlas* font);
 }
 //And more to come here i guess -- We only work with frames anyways
 

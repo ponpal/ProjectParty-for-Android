@@ -123,9 +123,19 @@ local function reloadPng(self, item, path)
 	item.frame[0].texture = texture[0]
 end
 
+local fontMT = { }
+fontMT.__index = fontMT;
+
+function fontMT:find(str)
+	local fnt = C.fontAtlasFindFont(self.font, str)
+	assert(fnt ~= nil, string.format("Failed to find font: %s", str))
+	return fnt;
+end
+
 local function loadFnt(self, path)
 	local fnt = C.loadFont(path)
 	local t = { }
+	setmetatable(t, fontMT);
 	t.font = fnt
 	return t
 end
@@ -135,7 +145,7 @@ local function unloadFnt(self, item)
 end
 
 local function reloadFnt(self, item, path)
-	C.reloadFont(path, item.font)
+	item.font = C.reloadFont(path, item.font)
 end
 
 local function loadAtl(self, path)
