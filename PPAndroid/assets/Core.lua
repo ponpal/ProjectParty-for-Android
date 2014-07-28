@@ -377,6 +377,7 @@ function Screen.setOrientation(orientation)
 	Screen.orientation = orientation
 end
 
+
 RawInput = { }
 Input = { }
 
@@ -412,9 +413,6 @@ function RawInput.onBackButton()
 	Input.onBackButton()
 end
 
-Font = ffi.typeof("Font")
-FontRef = ffi.typeof("Font[1]")
-
 Frame = ffi.typeof("Frame")
 FrameRef = ffi.typeof("Frame[1]")
 
@@ -426,15 +424,27 @@ local vec2_MT =
 	__sub = function (v0, v1)
 				return vec2(v0.x - v1.x, v0.y - v1.y)
 			end,
-	__mul = function (v0, scalar)
-				return vec2(v0.x * scalar, v0.y * scalar)
+	__mul = function (v0, v1)
+				return vec2(v0.x * v1.x, v0.y * v1.y)
 			end,
 	__div = function (v0, scalar)
 				return vec2(v0.x / scalar, v0.y / scalar)
 			end
 }
 
+
 vec2 = ffi.metatype("vec2f", vec2_MT)
+
+
+local font_MT = {}
+font_MT.__index = font_MT;
+
+function font_MT:measure(str)
+	return C.fontMeasure(self, str)
+end
+
+Font = ffi.metatype("Font", font_MT)
+
 
 local function doNothing(...) end
 
@@ -448,6 +458,10 @@ function restartGame()
 	Log.info("restarted the game")
 end
 
+function printStackTrace()
+	local str = debug.traceback();
+	Log.info(str);
+end
 
 function unbindState()
 	Input.onDown = doNothing
@@ -526,6 +540,8 @@ end
 Game = { }
 Game.name = ""
 Game.resourceDir = ffi.string(C.platformExternalResourceDirectory()) .. "/"
+Game.paused = false
+
 
 TextWriter = { }
 TextWriter.data = ""
@@ -609,7 +625,6 @@ end
 function runExternalFile(path)
 	local resource = C.platformLoadExternalResource(path)
 	local str = ffi.string(resource.buffer, resource.length)
-	Log.info(str)
 	local func, err= loadstring(str)
 	C.platformUnloadResource(resource)
 

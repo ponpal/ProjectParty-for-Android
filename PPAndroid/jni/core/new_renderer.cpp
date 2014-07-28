@@ -58,7 +58,7 @@ static const char gFragmentShader[] =
 "			discard; \n"
 "	 \n"
 "	    result = color; \n"
-"	    result.a = smoothstep(extra.y, extra.z, s);\n"
+"	    result.a *= smoothstep(extra.y, extra.z, s);\n"
 "	}\n"
 "\n"
 "	gl_FragColor = result;\n"
@@ -316,38 +316,13 @@ static inline void rendererDrawChar(Renderer* renderer, Texture texture, const C
 	renderer->elements += 4;
 }
 
-inline static glm::vec2 measureFont(const Font* font, const char* text)
+inline static int measureFont(const Font* font, const char* text)
 {
-	float width = 0, height = 0, cursor = 0;
+	int count = 0;
+	for(;*text; text++)
+		if(*text == '\n') count++;
 
-	auto spaceInfo = fontCharInfo(font, ' ');
-	auto itr   = &text[0];
-	auto end   = &text[strlen(text)];
-
-	while(itr != end)
-	{
-		auto c = utf8::next(itr, end);
-		if(c == '\r') continue;
-
-		if(c == ' ') {
-			cursor += spaceInfo->advance;
-			continue;
-		} else if(c == '\n') {
-			height += font->lineHeight;
-			width  = fmaxf(cursor, width);
-			cursor = 0;
-			continue;
-		} else if(c == '\t') {
-			cursor += spaceInfo->advance * 4;
-		}
-
-		auto info = fontCharInfo(font, c);
-		cursor += info->advance;
-	}
-
-	width = fmaxf(width, cursor);
-	height += font->size;
-	return glm::vec2(width, height);
+	return count;
 }
 
 void rendererAddText(Renderer* renderer, const Font* font,
@@ -373,8 +348,9 @@ void rendererAddText(Renderer* renderer, const Font* font,
 
 	using namespace glm;
 	auto pos = glm::vec2(inPos.x, inPos.y);
-	glm::vec2 size = measureFont(font, text) * scale;
-	auto cursor = glm::vec2(0, size.y - font->size * scale.y);
+	int count = measureFont(font, text);
+	auto cursor = glm::vec2(0,  -font->size * scale.y + font->lineHeight * count * scale.y);
+
 	auto spaceInfo = fontCharInfo(font, ' ');
 
 

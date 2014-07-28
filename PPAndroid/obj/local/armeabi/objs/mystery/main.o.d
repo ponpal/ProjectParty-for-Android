@@ -113,9 +113,11 @@ obj/local/armeabi/objs/mystery/main.o: jni/main.cpp jni/main.h \
  jni/glm/glm/detail/../geometric.hpp jni/glm/glm/vector_relational.hpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
- jni/core/time_helpers.h jni/core/lua_core_private.h jni/lua/lua.hpp \
- jni/lua/lua.h jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h \
- jni/lua/luajit.h jni/core/buffer.h \
+ jni/core/time_helpers.h jni/core/remote_debug.h \
+ C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
+ jni/core/lua_core_private.h jni/lua/lua.hpp jni/lua/lua.h \
+ jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h jni/lua/luajit.h \
+ jni/core/buffer.h \
  C:/Android/android-ndk-r9d/sources/android/ndk_helper/GLContext.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
  jni/core/platform.h \
@@ -125,7 +127,6 @@ obj/local/armeabi/objs/mystery/main.o: jni/main.cpp jni/main.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/endian.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/endian.h \
  jni/core/remote_debug.h \
- C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/unistd.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysconf.h \
@@ -458,6 +459,10 @@ jni/glm/glm/detail/func_integer.inl:
 
 jni/core/time_helpers.h:
 
+jni/core/remote_debug.h:
+
+C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
+
 jni/core/lua_core_private.h:
 
 jni/lua/lua.hpp:
@@ -495,8 +500,6 @@ C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/endian.
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/machine/endian.h:
 
 jni/core/remote_debug.h:
-
-C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/unistd.h:
 

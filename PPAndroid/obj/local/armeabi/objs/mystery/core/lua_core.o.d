@@ -109,15 +109,14 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/string \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/log.h \
  C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstring \
- jni/core/game.h jni/core/time_helpers.h \
+ jni/core/game.h jni/core/time_helpers.h jni/core/remote_debug.h \
+ C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
  C:/Android/android-ndk-r9d/sources/android/ndk_helper/GLContext.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h jni/core/path.h \
  jni/core/platform.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h \
- jni/core/remote_debug.h \
- C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib
+ C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h
 
 jni/core/lua_core.h:
 
@@ -445,6 +444,10 @@ jni/core/game.h:
 
 jni/core/time_helpers.h:
 
+jni/core/remote_debug.h:
+
+C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
+
 C:/Android/android-ndk-r9d/sources/android/ndk_helper/GLContext.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h:
@@ -462,7 +465,3 @@ jni/core/path.h:
 jni/core/platform.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h:
-
-jni/core/remote_debug.h:
-
-C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:

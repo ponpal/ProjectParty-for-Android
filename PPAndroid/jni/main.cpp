@@ -316,6 +316,8 @@ void sighandler(int signum)
 			break;
 	}
 
+
+
 	gameStop();
 	RLOGE("%s", "Exiting application");
 	sleep(1);

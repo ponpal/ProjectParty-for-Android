@@ -1,7 +1,6 @@
 --Lobby.lua
 
 local renderer
-local texture
 local font 
 
 local servers = { }
@@ -136,9 +135,6 @@ function Game.step()
 		end
 	end
 
-	--Need to scale threshold based upon some value instead!
-	local consolas = font:find("consola")
-	local dim      = C.fontMeasure(consolas, msg)
 
 	renderer:addText(font:find("consola"), msg, vec2(50, Screen.height - 100), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
 	renderer:draw()

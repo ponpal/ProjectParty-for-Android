@@ -100,13 +100,13 @@ obj/local/armeabi/objs/mystery/core/new_renderer.o: \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/native_window.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/android/rect.h \
  jni/core/assert.h jni/core/game.h jni/core/time_helpers.h \
- jni/core/lua_core_private.h jni/lua/lua.hpp jni/lua/lua.h \
- jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h jni/lua/luajit.h \
- jni/core/buffer.h \
+ jni/core/remote_debug.h jni/core/lua_core_private.h jni/lua/lua.hpp \
+ jni/lua/lua.h jni/lua/luaconf.h jni/lua/lauxlib.h jni/lua/lualib.h \
+ jni/lua/luajit.h jni/core/buffer.h \
  C:/Android/android-ndk-r9d/sources/android/ndk_helper/GLContext.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
- jni/lua/luajit.h jni/core/remote_debug.h
+ jni/lua/luajit.h
 
 jni/core/new_renderer.h:
 
@@ -408,6 +408,8 @@ jni/core/game.h:
 
 jni/core/time_helpers.h:
 
+jni/core/remote_debug.h:
+
 jni/core/lua_core_private.h:
 
 jni/lua/lua.hpp:
@@ -431,5 +433,3 @@ C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h:
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h:
 
 jni/lua/luajit.h:
-
-jni/core/remote_debug.h:

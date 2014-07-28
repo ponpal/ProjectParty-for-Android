@@ -31,6 +31,7 @@ local function reloadItem()
 	local sock = reloading.connection
 	local stream = sock.inStream
 
+	sock:receiveTimeout(1000)
 	sock:blocking(true)
 	Log.infof("Data length: %s", stream:dataLength())
 

@@ -74,7 +74,8 @@ obj/local/armeabi/objs/mystery/core/buffer.o: jni/core/buffer.cpp \
  jni/glm/glm/detail/../geometric.hpp jni/glm/glm/vector_relational.hpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
- jni/core/time_helpers.h jni/core/lua_core_private.h \
+ jni/core/time_helpers.h jni/core/remote_debug.h \
+ jni/core/lua_core_private.h \
  C:/Android/android-ndk-r9d/sources/android/native_app_glue/android_native_app_glue.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/poll.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/poll.h \
@@ -109,7 +110,7 @@ obj/local/armeabi/objs/mystery/core/buffer.o: jni/core/buffer.cpp \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
- jni/core/remote_debug.h jni/core/platform.h \
+ jni/core/platform.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/inttypes.h
 
 jni/core/buffer.h:
@@ -356,6 +357,8 @@ jni/glm/glm/detail/func_integer.inl:
 
 jni/core/time_helpers.h:
 
+jni/core/remote_debug.h:
+
 jni/core/lua_core_private.h:
 
 C:/Android/android-ndk-r9d/sources/android/native_app_glue/android_native_app_glue.h:
@@ -437,8 +440,6 @@ jni/core/new_renderer.h:
 jni/core/font.h:
 
 jni/lua/luajit.h:
-
-jni/core/remote_debug.h:
 
 jni/core/platform.h:
 

@@ -158,6 +158,10 @@ end
 
 function tcpMT:close()
 	C.socketDestroy(self.handle)
+
+	self.handle    = nil
+	self.outStream = nil
+	self.inStream  = nil
 end
 
 function tcpMT:sendTimeout(value)

@@ -74,7 +74,9 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  jni/glm/glm/detail/../geometric.hpp jni/glm/glm/vector_relational.hpp \
  jni/glm/glm/detail/func_vector_relational.hpp jni/glm/glm/integer.hpp \
  jni/glm/glm/detail/func_integer.hpp jni/glm/glm/detail/func_integer.inl \
- jni/core/time_helpers.h jni/core/lua_core_private.h \
+ jni/core/time_helpers.h jni/core/remote_debug.h \
+ C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
+ jni/core/lua_core_private.h \
  C:/Android/android-ndk-r9d/sources/android/native_app_glue/android_native_app_glue.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/poll.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/linux/poll.h \
@@ -86,8 +88,6 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/siginfo.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/siginfo.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/signal.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/string.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/malloc.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/signal.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/signal.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/sigcontext.h \
@@ -111,9 +111,7 @@ obj/local/armeabi/objs/mystery/core/game.o: jni/core/game.cpp \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/egl.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h \
- jni/core/assert.h \
- C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib \
- jni/core/remote_debug.h jni/core/lua_core.h jni/core/platform.h \
+ jni/core/assert.h jni/core/lua_core.h jni/core/platform.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/unistd.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/select.h \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/sys/sysconf.h \
@@ -366,6 +364,10 @@ jni/glm/glm/detail/func_integer.inl:
 
 jni/core/time_helpers.h:
 
+jni/core/remote_debug.h:
+
+C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
+
 jni/core/lua_core_private.h:
 
 C:/Android/android-ndk-r9d/sources/android/native_app_glue/android_native_app_glue.h:
@@ -389,10 +391,6 @@ C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/siginfo
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm-generic/siginfo.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/signal.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/string.h:
-
-C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/malloc.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/asm/signal.h:
 
@@ -455,10 +453,6 @@ jni/core/font.h:
 jni/lua/luajit.h:
 
 jni/core/assert.h:
-
-C:/Android/android-ndk-r9d/sources/cxx-stl/gnu-libstdc++/4.8/include/cstdlib:
-
-jni/core/remote_debug.h:
 
 jni/core/lua_core.h:
 

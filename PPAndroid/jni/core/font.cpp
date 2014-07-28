@@ -67,11 +67,11 @@ vec2f fontMeasure(const Font* font, const char* text)
 
         CharInfo info = font->chars[c];
         cursor += info.advance;
-        height = fmax(height, -info.srcRect.w);
+        height = fmax(height, info.srcRect.w);
     }
 
     width = fmaxf(width, cursor);
-    return (vec2f){width, height};
+    return (vec2f){(width / font->size), (height / font->size)};
 }
 
 

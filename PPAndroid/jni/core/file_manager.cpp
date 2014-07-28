@@ -42,6 +42,7 @@ typedef struct
 
 static void sendMapFile(const char* dirName, int socket)
 {
+	RLOGI("Sending Map file! %s", dirName);
 	std::string filePath = path::buildPath(dirName, MAP_FILE_NAME);
     uint8_t result;
 	if(path::assetExists(filePath.c_str()))

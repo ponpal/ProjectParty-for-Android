@@ -11,6 +11,7 @@
 
 
 #include "stdint.h"
+#include "remote_debug.h"
 
 extern "C"
 {
@@ -32,5 +33,26 @@ extern "C"
 
 uint64_t timeNowMonoliticNsecs();
 uint64_t timeTargetMonolitic(uint32_t msecs);
+
+struct Profile
+{
+	const char* id;
+	uint64_t start;
+
+	Profile(const char* id)
+	{
+		this->id = id;
+		this->start = timeNowMonoliticNsecs();
+	}
+
+	~Profile()
+	{
+		auto time  = timeNowMonoliticNsecs() - start;
+		auto msecs = time / 1000000;
+
+		RLOGI("%s took %llu nsecs. (%d msecs)", id, time, (uint32_t)msecs);
+	}
+};
+
 
 #endif

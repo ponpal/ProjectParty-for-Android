@@ -28,6 +28,8 @@ static void loadImage(const char* path, uint8_t** data, uint32_t* width, uint32_
 
 Texture loadTexture(const char* path)
 {
+	Profile profile("Loading texture ");
+
 	uint8_t* data;
 	uint32_t width, height;
 	loadImage(path, &data, &width, &height);
@@ -49,11 +51,14 @@ Texture loadTexture(const char* path)
 
 void unloadTexture(Texture tex)
 {
+	Profile profile("Unloading texture");
 	glDeleteTextures(1, &tex.glName);
 }
 
 Texture reloadTexture(const char* path, Texture tex)
 {
+	Profile profile("Reloading texture");
+
 	uint8_t* data;
 	uint32_t width, height;
 	loadImage(path, &data, &width, &height);
@@ -86,20 +91,15 @@ static size_t loadHeader(Resource asset, FontHeader** fonts, size_t* length)
 
 static FontAtlas* loadFontAtlas(Resource fontAsset, Texture texture)
 {
-	RLOGI("Loading font %d", 0);
-
 	FontHeader* header;
 	size_t headerLength;
 	size_t headerSize = loadHeader(fontAsset, &header, &headerLength);
 
-	RLOGI("Header Length %d, Header Size %d", headerLength, headerSize);
 
 	int dataSize = sizeof(FontAtlas) + sizeof(Font) * headerLength;
-	RLOGI("Data size %d", dataSize);
 	int length = dataSize;
 	for(int i = 0; i < headerLength; i++)
 		length += header[i].dataLength * sizeof(CharInfo);
-	RLOGI("Length: %d", length);
 
 	auto data = (uint8_t*)malloc(length);
 	memcpy(data + dataSize, fontAsset.buffer + headerSize, fontAsset.length - headerSize);
@@ -127,10 +127,6 @@ static FontAtlas* loadFontAtlas(Resource fontAsset, Texture texture)
 			font->layer = 0;
 
 		font->defaultChar = '_';
-
-		RLOGI("Font: Size=%f LH=%f CLen=%d Layer=%d",
-			  font->size, font->lineHeight,
-			  font->charsLength, font->layer);
 	}
 
 	return atlas;
@@ -138,6 +134,8 @@ static FontAtlas* loadFontAtlas(Resource fontAsset, Texture texture)
 
 FontAtlas* loadFont(const char* path)
 {
+	Profile profile("Loading font atlas");
+
 	auto texture = loadTexture(path::changeExtension(path, ".png").c_str());
 	Resource fontAsset = platformLoadResource(path);
 
@@ -149,12 +147,16 @@ FontAtlas* loadFont(const char* path)
 
 void unloadFont(FontAtlas* font)
 {
+	Profile profile("Unloading font atlas");
+
 	unloadTexture(font->page);
 	free(font);
 }
 
 FontAtlas* reloadFont(const char* path, FontAtlas* atlas)
 {
+	Profile profile("Reloading font atlas");
+
 	Texture texture = reloadTexture(path::changeExtension(path, ".png").c_str(), atlas->page);
 	free(atlas);
 

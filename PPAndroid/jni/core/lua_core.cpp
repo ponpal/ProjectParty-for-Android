@@ -27,12 +27,6 @@ lua_State* luaCoreCreate()
 
 	return luaState;
 }
-
-void luaCoreDestroy(lua_State* L)
-{
-	lua_close(L);
-}
-
 static void loadLuaScript(lua_State* L, const std::string& pathInFiles)
 {
 	Resource script = platformLoadExternalResource(pathInFiles.c_str());
@@ -85,6 +79,23 @@ void luaRunGarbageCollector(lua_State* L, int milisecs)
 		if(lua_gc(L, LUA_GCSTEP, 0)) break;
 }
 
+static void luaSetPaused(lua_State* L, bool value)
+{
+	char buffer[128];
+	int len = snprintf(buffer, 128, "Game.paused = %d", value);
+
+	int top = lua_gettop(L);
+	luaL_loadbuffer(L, buffer, len, "Setting boolean");
+	lua_pcall(L, 0, 0, 0);
+
+	if(top != lua_gettop(L))
+	{
+		RLOGI("INVALID STACK! %d %d", top, lua_gettop(L));
+	}
+
+}
+
+
 static void lua_xpcall(lua_State* L, const char* buffer, const char* id)
 {
 	lua_getglobal(L, "debug");
@@ -94,6 +105,7 @@ static void lua_xpcall(lua_State* L, const char* buffer, const char* id)
 	{
 		RLOGE("Failed to load lua buffer! %s", buffer);
 		lua_pop(L, 2);
+		luaSetPaused(L, true);
 		return;
 	}
 
@@ -102,6 +114,7 @@ static void lua_xpcall(lua_State* L, const char* buffer, const char* id)
 	{
 		RLOGE("Lua error: %s", lua_tostring(L, -1));
 		lua_pop(L, 1);
+		luaSetPaused(L, true);
 	}
 
 	lua_pop(L, 2);
@@ -112,18 +125,28 @@ static void callEmptyLuaFunction(lua_State* L, const char* buffer)
 	lua_xpcall(L, buffer, "empty");
 }
 
+
+void luaCoreDestroy(lua_State* L)
+{
+	RLOGI("Closing lua state %s!", "");
+	callEmptyLuaFunction(L, "printStackTrace()");
+	lua_close(L);
+}
+
 static bool callEmptyLuaFunctionBool(lua_State* L, const char* buffer)
 {
 	lua_getglobal(L, buffer);
 	int error = error | lua_pcall(L, 0, 1, 0);
 	if(error) {
-		RLOGW("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
+		RLOGE("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
 		lua_pop(L, 1);
+		luaSetPaused(L, true);
 		return false;
 	}
 	/*retrieve result */
 	if (!lua_isboolean(L, -1)) {
-	 	RLOGW("%s", "function `f' must return a boolean");
+	 	RLOGE("%s", "function `f' must return a boolean");
+		luaSetPaused(L, true);
 	 	return false;
 	}
 	auto result = lua_toboolean(L, -1);
@@ -152,7 +175,6 @@ bool luaConsoleInputCall(lua_State* L, const char* input, char** result)
 
 	lua_pop(L, 2);
 
-	RLOGI("%s", "Exit console input");
 
 	return sucess;
 }

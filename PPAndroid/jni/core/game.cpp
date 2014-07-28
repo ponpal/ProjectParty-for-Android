@@ -65,10 +65,11 @@ void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 void gameStop() {
 	if(!gGame)
 		return;
-	asyncOperationsCancel();
-	remoteDebugStop();
+
 	luaStopCall(gGame->L);
 	luaCoreDestroy(gGame->L);
+	asyncOperationsCancel();
+	remoteDebugStop();
 	delete gGame->clock;
 	delete gGame->sensor;
 	delete gGame;
@@ -87,6 +88,7 @@ int32_t sleep_offset = 0;
 void gameStep(ndk_helper::GLContext* context) {
     clockStep(gGame->clock);
 
+    remoteDebugUpdate();
     luaStepCall(gGame->L);
     asyncOperationsProcess();
     luaRunGarbageCollector(gGame->L, 3);
