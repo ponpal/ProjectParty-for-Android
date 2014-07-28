@@ -3,25 +3,30 @@ local reloading = { }
 local SERVICE_NAME = "FILE_RELOADING_SERVICE"
 local PORT = 22222
 local QUERY_INTERVAL = 1000
+local CONNECTION_TIMEOUT = 10000
 
+
+local function onAsyncConnect(socket, connected)
+	if connected then 
+		local sock = TcpFromSocket(socket, 1024, 128)
+		sock:blocking(false)
+		reloading.connection = sock
+		sock.outStream:writeString("tower_defence")
+		sock.outStream:flush()
+		Log.info("Connected to reloading!")
+	else 
+		C.serviceFinderAsync(SERVICE_NAME, PORT, onReload, QUERY_INTERVAL)
+	end
+end
 
 local function onReload(event, success)
 	if success then 
 		local buffer = event.buffer
-
 		local ip 	= C.bufferReadInt(buffer)
 		local port 	= C.bufferReadShort(buffer)
-		local sock = TcpSocket(1024, 128)
-		local res  = sock:connect(ip, port, 1000)
+		local sock  = C.socketCreate(C.TCP_SOCKET)
 
-		if res then 
-			sock:blocking(false)
-			reloading.connection = sock
-			sock.outStream:writeString("tower_defence")
-			sock.outStream:flush()
-		end
-
-		Log.info("Connected to reloading!")
+		C.socketAsyncConnect(sock, ip, port, CONNECTION_TIMEOUT, onAsyncConnect)
 	else
 		C.serviceFinderAsync(SERVICE_NAME, PORT, onReload, QUERY_INTERVAL)
 	end
@@ -64,8 +69,19 @@ local function reloadItem()
 		Log.info("Stopping game!")
 		Game.stop()
 
+
+		local reloadPath = Game.name .. "/" .. mainFile
+
+		local reloadName = nil
+		for k, v in pairs(R) do
+			if v.path == reloadPath then 
+				reloadName = Game.name .. "/" .. k
+				break
+			end
+		end
+
 		Log.info("running lua script")
-		runExternalFile(Game.name .. "/" .. mainFile)
+		runExternalFile(reloadPath, reloadName)
 		Game.restart()
 		Log.info("Reloaded lua script!")
 	end 

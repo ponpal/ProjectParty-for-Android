@@ -25,7 +25,7 @@ extern "C"
 	bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs);
 
 	//Need non-blocking connect.
-	typedef void (*connectedCallback)(int socket, bool result);
+	typedef void (*connectedCallback)(int socket,  bool result);
 	void socketAsyncConnect(int socket, uint32_t ip,
 							uint16_t port, uint32_t msecs,
 							connectedCallback callback);

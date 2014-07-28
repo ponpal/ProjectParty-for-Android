@@ -42,6 +42,8 @@ static void gameRestart() {
 void gameInitialize(uint32_t screenWidth, uint32_t screenHeight) {
 	if (gGame)
 		return;
+	Profile profile("Game initialize");
+
 	remoteDebugStart(platformDeviceName());
 
 	gGame = new Game();

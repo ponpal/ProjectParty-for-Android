@@ -328,6 +328,7 @@ ffi.cdef[[
 	static const uint32_t TCP_SOCKET = 1;
 	static const uint32_t UDP_SOCKET = 2;
 
+	
 	//Socket common
 	int socketCreate(int type);
 	bool socketBind(int socket, uint32_t ip, uint16_t port);
@@ -339,7 +340,15 @@ ffi.cdef[[
 
 	//For tcp sockets
 	bool socketConnect(int socket, uint32_t ip, uint16_t port, uint32_t msecs);
+
+	//Need non-blocking connect.
+	typedef void (*connectedCallback)(int socket,  bool result);
+	void socketAsyncConnect(int socket, uint32_t ip,
+							uint16_t port, uint32_t msecs,
+							connectedCallback callback);
+
 	bool socketTCPSend(int socket, Buffer* toSend);
+	void socketTcpNoDelay(int socket, bool value);
 
 	//For udp sockets
 	bool socketSend(int socket, Buffer* toSend, uint32_t ip, uint16_t port);
@@ -406,11 +415,19 @@ function RawInput.onCancel(pointerID, x, y)
 end
 
 function RawInput.onMenuButton()
-	Input.onMenuButton()
+	if not Input.onMenuButton() then
+		return false
+	else
+		return true
+	end
 end
 
 function RawInput.onBackButton()
-	Input.onBackButton()
+	if not Input.onBackButton()then
+		return false
+	else
+		return true
+	end
 end
 
 Frame = ffi.typeof("Frame")
@@ -610,26 +627,41 @@ function File.loadTable(name)
 	end
 end
 
-function runInternalFile(path)
+function loadAllScripts()
+	runExternalFile(Game.name .. "/R.lua")
+	for k, v in pairs(R) do
+		if v.type == "lua" then 
+			runExternalFile(v.path, Game.name .. "/" .. k .. ".lua")
+		end
+	end
+
+	C.loadLuaScripts(C.gGame.L, Game.name)
+end
+
+function runInternalFile(path, chunkName)
+	if not chunkName then chunkName = path end
+
 	local resource = C.platformLoadInternalResource(path)
-	local func, err = loadstring(ffi.string(resource.buffer, resource.length))
+	local func, err = loadstring(ffi.string(resource.buffer, resource.length), chunkName)
 	C.platformUnloadResource(resource)
 
 	if not func then 
-		Log.errorf("Failed to load internal %s Error: %s", path, err)
+		error(string.format("Failed to load external file! %s %s", path, chunkName))
 	else 
 		return func()
 	end 
 end
 
-function runExternalFile(path)
+function runExternalFile(path, chunkName)
+	if not chunkName then chunkName = path end
+
 	local resource = C.platformLoadExternalResource(path)
 	local str = ffi.string(resource.buffer, resource.length)
-	local func, err= loadstring(str)
+	local func, err= loadstring(str, chunkName)
 	C.platformUnloadResource(resource)
 
 	if not func then 
-		Log.errorf("Failed to load external %s Error: %s", path, err)
+		error(string.format("Failed to load external file! %s %s", path, chunkName))
 	else 
 		return func()
 	end 

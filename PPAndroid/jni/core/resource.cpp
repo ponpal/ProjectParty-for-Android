@@ -116,7 +116,6 @@ static FontAtlas* loadFontAtlas(Resource fontAsset, Texture texture)
 		font->page	= texture;
 
 		int start = dataSize + header[i].dataOffset;
-		RLOGI("Start %d", start);
 		font->chars = (CharInfo*)((data) + start);
 		font->charsLength = header[i].dataLength;
 		font->layer  = header[i].layer;

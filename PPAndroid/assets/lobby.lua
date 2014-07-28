@@ -59,6 +59,7 @@ local function transition(server, shouldRestart)
 	Game.resourceDir = Game.resourceDir .. Game.name .. "/"
 
 	initializeReloading(resources)
+	loadAllScripts()
 	C.loadLuaScripts(C.gGame.L, Game.name)
 
 	if shouldRestart then

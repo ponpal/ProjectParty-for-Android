@@ -174,7 +174,11 @@ end
 
 function tcpMT:connect(ip, port, msecs)
 	if not msecs then msecs = 0 end
-	return C.socketConnect(self.handle, ip, port, msecs)
+	local res = C.socketConnect(self.handle, ip, port, msecs)
+	if not res then 
+		error(string.format("Failed to connect to %d %d", ip, port))
+	end
+	return res
 end
 
 function tcpMT:isAlive( )
@@ -187,11 +191,15 @@ function tcpMT:receive()
 end
 
 function global.TcpSocket(inSize, outSize)
+	return TcpFromSocket(C.socketCreate(C.TCP_SOCKET), inSize, outSize)
+end
+
+function global.TcpFromSocket(socket, inSize, outSize)
 	if not inSize then inSize = 1024 end
 	if not outSize then outSize = 1024 end
 
 	local t = { }
-	t.handle    = C.socketCreate(C.TCP_SOCKET)
+	t.handle    = socket
 	t.inStream  = InputSocketStream(t.handle,  inSize) 
 	t.outStream = OutputSocketStream(t.handle, outSize)
 	setmetatable(t, tcpMT)

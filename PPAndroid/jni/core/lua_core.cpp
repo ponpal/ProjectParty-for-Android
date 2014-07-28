@@ -63,10 +63,9 @@ static void loadScripts(lua_State* L, const char* scriptsDirectory, const char* 
 	RLOGI("%s", "About to exit initializeLuaScript");
 }
 
-
 void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
 {
-	loadScripts(L, scriptsDirectory, ".lua");
+	//loadScripts(L, scriptsDirectory, ".lua");
 	loadScripts(L, scriptsDirectory, ".luag");
 }
 
@@ -104,7 +103,7 @@ static void lua_xpcall(lua_State* L, const char* buffer, const char* id)
 	if(err)
 	{
 		RLOGE("Failed to load lua buffer! %s", buffer);
-		lua_pop(L, 2);
+		lua_pop(L, 3);
 		luaSetPaused(L, true);
 		return;
 	}
@@ -129,28 +128,30 @@ static void callEmptyLuaFunction(lua_State* L, const char* buffer)
 void luaCoreDestroy(lua_State* L)
 {
 	RLOGI("Closing lua state %s!", "");
-	callEmptyLuaFunction(L, "printStackTrace()");
+	RLOGI("luaCoreDestroy Lua stack: %d", lua_gettop(L));
 	lua_close(L);
 }
 
-static bool callEmptyLuaFunctionBool(lua_State* L, const char* buffer)
+static bool callEmptyLuaFunctionBool(lua_State* L, const char* table, const char* field)
 {
-	lua_getglobal(L, buffer);
+	lua_getglobal(L, table);
+	lua_getfield(L, -1, field);
 	int error = error | lua_pcall(L, 0, 1, 0);
 	if(error) {
-		RLOGE("LUA Execution Error while calling %s. %s", buffer, lua_tostring(L, -1));
-		lua_pop(L, 1);
+		RLOGE("LUA Execution Error while calling %s. %s", field, lua_tostring(L, -1));
+		lua_pop(L, 2);
 		luaSetPaused(L, true);
 		return false;
 	}
 	/*retrieve result */
 	if (!lua_isboolean(L, -1)) {
 	 	RLOGE("%s", "function `f' must return a boolean");
+		lua_pop(L, 2);
 		luaSetPaused(L, true);
 	 	return false;
 	}
 	auto result = lua_toboolean(L, -1);
-	lua_pop(L, 1);  /* pop returned value */
+	lua_pop(L, 2);  /* pop returned value */
 
 	return result;
 }
@@ -159,7 +160,7 @@ static void callIntFloat2LuaFunction(lua_State* L, const char* methodName, uint3
 {
 	char buffer[128];
 	snprintf(buffer, 128, "%s(%d,%f,%f)", methodName, i, x, y);
-	lua_xpcall(L, buffer, "int float float");
+	lua_xpcall(L, buffer, methodName);
 }
 
 bool luaConsoleInputCall(lua_State* L, const char* input, char** result)
@@ -173,8 +174,7 @@ bool luaConsoleInputCall(lua_State* L, const char* input, char** result)
 	else
 		*result = (char*)lua_tostring(L, -1);
 
-	lua_pop(L, 2);
-
+	lua_pop(L, 1);
 
 	return sucess;
 }
@@ -212,12 +212,12 @@ void luaHandleMessageCall(lua_State* L, Buffer* buffer, uint32_t id)
 
 bool luaMenuCall(lua_State* L)
 {
-	return callEmptyLuaFunctionBool(L, "Input.onMenuButton");
+	return callEmptyLuaFunctionBool(L, "RawInput", "onMenuButton");
 }
 
 bool luaBackCall(lua_State* L)
 {
-	return callEmptyLuaFunctionBool(L, "Input.onBackButton");
+	return callEmptyLuaFunctionBool(L, "RawInput", "onBackButton");
 }
 
 void luaOnUpCall(lua_State* L, uint32_t pointerID, float x, float y)

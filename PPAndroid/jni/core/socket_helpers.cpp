@@ -155,8 +155,6 @@ void socketAsyncConnect(int socket, uint32_t ip,
 						uint16_t port, uint32_t msecs,
 						connectedCallback callback)
 {
-
-
 	struct sockaddr_in servaddr;
 	bzero(&servaddr, sizeof(servaddr));
 	servaddr.sin_family = AF_INET;
@@ -181,6 +179,7 @@ void socketAsyncConnect(int socket, uint32_t ip,
 
 	socketSetBlocking(socket, false);
 	asyncOperation(data, (asyncHandler)&asyncConnect, (asyncDestructor)&connectDtor,  "Connection Operation");
+
 }
 
 
