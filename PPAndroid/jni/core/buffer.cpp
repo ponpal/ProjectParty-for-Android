@@ -41,12 +41,14 @@ Buffer bufferWrapArray(uint8_t* array, uint32_t length)
 
 void bufferDelete(Buffer* buffer)
 {
+	RLOGI("Buffer delete %d", buffer);
 	delete [] buffer->base;
 	delete buffer;
 }
 
 bool bufferCheckError(Buffer* buffer)
 {
+	if(buffer == nullptr) return true;
 	return buffer->error != 0;
 }
 

@@ -51,7 +51,6 @@ local function reloadItem()
 			mainFile = name
 		end 
 		
-
 		Log.infof("File name: %s", name)
 		local result = C.receiveFile(stream.cHandle, Game.resourceDir, name)
 	end
@@ -62,14 +61,6 @@ local function reloadItem()
 	if ext ~= "lua" then
 		reloading.manager:reloadFromName(mainFile)
 	else 
-		--We are in the complicated case! Reloading of lua files!
-		--Simplest strategy Call Game.stop() reload the file and then Game.restart()
-		--It is anying to do this every time :(
-		Log.info("reloading lua file!")
-		Log.info("Stopping game!")
-		Game.stop()
-
-
 		local reloadPath = Game.name .. "/" .. mainFile
 
 		local reloadName = nil
@@ -79,11 +70,8 @@ local function reloadItem()
 				break
 			end
 		end
-
-		Log.info("running lua script")
+		
 		runExternalFile(reloadPath, reloadName)
-		Game.restart()
-		Log.info("Reloaded lua script!")
 	end 
 end
 

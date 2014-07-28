@@ -181,22 +181,22 @@ bool luaConsoleInputCall(lua_State* L, const char* input, char** result)
 
 void luaStopCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "Game.stop()");
+	callEmptyLuaFunction(L, "Game:stop()");
 }
 
 void luaStepCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "Game.step()");
+	callEmptyLuaFunction(L, "Game:step()");
 }
 
 void luaStartCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "Game.start()");
+	callEmptyLuaFunction(L, "Game:start()");
 }
 
 void luaRestartCall(lua_State* L)
 {
-	callEmptyLuaFunction(L, "Game.restart()");
+	callEmptyLuaFunction(L, "Game:restart()");
 }
 
 void luaHandleMessageCall(lua_State* L, Buffer* buffer, uint32_t id)

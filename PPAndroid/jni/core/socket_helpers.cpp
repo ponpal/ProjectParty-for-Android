@@ -299,6 +299,8 @@ void socketRecvTimeout(int socket, uint32_t msecs)
 	timeout.tv_sec = msecs / 1000;
 	timeout.tv_usec = (msecs % 1000) * 1000;
 
+	RLOGI("Recv timeout %d %d", timeout.tv_sec, timeout.tv_usec);
+
 	setsockopt(socket, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 }
 
@@ -307,4 +309,15 @@ void socketTcpNoDelay(int socket, bool value)
 {
 	int on = value ? 1 : 0;
 	setsockopt(socket, IPPROTO_TCP, TCP_NODELAY, &on, sizeof(on));
+}
+
+bool socketIsAlive(int sock)
+{
+	int error_code;
+	int size = sizeof(error_code);
+	int res = getsockopt(sock, SOL_SOCKET, SO_ERROR, &error_code, &size);
+
+	RLOGI("isAlive result %d %d", res, error_code);
+
+	return error_code == 0;
 }

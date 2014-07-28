@@ -14,6 +14,9 @@ local chosenServer = nil
 
 global.resources = ResourceManager()
 
+local Lobby = { }
+Lobby.__index = Lobby
+
 local function startReceivingFiles(serverInfo)
 	if receiveFiles == 0 then
 		local dir = ffi.string(C.platformExternalResourceDirectory()) .. "/" .. serverInfo.name
@@ -42,18 +45,19 @@ local function onServerFound(event, success)
 	end
 end
 
-function Game.start()
+function Lobby:start()
 	renderer = CRenderer(256)
     font = resources:load(R.Fonts)
     Screen.setOrientation(Orientation.portrait)
 
     C.serviceFinderAsync("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound, 500)
 
+    --WE NEED TO TURN OF jitting since otherwize we get wierd behaviour on reloading stuff :( 
+   	--This means that in production we can still have jit :)
+    jit.off()
 end
 
-local function transition(server, shouldRestart)
-	unbindState()
-	
+local function transition(server, shouldRestart)	
 	Game.name = server.name
 	Game.server = server
 	Game.resourceDir = Game.resourceDir .. Game.name .. "/"
@@ -63,22 +67,22 @@ local function transition(server, shouldRestart)
 	C.loadLuaScripts(C.gGame.L, Game.name)
 
 	if shouldRestart then
-		Game.restart()
+		Game:restart()
 	else
-		Game.start()
+		Game:start()
 	end
 end
 
-function Game.restart()
+function Lobby:restart()
 	local state = File.loadTable("lobby_save_state.luac")
 	if state.shouldTransition then
 		transition(state.server, true)
 	else 
-		Game.start();
+		Game:start();
 	end
 end
 
-function Game.stop()
+function Lobby:stop()
 	local toSave = { }
 	if chosenServer then
 		toSave.server = chosenServer
@@ -106,11 +110,11 @@ local function checkForTransition()
 	return false
 end
 
-function Game.step()
+function Lobby:step()
 	C.remoteDebugUpdate()
 	local shouldTransition = checkForTransition()
     if shouldTransition then
-		Game.stop()
+		Game:stop()
 		transition(chosenServer, false)
 		return;
     end
@@ -141,14 +145,4 @@ function Game.step()
 	renderer:draw()
 end
 
-function Input.onDown(pointerID, x, y)
-end
-
-function Input.onMove(pointerID, x, y)
-end
-
-function Input.onUp(pointerID, x, y)
-end
-
-function Input.onCancel(pointerID, x, y)
-end
+setmetatable(Game, Lobby)

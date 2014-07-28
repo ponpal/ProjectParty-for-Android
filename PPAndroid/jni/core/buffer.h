@@ -30,7 +30,7 @@ extern "C"
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 	uint32_t bufferBytesConsumed(Buffer* buffer);
 
-	bool bufferCheckError();
+	bool bufferCheckError(Buffer* buffer);
 
 	//Output buffer
 	void bufferWriteBytes(Buffer* buffer, uint8_t* data, uint32_t length);

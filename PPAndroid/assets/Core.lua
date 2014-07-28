@@ -33,13 +33,14 @@ ffi.cdef[[
 		uint32_t capacity;
 	} Buffer;
 
-
 	Buffer* bufferNew(uint32_t bufferSize);
 	void bufferDelete(Buffer* buffer);
 
 	Buffer bufferWrapArray(uint8_t* array, uint32_t arraySize);
 	uint32_t bufferBytesRemaining(Buffer* buffer);
 	uint32_t bufferBytesConsumed(Buffer* buffer);
+
+	bool bufferCheckError(Buffer* buffer);
 
 	//Output buffer
 	void bufferWriteBytes(Buffer* buffer, uint8_t* data, uint32_t length);
@@ -54,7 +55,6 @@ ffi.cdef[[
 	//Input Buffer
 	uint32_t bufferReadBytes(Buffer* buffer, uint8_t* dest, uint32_t numBytes);
 	char* bufferReadTempUTF8(Buffer* buffer);
-	uint32_t bufferReadUTF8(Buffer* buffer, char** dest);
 	uint8_t  bufferReadByte(Buffer* buffer);
 	uint16_t bufferReadShort(Buffer* buffer);
 	uint32_t bufferReadInt(Buffer* buffer);
@@ -353,6 +353,7 @@ ffi.cdef[[
 	//For udp sockets
 	bool socketSend(int socket, Buffer* toSend, uint32_t ip, uint16_t port);
 	bool socketReceive(int socket, Buffer* buffer);
+	bool socketIsAlive(int socket);
 ]]
 
 
@@ -478,18 +479,6 @@ end
 function printStackTrace()
 	local str = debug.traceback();
 	Log.info(str);
-end
-
-function unbindState()
-	Input.onDown = doNothing
-	Input.onUp = doNothing
-	Input.onCancel = doNothing
-	Input.onMove = doNothing
-
-	Game.step = doNothing
-	Game.start = doNothing
-	Game.stop = doNothing
-	Game.restart = doNothing
 end
 
 function consoleCall(input)
@@ -714,6 +703,7 @@ setmetatable(global, GlobalMT)
 
 do
 	GLOBAL_lock(_G)
+	runInternalFile("Type.lua")
 	runInternalFile("R.lua")
 	runInternalFile("gl.lua")
 	runInternalFile("socket.lua")

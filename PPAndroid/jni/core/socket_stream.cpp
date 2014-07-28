@@ -297,6 +297,8 @@ uint32_t streamReadInt(SocketStream* stream)
 
 uint64_t streamReadLong(SocketStream* stream)
 {
+	RLOGI("READ LONG %d, %d", stream, stream->buffer);
+
 	if(bufferBytesRemaining(&stream->buffer) < 8)
 	{
 		auto success = receiveUntil(stream, 8);

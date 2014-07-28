@@ -1,3 +1,151 @@
+
+local bufferMT = { }
+bufferMT.__index = bufferMT;
+
+function bufferMT:remaining()
+	local rem = C.bufferBytesRemaining(self)
+	if C.bufferCheckError(self) then 
+		error("Failed checking remaining")
+	end
+
+	return rem
+end
+
+function bufferMT:consumed()
+	local rem = C.bufferBytesConsumed(self)
+	if C.bufferCheckError(self) then 
+		error("Failed checking consumed")
+	end
+
+	return rem
+end
+
+function  bufferMT:writeBytes(towrite, length)
+	C.bufferWriteBytes(self, towrite, length)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing bytes %s %d", towrite, length))
+	end
+end
+
+function  bufferMT:writeByte(byte)
+	C.bufferWriteByte(self, byte)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing byte %d",byte))
+	end
+end
+
+function  bufferMT:writeShort(short)
+	C.bufferWriteShort(self, short)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing short %d",short))
+	end
+end
+
+function  bufferMT:writeInt(int)
+	C.bufferWriteInt(self, int)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing int %d",int))
+	end
+end
+
+function  bufferMT:writeLong(long)
+	C.bufferWriteLong(self, long)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing long %d",long))
+	end
+end
+
+function  bufferMT:writeFloat(float)
+	C.bufferWriteFloat(self, float)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing float %d",float))
+	end
+end
+
+function  bufferMT:writeDouble(double)
+	C.bufferWriteDouble(self, long)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing double %d",double))
+	end
+end
+
+function  bufferMT:writeString(str)
+	C.bufferWriteUTF8(self, str)
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed writing string %s", str))
+	end
+end
+
+function bufferMT:readString()
+	local c_str = C.bufferReadTempUTF8(self)	
+	if C.bufferCheckError(self) then 
+		error("Failed to readString")
+	end
+
+	return ffi.string(c_str)
+end
+
+function bufferMT:readByte()
+	local res = C.bufferReadByte(self)	
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed to readByte"))
+	end
+
+	return res
+end
+
+function bufferMT:readShort()
+	local res = C.bufferReadShort(self)	
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed to readShort"))
+	end
+
+	return res
+end
+
+function bufferMT:readInt()
+	local res = C.bufferReadInt(self)	
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed to readInt"))
+	end
+
+	return res
+end
+
+function bufferMT:readLong()
+	local res = C.bufferReadLong(self)	
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed to readLong"))
+	end
+
+	return res
+end
+
+function bufferMT:readFloat()
+	local res = C.bufferReadFloat(self)	
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed to readFloat"))
+	end
+
+	return res
+end
+
+function bufferMT:readDouble()
+	local res = C.bufferReadDouble(self)	
+	if C.bufferCheckError(self) then 
+		error(string.format("Failed to readDouble"))
+	end
+
+	return res
+end
+
+ffi.metatype("Buffer", bufferMT)
+
+function global.Buffer(capacity)
+	local buf = ffi.gc(C.bufferNew(capacity), C.bufferDelete)
+	return buf
+end
+
 local ISMT = { }
 ISMT.__index = ISMT
 function ISMT:readByte()
@@ -137,6 +285,9 @@ end
 
 function OSMT:flush()
 	C.streamFlush(self.cHandle, true)
+	if C.streamCheckError(self.cHandle) then
+		error("Failed to flush stream!")
+	end 
 end 
 
 function global.OutputSocketStream(sock, size)
@@ -181,9 +332,8 @@ function tcpMT:connect(ip, port, msecs)
 	return res
 end
 
-function tcpMT:isAlive( )
-	-- Call some C function here
-	return true
+function tcpMT:isAlive()
+	return C.socketIsAlive(self.cHandle)
 end
 
 function tcpMT:receive()
@@ -207,6 +357,8 @@ function global.TcpFromSocket(socket, inSize, outSize)
 	--Figure out how to do it with GC here.
 	return t
 end
+
+
 
 local udpMT = { }
 udpMT.__index = udpMT
@@ -250,8 +402,7 @@ function udpMT:send(ip, port)
 end
 
 function udpMT:isAlive()
-	--Call some C function here.
-	return true
+	return C.socketIsAlive(self.handle)
 end
 
 function global.UdpSocket(inSize, outSize)
@@ -260,8 +411,8 @@ function global.UdpSocket(inSize, outSize)
 
 	local t = { }
 	t.handle 	= C.socketCreate(C.UDP_SOCKET)
-	t.inBuffer  = ffi.gc(C.bufferNew(inSize), C.bufferDelete)
-	t.outBuffer = ffi.gc(C.bufferNew(outSize), C.bufferDelete)
+	t.inBuffer  = Buffer(inSize)
+	t.outBuffer = Buffer(outSize)
 
 	setmetatable(t, udpMT)
 	return t

@@ -36,6 +36,8 @@ extern "C"
 	//For udp sockets
 	bool socketSend(int socket, Buffer* toSend, uint32_t ip, uint16_t port);
 	bool socketReceive(int socket, Buffer* buffer);
+
+	bool socketIsAlive(int socket);
 }
 
 #endif /* SOCKET_HELPERS_H_ */
