@@ -166,7 +166,7 @@ end
 
 local function reloadAtl(self, item, path)
 	local tex = C.reloadTexture(Path.changeExt(path, "png"), item.__TEXTURE__)
-	local atl = runExternalFile(path, tex)
+	local atl = runExternalFile(path)
 
 	item.__TEXTURE__ = tex
 	item.width  = atl.width
