@@ -71,6 +71,9 @@ local function reloadItem()
 			end
 		end
 		
+   	    --WE NEED TO TURN OF jitting since otherwize we get wierd behaviour on reloading stuff :( 
+  	    --This means that in production we can still have jit :)
+  	    jit.off()
 		runExternalFile(reloadPath, reloadName)
 	end 
 end

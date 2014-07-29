@@ -13,7 +13,7 @@ end
 
 function Res:load(item)
 	if self.loaded[item.hash] then
-		return self.loaded
+		return self.loaded[item.hash]
 	end
 
 	local handle = loaders[item.type](self, item.path)

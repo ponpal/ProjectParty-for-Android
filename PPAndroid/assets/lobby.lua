@@ -52,9 +52,6 @@ function Lobby:start()
 
     C.serviceFinderAsync("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound, 500)
 
-    --WE NEED TO TURN OF jitting since otherwize we get wierd behaviour on reloading stuff :( 
-   	--This means that in production we can still have jit :)
-    jit.off()
 end
 
 local function transition(server, shouldRestart)	

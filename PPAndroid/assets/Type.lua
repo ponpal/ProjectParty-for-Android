@@ -4,6 +4,12 @@ RTTI.__index = RTTI
 
 setmetatable(Type, RTTI)
 
+function Type.restart(typeName, fileName)
+	local obj = { }
+	setmetatable(obj, RTTI[typeName])
+	obj:restart(fileName)
+	return obj
+end
 
 function Type.define(typ, name)
 	if type(typ) ~= "table" or type(name) ~= "string" then 
@@ -39,7 +45,6 @@ function Type.all(func)
 		local meta = getmetatable(t)
 
 		if meta then 
-			Log.infof("Key has table %s", k)
 			func(t, meta) 
 		end
 
@@ -58,15 +63,15 @@ end
 function Type.redefine(typ, name)
 	local mt = RTTI[name]
 
+	local saves = { }
+
 	Log.infof("Redefing type! %s", name)
 	Type.all(function (t, meta)
-		Log.infof("Redefing type! %s", name)
-		Log.infof("%s", meta.__TYPE__)
-
 		if meta.__TYPE__ == name then
 
 			if t.stop then 
-				t:stop()			
+				local id = t:stop()
+				table.insert(saves, id)			
 			end
 		end
 	end)
@@ -74,14 +79,15 @@ function Type.redefine(typ, name)
 
 	local mt = RTTI[name]
 	for k, v in pairs(typ) do
-		Log.info(k)
 		mt[k] = v
 	end
 
 	Type.all(function (t, meta)
 		if meta.__TYPE__ == name then 
 			if t.restart then 
-				t:restart()
+				local s = saves[1]
+				t:restart(s)
+				table.remove(saves, 1)
 			elseif t.start then 
 				t:start()
 			end

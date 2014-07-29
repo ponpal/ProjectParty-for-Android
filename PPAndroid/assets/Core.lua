@@ -375,6 +375,12 @@ Screen  =
 	height = C.gGame.screen.height
 }
 
+Time = { }
+function updateTime()
+	Time.total = C.clockTotal(C.gGame.clock)
+	Time.delta = C.clockElapsed(C.gGame.clock)
+end
+
 
 function Screen.setOrientation(orientation)
 	if orientation == Orientation.portrait then
@@ -447,6 +453,9 @@ local vec2_MT =
 			end,
 	__div = function (v0, scalar)
 				return vec2(v0.x / scalar, v0.y / scalar)
+			end,
+	__tostring = function(v)
+				return string.format("vec2(%f,%f)", v.x, v.y)
 			end
 }
 
@@ -467,13 +476,8 @@ Font = ffi.metatype("Font", font_MT)
 local function doNothing(...) end
 
 function restartGame()
-	Game.stop()
-	Log.info("stopped the game")
-
---	C.loadLuaScripts(C.gGame.L, Game.name)
-	
-	Game.restart()
-	Log.info("restarted the game")
+	Game:stop()
+	Game:start()
 end
 
 function printStackTrace()
@@ -575,7 +579,7 @@ local function serialize2(sink, t, tName)
 			sink:write("{ }\n")
 			serialize2(sink, v, tName .. "[" .. keyStr .. "]")
 		elseif type(v) == "string" then
-			sink:write("\"" .. v .. "\"")
+			sink:write("[[" .. v .. "]]")
 		else
 			sink:write(tostring(v))
 		end
@@ -593,16 +597,29 @@ function serialize(sink, t, name)
 		sink:write("return ")
 		sink:write(name)
 	else 
-		sink:write(name .. " = " .. tostring(t))
+		sink:write("return " .. tostring(t))
 	end
 
 	return sink
 end 
 
+function File.saveRandomTable(t)
+	local num = math.random(0, 0xFFFFFFFFFFFF)
+	local str = tostring(num)
+	local hash = C.bytesHash(str, #str, 0)
+	local result = tostring(hash) .. ".luac"
+	File.saveTable(t, result)
+	return result
+end
+
 function File.saveTable(t, name)
 	local path = Game.resourceDir .. name
 	local file = assert(io.open(path, "w"))
 	serialize(file, t, "t")
+	serialize(TextWriter, t, "t")
+	Log.infof("Saved %s %s", name, TextWriter.data)
+	TextWriter.data = ""
+
 	assert(file:close())
 
 	Log.infof("Table Saved %s", path)
