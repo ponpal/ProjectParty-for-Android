@@ -120,18 +120,39 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 	    }
 	} else if (type == AINPUT_EVENT_TYPE_KEY) {
 		auto code = AKeyEvent_getKeyCode(event);
+		auto action = AKeyEvent_getAction(event);
 		RLOGI("Received key event: %d", code);
 
-		switch(code) {
-            case AKEYCODE_MENU:
-            	return luaMenuCall(gGame->L);
-                break;
-            case AKEYCODE_BACK:
-            	RLOGI("BACK KEY PRESSED %s", "");
-            	return luaBackCall(gGame->L);
-                break;
-            default:
-            	return 0;
+		switch(action)
+		{
+			case AKEY_EVENT_ACTION_DOWN:
+				switch(code)
+				{
+					case AKEYCODE_MENU:
+		            	return luaMenuCall(gGame->L);
+					case AKEYCODE_BACK:
+						return luaBackCall(gGame->L);
+					case AKEYCODE_UNKNOWN:
+						return 0;
+					default:
+						//This can only be ascci due to android NDK being horribly broken!
+						int unicode = getUnicodeChar(gApp, action, code, AKeyEvent_getMetaState(event));
+						char buf[2];
+						buf[0] = (char)unicode;
+						buf[1] = '\0';
+						luaOnInputString(gGame->L, buf);
+						return 0;
+						break;
+				}
+				break;
+			case AKEY_EVENT_ACTION_UP:
+				//Do nothing for now
+				break;
+			case AKEY_EVENT_ACTION_MULTIPLE:
+				//We dont care about this
+				break;
+			default:
+				return 0;
 		}
 	}
 
@@ -198,7 +219,6 @@ void create() {
 	gAppState.isFocused = false;
 	gAppState.hasSurface = false;
 	gAppState.wasStopped = false;
-
 }
 
 void start() {
@@ -436,8 +456,13 @@ void android_main(android_app* state) {
 			gameInitialize(context->GetScreenWidth(), context->GetScreenHeight());
 
 		if (gAppState.fullyActive())
+		{
+			//Android makes it hard to make good systems...
+			auto unicodeInput = platformGetInputBuffer();
+			if(strlen(unicodeInput) > 0)
+				luaOnInputString(gGame->L, unicodeInput);
 			gameStep(context);
-
+		}
 		fullyActive = gAppState.fullyActive();
 	}
 }

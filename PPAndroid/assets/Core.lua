@@ -412,6 +412,12 @@ RawInput = { }
 Input = { }
 Input.pointers = { }
 Input.released = { }
+Input.string   = ""
+
+function Input.clear()
+	Input.released = { }
+	Input.string   = ""
+end
 
 function Input.showKeyboard()
 	Input.keyboardVisible = true
@@ -471,6 +477,10 @@ function RawInput.onBackButton()
 	else
 		return true
 	end
+end
+
+function RawInput.onString(str)
+	Input.string = Input.string .. ffi.string(str)
 end
 
 Frame = ffi.typeof("Frame")

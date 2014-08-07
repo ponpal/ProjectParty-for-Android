@@ -168,46 +168,38 @@ uint32_t platformLanIP()
 	return result;
 }
 
-static char deviceName[128];
+static void callJNIReturnString(const char* str, char* result)
+{
+	auto env = gApp->activity->env;
+	auto vm = gApp->activity->vm;
+	auto obj = gApp->activity->clazz;
+
+	vm->AttachCurrentThread( &env, NULL );
+	auto clazz = env->GetObjectClass(obj);
+	jmethodID methodID = env->GetMethodID(clazz, str, "()[B");
+
+	auto array = (jbyteArray)env->CallObjectMethod(obj, methodID);
+	auto ptr   = env->GetByteArrayElements(array, 0);
+	int len   = env->GetArrayLength(array);
+
+	memcpy(result, ptr, len);
+	result[len] = '\0';
+
+	env->ReleaseByteArrayElements(array, ptr, JNI_ABORT);
+
+	vm->DetachCurrentThread();
+}
+
 const char* platformDeviceName()
 {
-	auto env = gApp->activity->env;
-	auto vm = gApp->activity->vm;
-	auto obj = gApp->activity->clazz;
-
-	vm->AttachCurrentThread( &env, NULL );
-	auto clazz = env->GetObjectClass(obj);
-	jmethodID methodID = env->GetMethodID(clazz, "getDeviceName", "()[B");
-
-	auto array = (jbyteArray)env->CallObjectMethod(obj, methodID);
-	auto ptr   = env->GetByteArrayElements(array, 0);
-	int len   = env->GetArrayLength(array);
-
-	memcpy(deviceName, ptr, len);
-	deviceName[len] = '\0';
-
-	vm->DetachCurrentThread();
+	static char deviceName[128];
+	callJNIReturnString("getDeviceName", deviceName);
 	return deviceName;
 }
-static char inputBuffer[64];
 const char* platformGetInputBuffer()
 {
-	auto env = gApp->activity->env;
-	auto vm = gApp->activity->vm;
-	auto obj = gApp->activity->clazz;
-
-	vm->AttachCurrentThread( &env, NULL );
-	auto clazz = env->GetObjectClass(obj);
-	jmethodID methodID = env->GetMethodID(clazz, "getInputBuffer", "()[B");
-
-	auto array = (jbyteArray)env->CallObjectMethod(obj, methodID);
-	auto ptr   = env->GetByteArrayElements(array, 0);
-	int len   = env->GetArrayLength(array);
-
-	memcpy(inputBuffer, ptr, len);
-	inputBuffer[len] = '\0';
-
-	vm->DetachCurrentThread();
+	static char inputBuffer[64];
+	callJNIReturnString("getInputBuffer", inputBuffer);
 	return inputBuffer;
 }
 

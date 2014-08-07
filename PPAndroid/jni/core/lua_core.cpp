@@ -123,6 +123,13 @@ static void callEmptyLuaFunction(lua_State* L, const char* buffer)
 	lua_xpcall(L, buffer, "empty");
 }
 
+static void callStringLuaFunction(lua_State* L, const char* str)
+{
+	auto buffer = (char*)alloca(strlen("RawInput.onString()") + strlen(str) + 1);
+	sprintf(buffer, "RawInput.onString(%s)", str);
+	lua_xpcall(L, buffer, "string");
+}
+
 
 void luaCoreDestroy(lua_State* L)
 {
@@ -239,3 +246,7 @@ void luaOnCancelCall(lua_State* L, uint32_t pointerID, float x, float y)
 	callIntFloat2LuaFunction(L, "RawInput.onCancel", pointerID, x, y);
 }
 
+void luaOnInputString(lua_State* L, const char* input)
+{
+	callStringLuaFunction(L, input);
+}
