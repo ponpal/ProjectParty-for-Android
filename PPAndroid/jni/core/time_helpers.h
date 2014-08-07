@@ -29,6 +29,9 @@ extern "C"
 	void clockResume(Clock* clock);
 	void clockStart(Clock* clock);
 	void clockStop(Clock* clock);
+
+	//Should only be used for sub second time measurement.
+	uint32_t timeRelativeClock(Clock* clock);
 }
 
 uint64_t timeNowMonoliticNsecs();

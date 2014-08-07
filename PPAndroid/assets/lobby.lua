@@ -48,7 +48,7 @@ end
 function Lobby:start()
 	renderer = CRenderer(256)
     font = resources:load(R.Fonts)
-    Screen.setOrientation(Orientation.portrait)
+    Screen.setOrientation(ORIENTATION_PORTRAIT)
 
     C.serviceFinderAsync("SERVER_DISCOVERY_SERVICE", C.servicePort, onServerFound, 500)
 
@@ -118,7 +118,7 @@ function Lobby:step()
 
 	gl.glClearColor(0.5,0.5,0.5,1)
     gl.glClear(gl.GL_COLOR_BUFFER_BIT)
-    gl.glViewport(0,0,C.gGame.screen.width,C.gGame.screen.height)
+    gl.glViewport(0,0,Screen.width,Screen.height)
     gl.glEnable(gl.GL_BLEND)
     gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA)
 	
@@ -138,7 +138,11 @@ function Lobby:step()
 	end
 
 
-	renderer:addText(font:find("consola"), msg, vec2(50, Screen.height - 100), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
+	renderer:addText(font:find("consola"), msg, vec2(50, 100), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
+	renderer:addText(font:find("consola"), msg, vec2(50, 200), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
+	renderer:addText(font:find("consola"), msg, vec2(50, 300), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
+	renderer:addText(font:find("consola"), msg, vec2(50, 400), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
+	renderer:addText(font:find("consola"), msg, vec2(50, 500), 0xFFFFFFFF, vec2(35, 40), vec2(0.4, 0.5))
 	renderer:draw()
 end
 

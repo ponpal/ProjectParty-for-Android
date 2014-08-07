@@ -19,11 +19,7 @@ end
 
 function RendMT:draw(matrix)
 	if not matrix then
-	    matrix = C.matrixOrthogonalProjection(0,C.gGame.screen.width,0,C.gGame.screen.height)
-	    if Screen.orientation == Orientation.portrait then
-		    matrix = C.matrixTranslate(matrix, C.gGame.screen.width, 0)
-		    matrix = C.matrixRotate(matrix, math.pi/2)
-		end
+	    matrix = C.matrixOrthogonalProjection(0,Screen.width,0,Screen.height)
 	end
 	
 	C.rendererSetTransform(self.cRenderer, matrix)

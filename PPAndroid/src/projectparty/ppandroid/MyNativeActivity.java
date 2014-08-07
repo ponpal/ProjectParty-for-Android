@@ -6,10 +6,12 @@ import java.nio.charset.Charset;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.view.KeyEvent;
 import android.view.WindowManager;
 
 public class MyNativeActivity extends android.app.NativeActivity 
@@ -26,6 +28,7 @@ public class MyNativeActivity extends android.app.NativeActivity
 		DhcpInfo dhcp = wm.getDhcpInfo();
 		
 		int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
+		if(broadcast == 0) return 0xC0A801FF;
 		ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.order(ByteOrder.BIG_ENDIAN);
 		buf.putInt(broadcast);
@@ -53,9 +56,38 @@ public class MyNativeActivity extends android.app.NativeActivity
 		return buf.getInt();
 	}
 	
-	static 
+	String inputBuffer;
+	
+	public byte[] getInputBuffer()
 	{
-		System.loadLibrary("mystery");
+		if(inputBuffer == null) return new byte[0];
+		
+		byte[] arr = inputBuffer.getBytes(Charset.forName("UTF-8"));
+		inputBuffer = null;
+		return arr;
+	}
+	
+	@Override
+	public boolean dispatchKeyEvent(KeyEvent event)
+	{
+		int code = event.getUnicodeChar();
+		int action = event.getAction();
+		if(code == 0 && action == KeyEvent.ACTION_MULTIPLE)
+		{
+			String s = event.getCharacters();
+			if(inputBuffer == null) inputBuffer = s;
+			else inputBuffer += s;
+		}
+		
+		return false;
+	}
+	
+	void setOrientation(int orientation)
+	{
+		if(orientation == 0)
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+		else
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);			
 	}
 	
 	@SuppressLint("NewApi")

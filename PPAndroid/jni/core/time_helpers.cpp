@@ -33,9 +33,15 @@ uint64_t timeTargetMonolitic(uint32_t msecs)
 	time *= 1000000;
 	time += timeNowMonoliticNsecs();
 	return time;
-
 }
 
+///Should only be used for < second time messurement.
+uint32_t timeRelativeClock(Clock* clock)
+{
+	uint64_t now = timeNowMonoliticNsecs();
+	uint64_t elapsed = now - clock->_lastTime;
+	return (uint32_t)elapsed;
+}
 
 void clockStart(Clock* clock)
 {

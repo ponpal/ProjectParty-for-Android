@@ -88,22 +88,28 @@ uint32_t frames = 0;
 uint64_t next_second = 0;
 int32_t sleep_offset = 0;
 void gameStep(ndk_helper::GLContext* context) {
-    clockStep(gGame->clock);
 
-    remoteDebugUpdate();
-    luaStepCall(gGame->L);
-    asyncOperationsProcess();
-    luaRunGarbageCollector(gGame->L, 3);
+	clockStep(gGame->clock);
+	remoteDebugUpdate();
+	luaStepCall(gGame->L);
+	asyncOperationsProcess();
+	luaRunGarbageCollector(gGame->L, 3);
+
 
     struct timespec time1, time2;
     time1.tv_sec = 0;
     time1.tv_nsec = target_frame - sleep_offset - timeNowMonoliticNsecs();
     auto should_sleep = target_frame - timeNowMonoliticNsecs();
     auto before = timeNowMonoliticNsecs();
-    nanosleep(&time1, &time2);
+
+	nanosleep(&time1, &time2);
+
     auto after = timeNowMonoliticNsecs();
     frames++;
-    context->Swap();
+
+   	context->Swap();
+
+
     target_frame = timeNowMonoliticNsecs() + 1000000000L/gGame->fps;
 
     if(next_second <= timeNowMonoliticNsecs())

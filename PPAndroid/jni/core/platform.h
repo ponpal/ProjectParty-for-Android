@@ -24,6 +24,10 @@ extern "C"
 
 
 	int platformVibrate(uint64_t milliseconds);
+	void platformDisplayKeyboard(bool pShow);
+	const char* platformGetInputBuffer();
+	void platformSetOrientation(int orientation);
+
 	uint32_t platformGetBroadcastAddress();
 	uint32_t platformLanIP();
 	const char* platformDeviceName();

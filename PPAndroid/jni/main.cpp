@@ -13,6 +13,48 @@
 
 ndk_helper::GLContext* context;
 
+int getUnicodeChar(struct android_app* app, int eventType, int keyCode, int metaState)
+{
+	JavaVM* javaVM = app->activity->vm;
+	JNIEnv* jniEnv = app->activity->env;
+
+	JavaVMAttachArgs attachArgs;
+	attachArgs.version = JNI_VERSION_1_6;
+	attachArgs.name = "NativeThread";
+	attachArgs.group = NULL;
+
+	jint result = javaVM->AttachCurrentThread(&jniEnv, &attachArgs);
+	if(result == JNI_ERR)
+	{
+		return 0;
+	}
+
+	jclass class_key_event = jniEnv->FindClass("android/view/KeyEvent");
+	int unicodeKey;
+
+	if(metaState == 0)
+	{
+		jmethodID method_get_unicode_char = jniEnv->GetMethodID(class_key_event, "getUnicodeChar", "()I");
+		jmethodID eventConstructor = jniEnv->GetMethodID(class_key_event, "<init>", "(II)V");
+		jobject eventObj = jniEnv->NewObject(class_key_event, eventConstructor, eventType, keyCode);
+
+		unicodeKey = jniEnv->CallIntMethod(eventObj, method_get_unicode_char);
+	}
+	else
+	{
+		jmethodID method_get_unicode_char = jniEnv->GetMethodID(class_key_event, "getUnicodeChar", "(I)I");
+		jmethodID eventConstructor = jniEnv->GetMethodID(class_key_event, "<init>", "(II)V");
+		jobject eventObj = jniEnv->NewObject(class_key_event, eventConstructor, eventType, keyCode);
+
+		unicodeKey = jniEnv->CallIntMethod(eventObj, method_get_unicode_char, metaState);
+	}
+
+	javaVM->DetachCurrentThread();
+
+	return unicodeKey;
+}
+
+
 static int32_t handle_input(android_app* app, AInputEvent* event) {
 	if(!gGame)
 		return 0;
@@ -79,11 +121,13 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 	} else if (type == AINPUT_EVENT_TYPE_KEY) {
 		auto code = AKeyEvent_getKeyCode(event);
 		RLOGI("Received key event: %d", code);
+
 		switch(code) {
             case AKEYCODE_MENU:
             	return luaMenuCall(gGame->L);
                 break;
             case AKEYCODE_BACK:
+            	RLOGI("BACK KEY PRESSED %s", "");
             	return luaBackCall(gGame->L);
                 break;
             default:
@@ -236,6 +280,8 @@ void surfaceChanged() {
 	if (gameInitialized()) {
         gGame->screen->width = context->GetScreenWidth();
         gGame->screen->height = context->GetScreenHeight();
+		RLOGI("Updating game screen width and height %d %d", gGame->screen->width,
+			  gGame->screen->height);
 	}
 }
 }
@@ -324,12 +370,37 @@ void sighandler(int signum)
 	exit(-1);
 }
 
+
+static void process_input( struct android_app* app, struct android_poll_source* source) {
+    AInputEvent* event = NULL;
+    if (AInputQueue_getEvent(app->inputQueue, &event) >= 0) {
+        int type = AInputEvent_getType(event);
+        //LOGV("New input event: type=%d\n", AInputEvent_getType(event));
+
+        bool skip_predispatch
+              =  AInputEvent_getType(event)  == AINPUT_EVENT_TYPE_KEY
+              && AKeyEvent_getKeyCode(event) == AKEYCODE_BACK;
+
+        // skip predispatch (all it does is send to the IME)
+        if (!skip_predispatch && AInputQueue_preDispatchEvent(app->inputQueue, event)) {
+            return;
+        }
+
+        int32_t handled = 0;
+        if (app->onInputEvent != NULL) handled = app->onInputEvent(app, event);
+        AInputQueue_finishEvent(app->inputQueue, event, handled);
+    } else {
+        LOGE("Failure reading next input event: %s\n", strerror(errno));
+    }
+}
+
+
 void android_main(android_app* state) {
 	app_dummy();
+	state->inputPollSource.process = &process_input;
 
     signal(SIGSEGV, sighandler);
     signal(SIGFPE, 	sighandler);
-
 
     state->onAppCmd = &handle_cmd;
 	state->onInputEvent = &handle_input;
@@ -345,10 +416,9 @@ void android_main(android_app* state) {
 	while (true) {
 		int ident, fdesc, events;
 		android_poll_source* source;
-
 		while (true)
 		{
-			ident = ALooper_pollOnce(1, &fdesc, &events, (void**) &source);
+        	ident = ALooper_pollOnce(1, &fdesc, &events, (void**) &source);
 			if(ident <= 0)
 				break;
 			if (source)
@@ -367,7 +437,6 @@ void android_main(android_app* state) {
 
 		if (gAppState.fullyActive())
 			gameStep(context);
-
 
 		fullyActive = gAppState.fullyActive();
 	}

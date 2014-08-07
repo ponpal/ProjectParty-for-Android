@@ -162,7 +162,7 @@ static int asyncFindService(AsyncFindContext* context)
 	{
 		if(errno != EWOULDBLOCK && errno != EAGAIN) {
 			RLOGE("Failed to send data: Error %d %s", errno, strerror(errno));
-			context->handler(nullptr, false); //Failed!
+			context->handler(0, false); //Failed!
 			result = ASYNC_OPERATION_FAILURE;
 		}
 
@@ -196,11 +196,10 @@ static int asyncFindService(AsyncFindContext* context)
 	return result;
 }
 
-
 void serviceFinderAsync(const char* serviceID, uint16_t port, foundService function, uint32_t queryInterval)
 {
 	auto data   = new AsyncFindContext;
-	data->finder = serviceFinderCreate(serviceID, port, nullptr);
+	data->finder = serviceFinderCreate(serviceID, port, 0);
 	data->handler = function;
 	data->interval = queryInterval;
 	data->target   = timeTargetMonolitic(queryInterval);

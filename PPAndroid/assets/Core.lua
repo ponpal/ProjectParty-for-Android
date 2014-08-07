@@ -5,7 +5,6 @@ ffi.cdef[[
 	// ----------------------------
 	//  	types.h
 	// ----------------------------
-
 	typedef struct { float x; float y; } vec2f;
 	typedef struct { float x; float y; float z; } vec3f;
 	typedef struct { float x; float y; float z; float w; } vec4f;
@@ -195,7 +194,14 @@ ffi.cdef[[
 		uint32_t length;
 	} Resource;
 
+	static const int ORIENTATION_PORTRAIT  = 0;
+	static const int ORIENTATION_LANDSCAPE = 1;
+
 	int platformVibrate(uint64_t milliseconds);
+	void platformDisplayKeyboard(bool pShow);
+	const char* platformGetInputBuffer();
+	void platformSetOrientation(int orientation);
+
 	uint32_t platformGetBroadcastAddress();
 	uint32_t platformLanIP();
 	const char* platformDeviceName();
@@ -257,6 +263,8 @@ ffi.cdef[[
 		uint64_t _totalTime, _lastTime, _elapsedTime;
 		bool _isPaused, _isStopped;
 	} Clock;
+
+	uint32_t timeRelativeClock(Clock* clock);
 
 	float clockElapsed(Clock* clock);
 	float clockTotal(Clock* clock);
@@ -363,14 +371,13 @@ function vibrate(milliseconds)
 	return C.vibrate(milliseconds)
 end
 
-Orientation = {}
-Orientation.landscape = 0
-Orientation.portrait  = 1
+ORIENTATION_LANDSCAPE = C.ORIENTATION_LANDSCAPE
+ORIENTATION_PORTRAIT  = C.ORIENTATION_PORTRAIT
+
 
 Sensors = C.gGame.sensor
 Screen  = 
 { 
-	orientation = Orientation.landscape,
 	width  = C.gGame.screen.width,
 	height = C.gGame.screen.height
 }
@@ -383,41 +390,70 @@ end
 
 
 function Screen.setOrientation(orientation)
-	if orientation == Orientation.portrait then
-		Screen.width  = C.gGame.screen.height
-		Screen.height = C.gGame.screen.width
-	else
-		Screen.width  = C.gGame.screen.width
-		Screen.height = C.gGame.screen.height
+	C.platformSetOrientation(orientation)
+
+	local screen = C.gGame.screen
+	local max = math.max(screen.width, screen.height)
+	local min = math.min(screen.width, screen.height)
+
+	if orientation == ORIENTATION_PORTRAIT then 
+		Screen.width  = min
+		Screen.height = max
+	else 
+		Screen.width  = max
+		Screen.height = min
 	end
+
 	Screen.orientation = orientation
 end
 
 
 RawInput = { }
 Input = { }
+Input.pointers = { }
+Input.released = { }
+
+function Input.showKeyboard()
+	Input.keyboardVisible = true
+	C.platformDisplayKeyboard(true)
+end
+
+function Input.hideKeyboard()
+	Input.keyboardVisible = false
+	C.platformDisplayKeyboard(false)
+end
+
 
 local function transformInput(x,y)
-	if Screen.orientation == Orientation.portrait then
-		return Screen.width - y, Screen.height - x
-	else
 		return x, Screen.height-y
-	end
 end
 
 function RawInput.onMove(pointerID, x, y)
-	Input.onMove(pointerID, transformInput(x,y))
+	local tx, ty = transformInput(x,y)
+	Input.pointers[pointerID].pos = vec2(tx,ty)
+	Input.onMove(pointerID, tx, ty)
 end
 
 function RawInput.onUp(pointerID, x, y)
-	Input.onUp(pointerID, transformInput(x,y))
+	local tx, ty = transformInput(x,y)
+	Input.released[pointerID] = Input.pointers[pointerID]
+	Input.released[pointerID].pos = vec2(tx,ty)
+	Input.pointers[pointerID] = nil
+
+	Input.onUp(pointerID, tx, ty)
 end
 
 function RawInput.onDown(pointerID, x, y)
-	Input.onDown(pointerID, transformInput(x,y))
+	local tx, ty = transformInput(x,y)
+	Input.pointers[pointerID] = { down = vec2(tx,ty), pos = vec2(tx,ty) }
+	
+	Input.onDown(pointerID, tx, ty)
 end
 
 function RawInput.onCancel(pointerID, x, y)
+	Input.pointers = { }
+	Input.released = { }
+
 	Input.onCancel(pointerID, transformInput(x,y))
 end
 
@@ -459,9 +495,7 @@ local vec2_MT =
 			end
 }
 
-
 vec2 = ffi.metatype("vec2f", vec2_MT)
-
 
 local font_MT = {}
 font_MT.__index = font_MT;
@@ -603,12 +637,11 @@ function serialize(sink, t, name)
 	return sink
 end 
 
-function File.saveRandomTable(t)
-	local num = math.random(0, 0xFFFFFFFFFFFF)
-	local str = tostring(num)
-	local hash = C.bytesHash(str, #str, 0)
-	local result = tostring(hash) .. ".luac"
+File.tempCount = 0
+function File.saveTempTable(t)
+	local result = string.format("%d__TEMP__.luad", File.tempCount)
 	File.saveTable(t, result)
+	File.tempCount = File.tempCount + 1
 	return result
 end
 
@@ -667,7 +700,7 @@ function runExternalFile(path, chunkName)
 	C.platformUnloadResource(resource)
 
 	if not func then 
-		error(string.format("Failed to load external file! %s %s", path, chunkName))
+		error(string.format("Failed to load external file! %s", err))
 	else 
 		return func()
 	end 

@@ -72,9 +72,8 @@ void loadLuaScripts(lua_State* L, const char* scriptsDirectory)
 void luaRunGarbageCollector(lua_State* L, int milisecs)
 {
 	uint64_t nsecs = milisecs * 1000000L;
-
-	auto now = timeNowMonoliticNsecs();
-	while(timeNowMonoliticNsecs() - now < nsecs)
+	auto target = timeTargetMonolitic(milisecs);
+	while(target > timeNowMonoliticNsecs())
 		if(lua_gc(L, LUA_GCSTEP, 0)) break;
 }
 
