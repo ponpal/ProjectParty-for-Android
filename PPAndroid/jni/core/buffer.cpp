@@ -54,6 +54,13 @@ bool bufferCheckError(Buffer* buffer)
 
 uint32_t bufferBytesRemaining(Buffer* buffer)
 {
+	if(buffer == nullptr)
+	{
+		//Without this the jit compiler segfaults sometimes...
+		RLOGE("Buffer is null!","");
+		return 0;
+	}
+
 	return buffer->length - (buffer->ptr - buffer->base);
 }
 

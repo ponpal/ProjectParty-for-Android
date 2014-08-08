@@ -9,6 +9,7 @@
 #include "platform.h"
 #include "dirent.h"
 #include "lua.hpp"
+#include "lualib.h"
 #include "remote_debug.h"
 
 lua_State* luaCoreCreate()
@@ -90,9 +91,18 @@ static void luaSetPaused(lua_State* L, bool value)
 	{
 		RLOGI("INVALID STACK! %d %d", top, lua_gettop(L));
 	}
-
 }
 
+void luaStackDump(lua_State *L) {
+	int i;
+	int top = lua_gettop(L);
+	RLOGI("LUA stack dump! Size: %d", top);
+
+	lua_getglobal(L, "crashTraceback");
+	lua_call(L,0,0);
+
+	RLOGI("%s","\n");  /* end the listing */
+}
 
 static void lua_xpcall(lua_State* L, const char* buffer, const char* id)
 {
@@ -125,8 +135,8 @@ static void callEmptyLuaFunction(lua_State* L, const char* buffer)
 
 static void callStringLuaFunction(lua_State* L, const char* str)
 {
-	auto buffer = (char*)alloca(strlen("RawInput.onString()") + strlen(str) + 1);
-	sprintf(buffer, "RawInput.onString(%s)", str);
+	char buffer[128];
+	snprintf(buffer, 128, "RawInput.onString(\"%s\")", str);
 	lua_xpcall(L, buffer, "string");
 }
 

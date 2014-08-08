@@ -407,6 +407,47 @@ function Screen.setOrientation(orientation)
 	Screen.orientation = orientation
 end
 
+function crashTraceback()
+  local level = 2
+  local reg = debug.getregistry()
+  Log.infof("Reg %s", debug.getregistry());
+  for k, v in pairs(reg) do 
+  	Log.infof("Key: %s Value: %s", k, v)
+  end
+
+
+  while true do
+    local info = debug.getinfo(level)
+    if not info then break end
+    Log.infof("name: %s namewhat: %s currline: %d short_src: %s what: %s nups: %s",
+    		   info.name, 
+    		   info.namewhat, 
+    		   info.currentline, 
+    		   info.short_src,
+    		   info.what,
+    		   info.nups)
+
+    local locals = 1
+    while true do
+    	local name, val = debug.getlocal(level, locals) 
+    	if not name then break end
+    	Log.warnf("Local %d name: %s type: %s value: %s ", locals, name, type(val), val)
+    	locals = locals + 1
+    end
+
+    local upval = 1
+    while info.func do
+    	local name, val = debug.getupvalue(info.func, upval)
+		if not name then break end
+		Log.errorf("\tUpval: %s %s", name, val)
+		upval = upval + 1
+    end
+
+    level = level + 1
+  end
+end
+
+
 
 RawInput = { }
 Input = { }
@@ -695,7 +736,7 @@ function runInternalFile(path, chunkName)
 	C.platformUnloadResource(resource)
 
 	if not func then 
-		error(string.format("Failed to load external file! %s %s", path, chunkName))
+		error(string.format("Failed to load external file! %s ", err))
 	else 
 		return func()
 	end 
@@ -762,6 +803,8 @@ global = { }
 setmetatable(global, GlobalMT)
 
 do
+	jit.on(true, true)
+
 	GLOBAL_lock(_G)
 	runInternalFile("Type.lua")
 	runInternalFile("R.lua")
@@ -771,4 +814,6 @@ do
 	runInternalFile("renderer.lua")
 	runInternalFile("lobby.lua")
 	runInternalFile("reloading.lua")
+
+	--jit.flush(true, true)
 end

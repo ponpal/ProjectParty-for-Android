@@ -135,6 +135,8 @@ static int32_t handle_input(android_app* app, AInputEvent* event) {
 					case AKEYCODE_UNKNOWN:
 						return 0;
 					default:
+						RLOGI("Pressed code %d", code);
+
 						//This can only be ascci due to android NDK being horribly broken!
 						int unicode = getUnicodeChar(gApp, action, code, AKeyEvent_getMetaState(event));
 						char buf[2];
@@ -382,14 +384,36 @@ void sighandler(int signum)
 			break;
 	}
 
-
-
+	luaStackDump(gGame->L);
 	gameStop();
 	RLOGE("%s", "Exiting application");
 	sleep(1);
 	exit(-1);
 }
 
+static void handler_action(int sig, siginfo_t* si, void* unused)
+{
+	RLOGE("SIGSEGV at 0x%x", si->si_addr);
+	if(si->si_code == SEGV_MAPERR)
+		RLOGE("SIGSEGV unmapped address!","");
+	else if(si->si_code == SEGV_ACCERR)
+		RLOGE("SIGSEGV invalid access premissions!", "");
+	if(si->si_errno != 0)
+		RLOGE("SIGSEGV Error: %s", strerror(si->si_errno));
+
+	sighandler(sig);
+    signal(SIGFPE, 	sighandler);
+}
+
+
+static void initializeSignals()
+{
+	struct sigaction sa;
+	sa.sa_flags = SA_SIGINFO;
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = handler_action;
+	sigaction(SIGSEGV, &sa, 0);
+}
 
 static void process_input( struct android_app* app, struct android_poll_source* source) {
     AInputEvent* event = NULL;
@@ -419,8 +443,7 @@ void android_main(android_app* state) {
 	app_dummy();
 	state->inputPollSource.process = &process_input;
 
-    signal(SIGSEGV, sighandler);
-    signal(SIGFPE, 	sighandler);
+	initializeSignals();
 
     state->onAppCmd = &handle_cmd;
 	state->onInputEvent = &handle_input;
@@ -430,6 +453,7 @@ void android_main(android_app* state) {
 	initializeFileSystem();
 	initSensors();
 	lifecycle::create();
+
 
 
 	bool fullyActive = false;
@@ -462,6 +486,7 @@ void android_main(android_app* state) {
 			if(strlen(unicodeInput) > 0)
 				luaOnInputString(gGame->L, unicodeInput);
 			gameStep(context);
+
 		}
 		fullyActive = gAppState.fullyActive();
 	}

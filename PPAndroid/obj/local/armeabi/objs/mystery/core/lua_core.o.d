@@ -116,7 +116,8 @@ obj/local/armeabi/objs/mystery/core/lua_core.o: jni/core/lua_core.cpp \
  C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/EGL/eglplatform.h \
  jni/core/new_renderer.h jni/core/font.h jni/lua/luajit.h jni/core/path.h \
  jni/core/platform.h \
- C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h
+ C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h \
+ jni/lua/lualib.h
 
 jni/core/lua_core.h:
 
@@ -465,3 +466,5 @@ jni/core/path.h:
 jni/core/platform.h:
 
 C:/Android/android-ndk-r9d/platforms/android-19/arch-arm/usr/include/dirent.h:
+
+jni/lua/lualib.h:

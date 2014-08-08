@@ -1,6 +1,21 @@
 
 local bufferMT = { }
-bufferMT.__index = bufferMT;
+bufferMT.__index = bufferMT
+
+function bufferMT.__tostring(self)
+	local loc  = tonumber(ffi.cast("int32_t", self))
+	local ptr  = tonumber(ffi.cast("int32_t", self.ptr))
+	local base = tonumber(ffi.cast("int32_t", self.base)) 
+	local len  = self.length
+	local cap  = self.capacity
+
+
+	local used = ptr - base
+	local left = len - used
+
+	return string.format("\n\tBuffer %s\n\tLength: %d\n\t Capacity: %d\n\t Pointer: %s\n\t Base: %s Used %s Left %s",
+						  loc, len, cap, ptr, base, used, left) 
+end
 
 function bufferMT:remaining()
 	local rem = C.bufferBytesRemaining(self)

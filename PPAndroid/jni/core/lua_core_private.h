@@ -34,7 +34,7 @@ void luaOnDownCall(lua_State* L, uint32_t pointerID, float x, float y);
 void luaOnMoveCall(lua_State* L, uint32_t pointerID, float x, float y);
 void luaOnCancelCall(lua_State* L, uint32_t pointerID, float x, float y);
 void luaOnInputString(lua_State* L, const char* input);
-
+void luaStackDump(lua_State* L);
 #endif /* LUA_CORE_PRIVATE_H_ */
 
 

@@ -67,20 +67,20 @@ public class MyNativeActivity extends android.app.NativeActivity
 		return arr;
 	}
 	
-	@Override
-	public boolean dispatchKeyEvent(KeyEvent event)
-	{
-		int code = event.getUnicodeChar();
-		int action = event.getAction();
-		if(code == 0 && action == KeyEvent.ACTION_MULTIPLE)
-		{
-			String s = event.getCharacters();
-			if(inputBuffer == null) inputBuffer = s;
-			else inputBuffer += s;
-		}
-		
-		return false;
-	}
+	//@Override
+	//public boolean dispatchKeyEvent(KeyEvent event)
+	//{
+	//	int code = event.getUnicodeChar();
+	//	int action = event.getAction();
+	//	if(code == 0 && action == KeyEvent.ACTION_MULTIPLE)
+	//	{
+	//		String s = event.getCharacters();
+	//		if(inputBuffer == null) inputBuffer = s;
+	//		else inputBuffer += s;
+	//	}
+	//	
+	//	return true;
+	//}
 	
 	void setOrientation(int orientation)
 	{
